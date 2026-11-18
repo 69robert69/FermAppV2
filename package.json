@@ -1,0 +1,24 @@
+{
+  "name": "fermapp",
+  "private": true,
+  "version": "1.0.0",
+  "description": "Platformă de management agricol: parcele, culturi, lucrări, irigații, meteo, sol, satelit și AI.",
+  "workspaces": [
+    "packages/*",
+    "apps/*"
+  ],
+  "engines": {
+    "node": ">=22"
+  },
+  "scripts": {
+    "dev:api": "npm run dev -w @fermapp/api",
+    "dev:mobile": "npm run start -w @fermapp/mobile",
+    "build:api": "npm run build -w @fermapp/api",
+    "test": "npm run test -w @fermapp/domain && npm run test -w @fermapp/api",
+    "typecheck": "npm run typecheck -w @fermapp/domain && npm run typecheck -w @fermapp/api && npm run typecheck -w @fermapp/mobile",
+    "db:generate": "npm run db:generate -w @fermapp/api",
+    "db:migrate": "npm run db:migrate -w @fermapp/api",
+    "db:seed": "npm run db:seed -w @fermapp/api",
+    "docs:api": "npm run docs:api -w @fermapp/api"
+  }
+}

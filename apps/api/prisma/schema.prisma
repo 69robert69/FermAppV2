@@ -1,0 +1,697 @@
+generator client {
+  provider      = "prisma-client-js"
+  binaryTargets = ["native", "linux-musl-openssl-3.0.x", "debian-openssl-3.0.x"]
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum Role {
+  ADMIN
+  FARM_MANAGER
+  OPERATOR
+  AGRONOMIST
+}
+
+enum CropCode {
+  WHEAT
+  BARLEY
+  CORN
+  SUNFLOWER
+  RAPESEED
+  SOY
+  ALFALFA
+  OAT
+  POTATO
+  BEET
+  VEGETABLES
+}
+
+enum MachineType {
+  TRACTOR
+  COMBINE
+  SPRAYER
+  SEEDER
+  DISC
+  CULTIVATOR
+  SUBSOILER
+  TRAILER
+}
+
+enum WorkType {
+  PLOWING
+  DISCING
+  SUBSOILING
+  SOWING
+  FERTILIZING
+  SPRAYING
+  HARVESTING
+}
+
+enum RunStatus {
+  RUNNING
+  PAUSED
+  COMPLETED
+  CANCELLED
+}
+
+enum TaskType {
+  FERTILIZATION
+  HERBICIDE
+  FUNGICIDE
+  INSECTICIDE
+  PEST_CHECK
+  DISEASE_CHECK
+  MOISTURE_CHECK
+  LEAF_ANALYSIS
+  HARVEST
+  SOIL_PREP
+  SEED_PURCHASE
+  SOWING
+  EMERGENCE_CHECK
+  HARVEST_PREP
+}
+
+enum TaskPriority {
+  LOW
+  MEDIUM
+  HIGH
+  URGENT
+}
+
+enum TaskStatus {
+  TODO
+  IN_PROGRESS
+  DONE
+}
+
+enum IrrigationSystemType {
+  REEL
+  PIVOT
+  LINEAR
+}
+
+enum SoilStatus {
+  PENDING
+  READY
+  FAILED
+}
+
+enum AlertType {
+  RAIN
+  STORM
+  HAIL
+  FROST
+  HEAT
+  WIND_SPRAYING
+}
+
+enum AlertSeverity {
+  INFO
+  WARNING
+  SEVERE
+}
+
+enum CostCategory {
+  SEED
+  FERTILIZER
+  PESTICIDE
+  FUEL
+  LABOR
+  IRRIGATION
+  OTHER
+}
+
+enum AiRole {
+  USER
+  ASSISTANT
+}
+
+enum IotDeviceKind {
+  WEATHER_STATION
+  SOIL_MOISTURE
+  SOIL_TEMPERATURE
+  CONDUCTIVITY
+  FLOW_METER
+  TANK_LEVEL
+}
+
+enum IotProtocol {
+  MQTT
+  REST
+  WEBSOCKET
+}
+
+model Farm {
+  id        String   @id @default(uuid()) @db.Uuid
+  name      String
+  county    String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  members       FarmMembership[]
+  parcels       Parcel[]
+  machines      Machine[]
+  workSessions  WorkSession[]
+  tasks         Task[]
+  irrigation    IrrigationRun[]
+  alerts        WeatherAlert[]
+  costs         CostEntry[]
+  conversations AiConversation[]
+  iotDevices    IotDevice[]
+  notifications Notification[]
+}
+
+model User {
+  id           String   @id @default(uuid()) @db.Uuid
+  email        String   @unique
+  fullName     String
+  passwordHash String
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  memberships   FarmMembership[]
+  refreshTokens RefreshToken[]
+  pushDevices   PushDevice[]
+  workSessions  WorkSession[]    @relation("WorkOperator")
+  assignedTasks Task[]           @relation("TaskAssignee")
+  machines      Machine[]        @relation("MachineOperator")
+  conversations AiConversation[]
+  notifications Notification[]
+  observations  Observation[]    @relation("ObservationAuthor")
+  photos        Photo[]          @relation("PhotoAuthor")
+}
+
+model FarmMembership {
+  id        String   @id @default(uuid()) @db.Uuid
+  farmId    String   @db.Uuid
+  userId    String   @db.Uuid
+  role      Role
+  createdAt DateTime @default(now())
+
+  farm Farm @relation(fields: [farmId], references: [id], onDelete: Cascade)
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([farmId, userId])
+  @@index([userId])
+}
+
+model RefreshToken {
+  id        String    @id @default(uuid()) @db.Uuid
+  userId    String    @db.Uuid
+  farmId    String    @db.Uuid
+  tokenHash String    @unique
+  familyId  String    @db.Uuid
+  expiresAt DateTime
+  revokedAt DateTime?
+  createdAt DateTime  @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([familyId])
+}
+
+model PushDevice {
+  id        String   @id @default(uuid()) @db.Uuid
+  userId    String   @db.Uuid
+  token     String   @unique
+  platform  String?
+  updatedAt DateTime @updatedAt
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+}
+
+model IdempotencyRecord {
+  id         String   @id @default(uuid()) @db.Uuid
+  userId     String   @db.Uuid
+  key        String
+  route      String
+  statusCode Int      @default(0)
+  response   Json?
+  createdAt  DateTime @default(now())
+
+  @@unique([userId, key])
+  @@index([createdAt])
+}
+
+model Parcel {
+  id         String    @id @default(uuid()) @db.Uuid
+  farmId     String    @db.Uuid
+  name       String
+  code       String
+  /// Poligon GeoJSON în WGS84.
+  geometry   Json
+  areaHa     Float
+  perimeterM Float
+  centerLat  Float
+  centerLng  Float
+  locality   String?
+  county     String?
+  notes      String?
+  /// Suprafața echipată pentru irigații, în hectare.
+  irrigatedAreaHa Float?
+  /// Ultima cultură declarată la configurare: un cod de cultură sau OTHER.
+  lastCrop    String?
+  plannedCrop CropCode?
+  archivedAt DateTime?
+  createdAt  DateTime  @default(now())
+  updatedAt  DateTime  @updatedAt
+
+  farm         Farm                  @relation(fields: [farmId], references: [id], onDelete: Cascade)
+  seasons      CropSeason[]
+  soilProfile  SoilProfile?
+  workSessions WorkSession[]
+  tasks        Task[]
+  irrigation   IrrigationRun[]
+  alerts       WeatherAlert[]
+  satellite    SatelliteObservation[]
+  costs        CostEntry[]
+  iotDevices   IotDevice[]
+  recommendations CropRecommendation[]
+  weatherData  WeatherData[]
+  observations Observation[]
+  photos       Photo[]
+  incomes      Income[]
+  plans        ParcelPlan[]
+
+  @@unique([farmId, code])
+  @@index([farmId, archivedAt])
+  @@index([farmId, updatedAt])
+}
+
+model CropSeason {
+  id                String    @id @default(uuid()) @db.Uuid
+  parcelId          String    @db.Uuid
+  year              Int
+  crop              CropCode
+  sowingDate        DateTime?
+  expectedHarvestDate DateTime?
+  harvestDate       DateTime?
+  /// Producția totală a parcelei, în tone.
+  yieldT            Float?
+  harvestMoisture   Float?
+  expectedYieldTHa  Float?
+  expectedPricePerT Decimal?  @db.Decimal(12, 2)
+  actualPricePerT   Decimal?  @db.Decimal(12, 2)
+  notes             String?
+  createdAt         DateTime  @default(now())
+  updatedAt         DateTime  @updatedAt
+
+  parcel Parcel @relation(fields: [parcelId], references: [id], onDelete: Cascade)
+
+  @@unique([parcelId, year])
+  @@index([parcelId, year(sort: Desc)])
+}
+
+/// Planul tehnologic al unui an agricol. Versiunile vechi rămân în istoricul parcelei.
+model ParcelPlan {
+  id        String   @id @default(uuid()) @db.Uuid
+  parcelId  String   @db.Uuid
+  year      Int
+  crop      CropCode
+  active    Boolean  @default(true)
+  /// WIZARD sau CROP_CHANGED.
+  trigger   String
+  data      Json
+  createdAt DateTime @default(now())
+
+  parcel Parcel @relation(fields: [parcelId], references: [id], onDelete: Cascade)
+  tasks  Task[]
+
+  @@index([parcelId, active, year])
+  @@index([parcelId, createdAt(sort: Desc)])
+}
+
+model SoilProfile {
+  id                 String     @id @default(uuid()) @db.Uuid
+  parcelId           String     @unique @db.Uuid
+  status             SoilStatus @default(PENDING)
+  ph                 Float?
+  clayPct            Float?
+  sandPct            Float?
+  siltPct            Float?
+  organicCarbonGKg   Float?
+  organicMatterPct   Float?
+  waterHoldingMmPerM Float?
+  texture            String?
+  soilType           String?
+  label              String?
+  errorMessage       String?
+  fetchedAt          DateTime?
+  updatedAt          DateTime   @updatedAt
+
+  parcel Parcel @relation(fields: [parcelId], references: [id], onDelete: Cascade)
+}
+
+model Machine {
+  id               String      @id @default(uuid()) @db.Uuid
+  farmId           String      @db.Uuid
+  name             String
+  type             MachineType
+  brand            String?
+  model            String?
+  powerHp          Float?
+  /// Consum mediu, în litri pe oră.
+  avgConsumptionLh Float?
+  operatorId       String?     @db.Uuid
+  archivedAt       DateTime?
+  createdAt        DateTime    @default(now())
+  updatedAt        DateTime    @updatedAt
+
+  farm         Farm          @relation(fields: [farmId], references: [id], onDelete: Cascade)
+  operator     User?         @relation("MachineOperator", fields: [operatorId], references: [id], onDelete: SetNull)
+  workSessions WorkSession[]
+  locations    MachineLocation[]
+
+  @@index([farmId])
+}
+
+model MachineLocation {
+  id            BigInt   @id @default(autoincrement())
+  workSessionId String   @db.Uuid
+  machineId     String?  @db.Uuid
+  lat           Float
+  lng           Float
+  headingDeg    Float?
+  speedKmh      Float?
+  accuracyM     Float?
+  recordedAt    DateTime @default(now())
+
+  workSession WorkSession @relation(fields: [workSessionId], references: [id], onDelete: Cascade)
+  machine     Machine?    @relation(fields: [machineId], references: [id], onDelete: SetNull)
+
+  @@index([workSessionId, recordedAt(sort: Desc)])
+  @@index([recordedAt])
+}
+
+model CropRecommendation {
+  id        String   @id @default(uuid()) @db.Uuid
+  parcelId  String   @db.Uuid
+  year      Int
+  crop      CropCode
+  score     Int
+  reasons   Json
+  createdAt DateTime @default(now())
+
+  parcel Parcel @relation(fields: [parcelId], references: [id], onDelete: Cascade)
+
+  @@unique([parcelId, year, crop])
+}
+
+model WeatherData {
+  id              String   @id @default(uuid()) @db.Uuid
+  parcelId        String   @db.Uuid
+  date            DateTime @db.Date
+  tMaxC           Float
+  tMinC           Float
+  precipitationMm Float
+  humidityPct     Float?
+  windMaxKmh      Float?
+  et0Mm           Float?
+  source          String   @default("open-meteo")
+  updatedAt       DateTime @updatedAt
+
+  parcel Parcel @relation(fields: [parcelId], references: [id], onDelete: Cascade)
+
+  @@unique([parcelId, date])
+}
+
+model Observation {
+  id        String   @id @default(uuid()) @db.Uuid
+  parcelId  String   @db.Uuid
+  authorId  String   @db.Uuid
+  text      String
+  lat       Float?
+  lng       Float?
+  createdAt DateTime @default(now())
+
+  parcel Parcel  @relation(fields: [parcelId], references: [id], onDelete: Cascade)
+  author User    @relation("ObservationAuthor", fields: [authorId], references: [id], onDelete: Cascade)
+  photos Photo[]
+
+  @@index([parcelId, createdAt(sort: Desc)])
+}
+
+model Photo {
+  id            String   @id @default(uuid()) @db.Uuid
+  parcelId      String   @db.Uuid
+  observationId String?  @db.Uuid
+  authorId      String   @db.Uuid
+  storageKey    String   @unique
+  contentType   String
+  sizeBytes     Int
+  notes         String?
+  createdAt     DateTime @default(now())
+
+  parcel      Parcel       @relation(fields: [parcelId], references: [id], onDelete: Cascade)
+  observation Observation? @relation(fields: [observationId], references: [id], onDelete: SetNull)
+  author      User         @relation("PhotoAuthor", fields: [authorId], references: [id], onDelete: Cascade)
+
+  @@index([parcelId, createdAt(sort: Desc)])
+}
+
+model Income {
+  id        String   @id @default(uuid()) @db.Uuid
+  parcelId  String   @db.Uuid
+  year      Int
+  amount    Decimal  @db.Decimal(12, 2)
+  currency  String   @default("RON")
+  source    String?
+  date      DateTime @default(now())
+  createdAt DateTime @default(now())
+
+  parcel Parcel @relation(fields: [parcelId], references: [id], onDelete: Cascade)
+
+  @@index([parcelId, year])
+}
+
+model WorkSession {
+  id            String    @id @default(uuid()) @db.Uuid
+  farmId        String    @db.Uuid
+  parcelId      String    @db.Uuid
+  machineId     String?   @db.Uuid
+  operatorId    String    @db.Uuid
+  type          WorkType
+  areaHa        Float
+  workingWidthM Float
+  speedKmh      Float
+  efficiencyPct Float
+  capacityHaH   Float
+  durationHours Float
+  status        RunStatus @default(RUNNING)
+  startedAt     DateTime  @default(now())
+  pausedAt      DateTime?
+  pausedMs      BigInt    @default(0)
+  completedAt   DateTime?
+  progressPct   Float     @default(0)
+  fuelLiters    Float?
+  notes         String?
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+
+  farm     Farm     @relation(fields: [farmId], references: [id], onDelete: Cascade)
+  parcel   Parcel   @relation(fields: [parcelId], references: [id], onDelete: Cascade)
+  machine  Machine? @relation(fields: [machineId], references: [id], onDelete: SetNull)
+  operator User     @relation("WorkOperator", fields: [operatorId], references: [id], onDelete: Restrict)
+  locations MachineLocation[]
+
+  @@index([farmId, status])
+  @@index([farmId, startedAt(sort: Desc)])
+  @@index([parcelId])
+}
+
+model Task {
+  id             String       @id @default(uuid()) @db.Uuid
+  farmId         String       @db.Uuid
+  parcelId       String?      @db.Uuid
+  assigneeId     String?      @db.Uuid
+  planId         String?      @db.Uuid
+  planStepKey    String?
+  type           TaskType
+  title          String
+  description    String?
+  priority       TaskPriority @default(MEDIUM)
+  status         TaskStatus   @default(TODO)
+  dueDate        DateTime
+  reminderSentAt DateTime?
+  completedAt    DateTime?
+  createdAt      DateTime     @default(now())
+  updatedAt      DateTime     @updatedAt
+
+  farm     Farm    @relation(fields: [farmId], references: [id], onDelete: Cascade)
+  parcel   Parcel? @relation(fields: [parcelId], references: [id], onDelete: SetNull)
+  assignee User?   @relation("TaskAssignee", fields: [assigneeId], references: [id], onDelete: SetNull)
+  plan     ParcelPlan? @relation(fields: [planId], references: [id], onDelete: SetNull)
+
+  @@index([planId])
+  @@index([farmId, status])
+  @@index([status, dueDate])
+}
+
+model IrrigationRun {
+  id            String               @id @default(uuid()) @db.Uuid
+  farmId        String               @db.Uuid
+  parcelId      String               @db.Uuid
+  systemType    IrrigationSystemType
+  routeLengthM  Float
+  speedMPerH    Float
+  doseMm        Float?
+  durationHours Float
+  status        RunStatus            @default(RUNNING)
+  startedAt     DateTime             @default(now())
+  pausedAt      DateTime?
+  pausedMs      BigInt               @default(0)
+  completedAt   DateTime?
+  progressPct   Float                @default(0)
+  createdAt     DateTime             @default(now())
+  updatedAt     DateTime             @updatedAt
+
+  farm   Farm   @relation(fields: [farmId], references: [id], onDelete: Cascade)
+  parcel Parcel @relation(fields: [parcelId], references: [id], onDelete: Cascade)
+
+  @@index([farmId, status])
+  @@index([parcelId])
+}
+
+model WeatherAlert {
+  id        String        @id @default(uuid()) @db.Uuid
+  farmId    String        @db.Uuid
+  parcelId  String        @db.Uuid
+  type      AlertType
+  severity  AlertSeverity
+  title     String
+  message   String
+  /// Ora locală a parcelei.
+  startsAt  String
+  dedupeKey String
+  source    String
+  createdAt DateTime      @default(now())
+
+  farm   Farm   @relation(fields: [farmId], references: [id], onDelete: Cascade)
+  parcel Parcel @relation(fields: [parcelId], references: [id], onDelete: Cascade)
+
+  @@unique([parcelId, dedupeKey])
+  @@index([farmId, createdAt(sort: Desc)])
+}
+
+model SatelliteObservation {
+  id           String   @id @default(uuid()) @db.Uuid
+  parcelId     String   @db.Uuid
+  date         DateTime @db.Date
+  ndvi         Float
+  ndre         Float?
+  healthIndex  Int
+  healthClass  String
+  cloudPct     Float?
+  source       String   @default("sentinel-2-l2a")
+  createdAt    DateTime @default(now())
+
+  parcel Parcel @relation(fields: [parcelId], references: [id], onDelete: Cascade)
+
+  @@unique([parcelId, date])
+  @@index([parcelId, date(sort: Desc)])
+}
+
+model CostEntry {
+  id        String       @id @default(uuid()) @db.Uuid
+  farmId    String       @db.Uuid
+  parcelId  String       @db.Uuid
+  year      Int
+  category  CostCategory
+  amount    Decimal      @db.Decimal(12, 2)
+  currency  String       @default("RON")
+  date      DateTime     @default(now())
+  notes     String?
+  createdAt DateTime     @default(now())
+  updatedAt DateTime     @updatedAt
+
+  farm   Farm   @relation(fields: [farmId], references: [id], onDelete: Cascade)
+  parcel Parcel @relation(fields: [parcelId], references: [id], onDelete: Cascade)
+
+  @@index([farmId, year])
+  @@index([parcelId, year])
+}
+
+model AiConversation {
+  id        String   @id @default(uuid()) @db.Uuid
+  farmId    String   @db.Uuid
+  userId    String   @db.Uuid
+  parcelId  String?  @db.Uuid
+  title     String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  farm     Farm        @relation(fields: [farmId], references: [id], onDelete: Cascade)
+  user     User        @relation(fields: [userId], references: [id], onDelete: Cascade)
+  messages AiMessage[]
+
+  @@index([farmId, userId, updatedAt(sort: Desc)])
+}
+
+model AiMessage {
+  id             String   @id @default(uuid()) @db.Uuid
+  conversationId String   @db.Uuid
+  role           AiRole
+  content        String
+  source         String?
+  createdAt      DateTime @default(now())
+
+  conversation AiConversation @relation(fields: [conversationId], references: [id], onDelete: Cascade)
+
+  @@index([conversationId, createdAt])
+}
+
+model IotDevice {
+  id         String        @id @default(uuid()) @db.Uuid
+  farmId     String        @db.Uuid
+  parcelId   String?       @db.Uuid
+  name       String
+  kind       IotDeviceKind
+  vendor     String?
+  protocol   IotProtocol
+  keyHash    String        @unique
+  lastSeenAt DateTime?
+  createdAt  DateTime      @default(now())
+  updatedAt  DateTime      @updatedAt
+
+  farm     Farm         @relation(fields: [farmId], references: [id], onDelete: Cascade)
+  parcel   Parcel?      @relation(fields: [parcelId], references: [id], onDelete: SetNull)
+  readings IotReading[]
+
+  @@index([farmId])
+}
+
+model IotReading {
+  id         BigInt   @id @default(autoincrement())
+  deviceId   String   @db.Uuid
+  metric     String
+  value      Float
+  unit       String?
+  recordedAt DateTime
+
+  device IotDevice @relation(fields: [deviceId], references: [id], onDelete: Cascade)
+
+  @@unique([deviceId, metric, recordedAt])
+  @@index([deviceId, recordedAt(sort: Desc)])
+}
+
+model Notification {
+  id        String    @id @default(uuid()) @db.Uuid
+  farmId    String    @db.Uuid
+  userId    String    @db.Uuid
+  title     String
+  body      String
+  data      Json?
+  readAt    DateTime?
+  createdAt DateTime  @default(now())
+
+  farm Farm @relation(fields: [farmId], references: [id], onDelete: Cascade)
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId, createdAt(sort: Desc)])
+}

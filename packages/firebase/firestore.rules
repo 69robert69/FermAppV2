@@ -1,0 +1,233 @@
+rules_version = '2';
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+    function userPath(uid) {
+      return /databases/$(database)/documents/users/$(uid);
+    }
+    function hasProfile() {
+      return request.auth != null && exists(userPath(request.auth.uid));
+    }
+    function me() {
+      return get(userPath(request.auth.uid)).data;
+    }
+    function hasRole(roles) {
+      return hasProfile() && me().role in roles;
+    }
+    function inFarm(farmId) {
+      return hasProfile() && me().farmId == farmId;
+    }
+
+    function everyone() { return ['ADMIN', 'FARM_MANAGER', 'OPERATOR', 'AGRONOMIST']; }
+    function managers() { return ['ADMIN', 'FARM_MANAGER']; }
+    function planners() { return ['ADMIN', 'FARM_MANAGER', 'AGRONOMIST']; }
+    function field() { return ['ADMIN', 'FARM_MANAGER', 'OPERATOR']; }
+
+    function canRead() {
+      return inFarm(resource.data.farmId);
+    }
+    function canCreate(roles) {
+      return hasRole(roles) && request.resource.data.farmId == me().farmId;
+    }
+    function canUpdate(roles) {
+      return hasRole(roles)
+        && resource.data.farmId == me().farmId
+        && request.resource.data.farmId == resource.data.farmId;
+    }
+    function canDelete(roles) {
+      return hasRole(roles) && resource.data.farmId == me().farmId;
+    }
+    function changesOnly(fields) {
+      return request.resource.data.diff(resource.data).affectedKeys().hasOnly(fields);
+    }
+
+    match /farms/{farmId} {
+      allow read: if inFarm(farmId) || (request.auth != null && resource.data.ownerId == request.auth.uid);
+      // Un cont nou își poate crea o singură fermă, înainte să aibă profil.
+      allow create: if request.auth != null
+        && !hasProfile()
+        && request.resource.data.ownerId == request.auth.uid;
+      allow update: if hasRole(['ADMIN'])
+        && me().farmId == farmId
+        && request.resource.data.ownerId == resource.data.ownerId;
+    }
+
+    match /invites/{email} {
+      function isInvitee() {
+        return request.auth != null
+          && request.auth.token.email_verified == true
+          && request.auth.token.email.lower() == email;
+      }
+      allow read: if isInvitee() || (hasRole(['ADMIN']) && resource.data.farmId == me().farmId);
+      allow create: if canCreate(['ADMIN']) && request.resource.data.role in everyone();
+      allow delete: if isInvitee() || canDelete(['ADMIN']);
+    }
+
+    match /users/{uid} {
+      function ownsFarm(farmId) {
+        let farm = /databases/$(database)/documents/farms/$(farmId);
+        return exists(farm) && get(farm).data.ownerId == request.auth.uid;
+      }
+      function invited() {
+        let invite = /databases/$(database)/documents/invites/$(request.auth.token.email.lower());
+        return request.auth.token.email_verified == true
+          && exists(invite)
+          && get(invite).data.farmId == request.resource.data.farmId
+          && get(invite).data.role == request.resource.data.role;
+      }
+
+      allow read: if request.auth != null && (request.auth.uid == uid || inFarm(resource.data.farmId));
+      allow create: if request.auth != null
+        && request.auth.uid == uid
+        && request.resource.data.uid == uid
+        && ((request.resource.data.role == 'ADMIN' && ownsFarm(request.resource.data.farmId)) || invited());
+      // Rolul și ferma se schimbă doar de către administrator.
+      allow update: if (request.auth != null && request.auth.uid == uid && changesOnly(['name', 'updatedAt']))
+        || (hasRole(['ADMIN'])
+          && resource.data.farmId == me().farmId
+          && request.resource.data.farmId == resource.data.farmId
+          && request.resource.data.role in everyone()
+          && changesOnly(['role', 'updatedAt']));
+      allow delete: if hasRole(['ADMIN']) && resource.data.farmId == me().farmId && request.auth.uid != uid;
+    }
+
+    match /parcels/{id} {
+      allow read: if canRead();
+      allow create: if canCreate(managers()) && request.resource.data.ownerId == request.auth.uid;
+      // Agronomul actualizează doar cultura planificată și scorul de rotație.
+      allow update: if (canUpdate(managers()) && request.resource.data.ownerId == resource.data.ownerId)
+        || (canUpdate(['AGRONOMIST']) && changesOnly(['currentCrop', 'plannedCrop', 'rotationScore', 'updatedAt']));
+      allow delete: if canDelete(['ADMIN']);
+    }
+
+    match /cropHistory/{id} {
+      allow read: if canRead();
+      allow create: if canCreate(planners());
+      allow update: if canUpdate(planners());
+      allow delete: if canDelete(planners());
+    }
+    match /cropPlans/{id} {
+      allow read: if canRead();
+      allow create: if canCreate(planners());
+      allow update: if canUpdate(planners());
+      allow delete: if canDelete(planners());
+    }
+    match /recommendations/{id} {
+      allow read: if canRead();
+      allow create: if canCreate(planners());
+      allow update: if canUpdate(planners());
+      allow delete: if canDelete(planners());
+    }
+
+    match /soilAnalysis/{id} {
+      allow read: if canRead();
+      allow create: if canCreate(everyone());
+      allow update: if canUpdate(everyone());
+    }
+    match /weatherData/{id} {
+      allow read: if canRead();
+      allow create: if canCreate(everyone());
+      allow update: if canUpdate(everyone());
+    }
+    match /satelliteImages/{id} {
+      allow read: if canRead();
+      allow create: if canCreate(planners());
+      allow update: if canUpdate(planners());
+    }
+
+    match /tasks/{id} {
+      allow read: if canRead();
+      allow create: if canCreate(planners());
+      // Operatorul schimbă doar statusul task-urilor atribuite lui.
+      allow update: if canUpdate(planners())
+        || (canUpdate(['OPERATOR'])
+          && resource.data.responsibleUser == request.auth.uid
+          && changesOnly(['status', 'completedAt', 'updatedAt']));
+      allow delete: if canDelete(planners());
+    }
+
+    match /machines/{id} {
+      allow read: if canRead();
+      allow create: if canCreate(managers());
+      allow update: if canUpdate(managers())
+        || (canUpdate(['OPERATOR']) && changesOnly(['lastKnownLocation', 'currentStatus', 'updatedAt']));
+      allow delete: if canDelete(managers());
+    }
+
+    match /machineWork/{id} {
+      allow read: if canRead();
+      allow create: if canCreate(managers())
+        || (canCreate(['OPERATOR']) && request.resource.data.operatorId == request.auth.uid);
+      allow update: if canUpdate(managers())
+        || (canUpdate(['OPERATOR'])
+          && resource.data.operatorId == request.auth.uid
+          && request.resource.data.operatorId == request.auth.uid);
+    }
+
+    match /irrigations/{id} {
+      allow read: if canRead();
+      allow create: if canCreate(field());
+      allow update: if canUpdate(field());
+    }
+
+    // Datele financiare nu sunt vizibile pentru operatori.
+    match /expenses/{id} {
+      allow read: if hasRole(planners()) && canRead();
+      allow create: if canCreate(planners());
+      allow update: if canUpdate(planners());
+      allow delete: if canDelete(planners());
+    }
+    match /reports/{id} {
+      allow read: if hasRole(planners()) && canRead();
+      allow create: if canCreate(planners());
+      allow update: if canUpdate(planners());
+      allow delete: if canDelete(planners());
+    }
+
+    // Catalogul este al fiecărei ferme și se modifică doar de administrator.
+    match /seedCatalog/{id} {
+      allow read: if canRead();
+      allow create: if canCreate(['ADMIN']);
+      allow update: if canUpdate(['ADMIN']);
+      allow delete: if canDelete(['ADMIN']);
+    }
+    match /machineCatalog/{id} {
+      allow read: if canRead();
+      allow create: if canCreate(['ADMIN']);
+      allow update: if canUpdate(['ADMIN']);
+      allow delete: if canDelete(['ADMIN']);
+    }
+    match /implementCatalog/{id} {
+      allow read: if canRead();
+      allow create: if canCreate(['ADMIN']);
+      allow update: if canUpdate(['ADMIN']);
+      allow delete: if canDelete(['ADMIN']);
+    }
+
+    match /notifications/{id} {
+      allow read: if request.auth != null && resource.data.userId == request.auth.uid && canRead();
+      allow create: if canCreate(everyone());
+      allow update: if canUpdate(everyone())
+        && resource.data.userId == request.auth.uid
+        && changesOnly(['readAt', 'updatedAt']);
+      allow delete: if canDelete(everyone()) && resource.data.userId == request.auth.uid;
+    }
+
+    match /photos/{id} {
+      allow read: if canRead();
+      allow create: if canCreate(everyone()) && request.resource.data.authorId == request.auth.uid;
+      allow update: if canUpdate(everyone()) && resource.data.authorId == request.auth.uid
+        && request.resource.data.authorId == request.auth.uid;
+      allow delete: if canDelete(managers())
+        || (canDelete(everyone()) && resource.data.authorId == request.auth.uid);
+    }
+    match /observations/{id} {
+      allow read: if canRead();
+      allow create: if canCreate(everyone()) && request.resource.data.authorId == request.auth.uid;
+      allow update: if canUpdate(everyone()) && resource.data.authorId == request.auth.uid
+        && request.resource.data.authorId == request.auth.uid;
+      allow delete: if canDelete(managers())
+        || (canDelete(everyone()) && resource.data.authorId == request.auth.uid);
+    }
+  }
+}

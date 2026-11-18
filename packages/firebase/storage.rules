@@ -1,0 +1,22 @@
+rules_version = '2';
+
+service firebase.storage {
+  match /b/{bucket}/o {
+    function sameFarm(parcelId) {
+      let profile = firestore.get(/databases/(default)/documents/users/$(request.auth.uid));
+      let parcel = firestore.get(/databases/(default)/documents/parcels/$(parcelId));
+      return request.auth != null
+        && profile != null
+        && parcel != null
+        && profile.data.farmId == parcel.data.farmId;
+    }
+
+    match /photos/{parcelId}/{fileName} {
+      allow read: if sameFarm(parcelId);
+      allow create: if sameFarm(parcelId)
+        && request.resource.size < 10 * 1024 * 1024
+        && request.resource.contentType.matches('image/.*');
+      allow delete: if sameFarm(parcelId);
+    }
+  }
+}

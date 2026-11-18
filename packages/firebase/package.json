@@ -1,0 +1,16 @@
+{
+  "name": "@fermapp/firebase",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "test:rules": "vitest run"
+  },
+  "devDependencies": {
+    "@firebase/rules-unit-testing": "6.0.0",
+    "firebase": "13.4.0",
+    "vitest": "^3.2.4",
+    "exceljs": "^4.4.0",
+    "jszip": "^3.10.1"
+  }
+}
