@@ -19,3 +19,6 @@ build/
 local.properties
 *.iml
 .idea/
+
+# Java API build output
+apps/api/target/

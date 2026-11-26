@@ -45,8 +45,8 @@ Kubernetes becomes useful above about 10 instances. Until then, a managed contai
 
 ## Launch steps
 
-1. Build the image: `docker build -f apps/api/Dockerfile -t fermapp-api .`
-2. Run the migrations once: `npx prisma migrate deploy`.
+1. Build the image: `docker build -t fermapp-api apps/api`
+2. The migrations (Flyway) run when the first instance starts; with several instances starting together, start one first.
 3. Start the API instances with `JOBS_ENABLED=false`.
 4. Start the workers with `JOBS_ENABLED=true`.
 5. Check `/health`, then shift traffic gradually.

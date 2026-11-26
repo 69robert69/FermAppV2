@@ -11,14 +11,14 @@
     "node": ">=22"
   },
   "scripts": {
-    "dev:api": "npm run dev -w @fermapp/api",
+    "dev:api": "node scripts/dev-local.mjs",
     "dev:mobile": "npm run start -w @fermapp/mobile",
-    "build:api": "npm run build -w @fermapp/api",
-    "test": "npm run test -w @fermapp/domain && npm run test -w @fermapp/api",
-    "typecheck": "npm run typecheck -w @fermapp/domain && npm run typecheck -w @fermapp/api && npm run typecheck -w @fermapp/mobile",
-    "db:generate": "npm run db:generate -w @fermapp/api",
-    "db:migrate": "npm run db:migrate -w @fermapp/api",
-    "db:seed": "npm run db:seed -w @fermapp/api",
-    "docs:api": "npm run docs:api -w @fermapp/api"
+    "build:api": "node scripts/mvn.mjs -q -B package -DskipTests",
+    "test": "npm run test -w @fermapp/domain && npm run test:api",
+    "test:api": "node scripts/mvn.mjs -B test",
+    "typecheck": "npm run typecheck -w @fermapp/domain && npm run typecheck -w @fermapp/mobile"
+  },
+  "devDependencies": {
+    "embedded-postgres": "18.6.0-beta.19"
   }
 }

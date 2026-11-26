@@ -1,0 +1,105 @@
+# Every setting reads the same environment variable as the TypeScript server did.
+server:
+  port: ${PORT:4000}
+  forward-headers-strategy: framework
+  compression:
+    enabled: true
+    mime-types: application/json,application/geo+json,text/plain,text/html,application/xml
+  error:
+    whitelabel:
+      enabled: false
+  tomcat:
+    max-swallow-size: 25MB
+
+spring:
+  application:
+    name: fermapp-api
+  config:
+    # Local development keeps its settings in apps/api/.env, as before; real environment variables win.
+    import: optional:file:./.env[.properties]
+  threads:
+    virtual:
+      enabled: true
+  datasource:
+    url: ${JDBC_DATABASE_URL:}
+    username: ${DATABASE_USERNAME:}
+    password: ${DATABASE_PASSWORD:}
+  jpa:
+    open-in-view: false
+    hibernate:
+      ddl-auto: none
+      naming:
+        physical-strategy: org.hibernate.boot.model.naming.PhysicalNamingStrategyStandardImpl
+    properties:
+      hibernate:
+        globally_quoted_identifiers: true
+        jdbc:
+          time_zone: UTC
+          batch_size: 50
+        default_batch_fetch_size: 100
+        order_inserts: true
+  flyway:
+    enabled: true
+    locations: classpath:db/migration
+    # A database created by the TypeScript server (Prisma) already has all five migrations.
+    baseline-on-migrate: true
+    baseline-version: 5
+  servlet:
+    multipart:
+      enabled: true
+      max-file-size: 20MB
+      max-request-size: 21MB
+      resolve-lazily: true
+  data:
+    redis:
+      # The URL comes from REDIS_URL, set only when it is not empty (see DatabaseUrlEnvironmentPostProcessor).
+      timeout: 2s
+      repositories:
+        enabled: false
+  jackson:
+    default-property-inclusion: always
+
+springdoc:
+  api-docs:
+    path: /api/docs.json
+  swagger-ui:
+    path: /api/docs
+  paths-to-match: /api/v1/**
+
+management:
+  health:
+    redis:
+      enabled: false
+
+fermapp:
+  environment: ${NODE_ENV:development}
+  cors-origins: ${CORS_ORIGINS:http://localhost:8081}
+  redis-url: ${REDIS_URL:}
+  jwt-access-secret: ${JWT_ACCESS_SECRET:}
+  jwt-access-ttl-seconds: ${JWT_ACCESS_TTL_SECONDS:900}
+  refresh-token-ttl-days: ${REFRESH_TOKEN_TTL_DAYS:30}
+  openweather-api-key: ${OPENWEATHER_API_KEY:}
+  sentinel-client-id: ${SENTINEL_CLIENT_ID:}
+  sentinel-client-secret: ${SENTINEL_CLIENT_SECRET:}
+  sentinel-token-url: ${SENTINEL_TOKEN_URL:https://identity.dataspace.copernicus.eu/auth/realms/CDSE/protocol/openid-connect/token}
+  sentinel-api-url: ${SENTINEL_API_URL:https://sh.dataspace.copernicus.eu}
+  anthropic-api-key: ${ANTHROPIC_API_KEY:}
+  anthropic-model: ${ANTHROPIC_MODEL:claude-opus-5-5}
+  mqtt-url: ${MQTT_URL:}
+  mqtt-username: ${MQTT_USERNAME:}
+  mqtt-password: ${MQTT_PASSWORD:}
+  expo-access-token: ${EXPO_ACCESS_TOKEN:}
+  upload-dir: ${UPLOAD_DIR:.tmp/uploads}
+  jobs-enabled: ${JOBS_ENABLED:true}
+  seed-demo-data: ${SEED_DEMO_DATA:false}
+  global-rate-limit-per-minute: 600
+
+logging:
+  level:
+    root: INFO
+    org.hibernate.SQL: WARN
+    # Unique-constraint violations are expected (409 CONFLICT, idempotency, alert dedupe);
+    # unexpected database errors are still logged by the GlobalExceptionHandler.
+    org.hibernate.engine.jdbc.spi.SqlExceptionHelper: OFF
+    org.hibernate.engine.jdbc.batch.internal.BatchingBatch: OFF
+    org.hibernate.persister.entity.AbstractEntityPersister: ERROR

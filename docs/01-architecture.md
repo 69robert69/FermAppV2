@@ -8,17 +8,17 @@ Mobile app (Expo)
   Zustand, TanStack Query
         │ HTTPS REST + Socket.IO
         ▼
-Express API (stateless instances) ──── Redis: cache, locks, Socket.IO
+Spring Boot API (stateless instances) ──── Redis: cache, locks, Socket.IO
         │                         └─── Jobs: progress, alerts, reminders
         ▼
-PostgreSQL (Prisma)
+PostgreSQL (JPA + Flyway)
 
 External services: Open-Meteo, OpenWeatherMap, SoilGrids, NASA POWER,
 Copernicus Sentinel-2, Claude API, Expo Push
 Sensors: MQTT, REST, WebSocket ──► the same ingestion point
 ```
 
-The agronomic rules live in `packages/domain`, with no dependencies. The server and the phone use the same code for areas, work capacity, rotation and ETA. Estimates stay identical online and offline.
+The agronomic rules live in `packages/domain` (TypeScript, used by the phone) and in `com.fermapp.api.domain` (Java, a line-by-line port used by the server). Both give the same areas, work capacity, rotation and ETA, so estimates stay identical online and offline; a change to a rule is made in both.
 
 ## Main decisions
 
@@ -35,40 +35,27 @@ The agronomic rules live in `packages/domain`, with no dependencies. The server 
 ## Backend structure
 
 ```text
-apps/api/
-├── Dockerfile
-├── prisma/
-│   ├── schema.prisma            database models
-│   ├── migrations/              SQL migrations
-│   └── seed.ts                  demo data
-├── scripts/generate-docs.ts     OpenAPI and the endpoint list
-├── src/
-│   ├── app.ts                   middleware, routes, Swagger
-│   ├── server.ts                startup and graceful shutdown
-│   ├── config/env.ts            configuration validation
-│   ├── integrations/
-│   │   ├── openMeteo.ts         forecast and history
-│   │   ├── openWeather.ts       forecast for alerts
-│   │   ├── soilGrids.ts         soil profile
-│   │   ├── nasaPower.ts         climate and GDD
-│   │   └── sentinel.ts          NDVI, NDRE, images
-│   ├── jobs/scheduler.ts        progress, reminders, alerts
-│   ├── lib/
-│   │   ├── route.ts             validated routes, roles, idempotency, OpenAPI
-│   │   ├── openapi.ts           the Swagger document
-│   │   ├── access.ts            farm membership checks
-│   │   ├── cache.ts             Redis with in-memory fallback
-│   │   ├── errors.ts, http.ts, logger.ts, prisma.ts, tokens.ts
-│   ├── middleware/error.ts      uniform error format
-│   ├── realtime/socket.ts       per-farm rooms, the /iot namespace
-│   └── modules/
-│       ├── auth/  team/  dashboard/  notifications/
-│       ├── parcels/             CRUD, GeoJSON, KML, KMZ, SHP, LPIS
-│       ├── crops/               history, rotation, recommendations, climate
-│       ├── machines/  work/  tasks/  irrigation/
-│       ├── weather/  soil/  satellite/
-│       ├── costs/  reports/  ai/  iot/
-└── test/                        integration tests on a real PostgreSQL
+apps/api/                          Java 21, Spring Boot 3.5, Maven (mvnw)
+├── Dockerfile, pom.xml, MIGRATION.md
+└── src/
+    ├── main/resources/
+    │   ├── application.yml        configuration from the same environment variables
+    │   ├── db/migration/          Flyway migrations V1..V5 (the former Prisma migrations)
+    │   └── fonts/                 DejaVu Sans for PDF reports
+    ├── main/java/com/fermapp/api/
+    │   ├── config/                security, JSON, web pipeline, OpenAPI, WebSocket, Prisma takeover
+    │   ├── common/                errors, envelope, rate limits, idempotency, cache, HTTP, storage
+    │   ├── security/              JWT (Spring Security, Nimbus HS256), roles, bcrypt
+    │   ├── domain/                agronomic rules (port of packages/domain)
+    │   ├── persistence/           JPA entities and Spring Data repositories
+    │   ├── integrations/          Open-Meteo, OpenWeatherMap, SoilGrids, NASA POWER, Sentinel, Claude, Expo Push
+    │   ├── realtime/              Socket.IO v4 protocol over Spring WebSocket, farm rooms, /iot
+    │   ├── jobs/                  progress, reminders, alerts, soil retry, cleanup
+    │   ├── seed/                  demo data (SEED_DEMO_DATA=true)
+    │   └── modules/               auth, team, dashboard, parcels, plans, crops, machines, work, tasks,
+    │                              irrigation, weather, soil, satellite, intelligence, costs,
+    │                              economics, reports, ai, iot, notifications, map
+    └── test/                      domain, security, JSON and web-layer tests
 ```
 
 ## Frontend structure

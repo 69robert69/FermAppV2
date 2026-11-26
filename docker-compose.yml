@@ -23,23 +23,10 @@ services:
     volumes:
       - redis-data:/data
 
-  migrate:
-    build:
-      context: .
-      dockerfile: apps/api/Dockerfile
-      target: build
-    working_dir: /repo/apps/api
-    command: ['npx', 'prisma', 'migrate', 'deploy']
-    environment:
-      DATABASE_URL: postgresql://fermapp:${POSTGRES_PASSWORD:-fermapp}@postgres:5432/fermapp
-    depends_on:
-      postgres:
-        condition: service_healthy
-
+  # The API applies the database migrations (Flyway) when it starts.
   api:
     build:
-      context: .
-      dockerfile: apps/api/Dockerfile
+      context: apps/api
     env_file:
       - apps/api/.env
     environment:
@@ -49,8 +36,8 @@ services:
     ports:
       - '4000:4000'
     depends_on:
-      migrate:
-        condition: service_completed_successfully
+      postgres:
+        condition: service_healthy
       redis:
         condition: service_started
 
