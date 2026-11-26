@@ -1,0 +1,15 @@
+**/node_modules
+**/dist
+**/.tmp
+**/.env
+**/.env.*
+!**/.env.example
+.git
+.firebase
+apps/mobile/.expo
+apps/mobile/android
+apps/mobile/ios
+docs
+*.log
+Dockerfile.txt
+.dockerignore.txt

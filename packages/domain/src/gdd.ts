@@ -6,7 +6,7 @@ export interface DailyTemperature {
   tMinC: number;
 }
 
-/** Grade-zile pentru o zi, cu limitare la pragul de bază și pragul superior. */
+/** Degree-days for one day, capped at the base and upper thresholds. */
 export function dailyGdd(tMaxC: number, tMinC: number, baseC: number, capC = 30): number {
   const max = Math.min(capC, Math.max(baseC, tMaxC));
   const min = Math.min(capC, Math.max(baseC, tMinC));
@@ -14,11 +14,11 @@ export function dailyGdd(tMaxC: number, tMinC: number, baseC: number, capC = 30)
 }
 
 const STAGES = [
-  { upTo: 0.1, label: 'Răsărire' },
-  { upTo: 0.35, label: 'Dezvoltare vegetativă' },
-  { upTo: 0.55, label: 'Înflorire' },
-  { upTo: 0.8, label: 'Formarea boabelor' },
-  { upTo: 1, label: 'Maturare' },
+  { upTo: 0.1, label: 'Emergence' },
+  { upTo: 0.35, label: 'Vegetative growth' },
+  { upTo: 0.55, label: 'Flowering' },
+  { upTo: 0.8, label: 'Grain fill' },
+  { upTo: 1, label: 'Ripening' },
 ];
 
 export interface CropDevelopment {
@@ -36,7 +36,7 @@ export function cropDevelopment(crop: CropCode, days: readonly DailyTemperature[
     0,
   );
   const ratio = accumulated / profile.gddToMaturity;
-  const stage = ratio >= 1 ? 'Maturitate' : STAGES.find((item) => ratio <= item.upTo)!.label;
+  const stage = ratio >= 1 ? 'Mature' : STAGES.find((item) => ratio <= item.upTo)!.label;
   return {
     crop,
     accumulatedGdd: Math.round(accumulated),

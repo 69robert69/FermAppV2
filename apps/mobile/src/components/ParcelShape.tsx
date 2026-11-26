@@ -10,7 +10,7 @@ interface Props {
   filled?: boolean;
 }
 
-/** Conturul real al parcelei, folosit ca semn de recunoaștere în toată aplicația. */
+/** The real outline of the parcel, used as a recognition mark throughout the app. */
 export const ParcelShape = memo(function ParcelShape({ geometry, size = 44, color = colors.wheat, filled = true }: Props) {
   const path = useMemo(() => {
     const ring = geometry.coordinates[0] ?? [];

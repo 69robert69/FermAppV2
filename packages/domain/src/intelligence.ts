@@ -1,7 +1,7 @@
 import { CROPS, type CropCode } from './crops';
 import { summarizeCosts, type CostSummaryInput } from './costs';
 
-/** Durata orientativă de la semănat la recoltare, în zile. */
+/** Indicative duration from sowing to harvest, in days. */
 export const CROP_SEASON_DAYS: Record<CropCode, number> = {
   WHEAT: 270,
   BARLEY: 250,
@@ -63,7 +63,7 @@ export interface SoilIndices {
   waterRetentionIndex: number;
 }
 
-/** Indici orientativi 0-100, calculați din proprietățile solului. */
+/** Indicative 0-100 indices, computed from soil properties. */
 export function soilIndices(soil: {
   ph: number;
   organicMatterPct: number;
@@ -93,18 +93,18 @@ export interface SprayAlert {
 export const SPRAY_WIND_LIMIT_KMH = 15;
 export const SPRAY_RAIN_LIMIT_PCT = 60;
 
-/** Condițiile de stropire pentru orele imediat următoare. */
+/** Spraying conditions for the next few hours. */
 export function sprayingAlerts(
   hours: readonly { windKmh: number; precipitationProbabilityPct?: number | null }[],
 ): SprayAlert[] {
   const alerts: SprayAlert[] = [];
   const wind = hours[0]?.windKmh ?? 0;
   if (wind > SPRAY_WIND_LIMIT_KMH) {
-    alerts.push({ code: 'WIND', message: `Vânt ${Math.round(wind)} km/h. Nu stropi.` });
+    alerts.push({ code: 'WIND', message: `Wind ${Math.round(wind)} km/h. Do not spray.` });
   }
   const rain = Math.max(0, ...hours.map((hour) => hour.precipitationProbabilityPct ?? 0));
   if (rain > SPRAY_RAIN_LIMIT_PCT) {
-    alerts.push({ code: 'RAIN', message: `Probabilitate de ploaie ${Math.round(rain)}%. Amână stropirea.` });
+    alerts.push({ code: 'RAIN', message: `Rain probability ${Math.round(rain)}%. Postpone spraying.` });
   }
   return alerts;
 }
@@ -142,7 +142,7 @@ const NITROGEN_CROPS: readonly CropCode[] = ['WHEAT', 'BARLEY', 'CORN', 'RAPESEE
 const LOW_SOIL_MOISTURE_PCT = 30;
 const WATER_DEFICIT_MM = 20;
 
-/** Alege următoarea acțiune prin reguli agronomice, de la cea mai urgentă la cea mai puțin urgentă. */
+/** Picks the next action using agronomic rules, from most to least urgent. */
 export function nextRecommendedAction(input: NextActionInput): NextAction {
   const { crop, progress, weather, soilMoisturePct, healthClass, recentWork = [], now = new Date() } = input;
   const confidence =
@@ -158,8 +158,8 @@ export function nextRecommendedAction(input: NextActionInput): NextAction {
   if (!crop) {
     return result({
       code: 'PLAN_CROP',
-      action: 'Planifică cultura pentru această parcelă.',
-      reason: 'Parcela nu are o cultură înregistrată în anul curent.',
+      action: 'Plan the crop for this parcel.',
+      reason: 'The parcel has no crop recorded for the current year.',
       priority: 'MEDIUM',
       riskLevel: 'LOW',
       dueInDays: null,
@@ -170,8 +170,8 @@ export function nextRecommendedAction(input: NextActionInput): NextAction {
   if (!progress || progress.status === 'NOT_SOWN') {
     return result({
       code: 'SET_SOWING',
-      action: 'Completează data semănatului.',
-      reason: `Fără această dată nu se poate estima stadiul culturii de ${name}.`,
+      action: 'Fill in the sowing date.',
+      reason: `Without this date the stage of the ${name} crop cannot be estimated.`,
       priority: 'MEDIUM',
       riskLevel: 'LOW',
       dueInDays: null,
@@ -180,8 +180,8 @@ export function nextRecommendedAction(input: NextActionInput): NextAction {
   if (progress.status === 'HARVESTED') {
     return result({
       code: 'POST_HARVEST',
-      action: 'Pregătește terenul pentru cultura următoare.',
-      reason: `Cultura de ${name} a fost recoltată.`,
+      action: 'Prepare the land for the next crop.',
+      reason: `The ${name} crop has been harvested.`,
       priority: 'LOW',
       riskLevel: 'LOW',
       dueInDays: 14,
@@ -190,8 +190,8 @@ export function nextRecommendedAction(input: NextActionInput): NextAction {
   if (progress.status === 'READY') {
     return result({
       code: 'HARVEST',
-      action: 'Pregătește recoltarea.',
-      reason: `Cultura de ${name} a ajuns la ${progress.percent}% din ciclul estimat. Verifică umiditatea boabelor.`,
+      action: 'Prepare for harvest.',
+      reason: `The ${name} crop has reached ${progress.percent}% of its estimated cycle. Check grain moisture.`,
       priority: 'HIGH',
       riskLevel: 'MEDIUM',
       dueInDays: 7,
@@ -200,8 +200,8 @@ export function nextRecommendedAction(input: NextActionInput): NextAction {
   if (weather && weather.minTempC <= 0 && progress.percent < 30) {
     return result({
       code: 'FROST',
-      action: 'Verifică plantele după înghețul estimat.',
-      reason: `Sunt estimate ${Math.round(weather.minTempC)} °C, iar cultura este într-un stadiu sensibil.`,
+      action: 'Check the plants after the expected frost.',
+      reason: `${Math.round(weather.minTempC)} °C is expected and the crop is at a sensitive stage.`,
       priority: 'HIGH',
       riskLevel: 'HIGH',
       dueInDays: 2,
@@ -210,8 +210,8 @@ export function nextRecommendedAction(input: NextActionInput): NextAction {
   if (healthClass === 'PROBLEM') {
     return result({
       code: 'SCOUT',
-      action: 'Inspectează parcela în teren.',
-      reason: 'Ultima imagine satelitară indică o problemă posibilă de vegetație.',
+      action: 'Inspect the parcel in the field.',
+      reason: 'The latest satellite image indicates a possible vegetation problem.',
       priority: 'HIGH',
       riskLevel: 'HIGH',
       dueInDays: 2,
@@ -222,10 +222,10 @@ export function nextRecommendedAction(input: NextActionInput): NextAction {
   if ((lowMoisture || waterDeficit > WATER_DEFICIT_MM) && progress.percent >= 15 && progress.percent <= 85) {
     return result({
       code: 'IRRIGATE',
-      action: 'Planifică o irigare în următoarele 3 zile.',
+      action: 'Plan an irrigation within the next 3 days.',
       reason: lowMoisture
-        ? `Umiditatea solului este ${Math.round(soilMoisturePct!)}%.`
-        : `Evapotranspirația depășește precipitațiile cu ${Math.round(waterDeficit)} mm în următoarele 7 zile.`,
+        ? `Soil moisture is ${Math.round(soilMoisturePct!)}%.`
+        : `Evapotranspiration exceeds rainfall by ${Math.round(waterDeficit)} mm over the next 7 days.`,
       priority: 'HIGH',
       riskLevel: 'MEDIUM',
       dueInDays: 3,
@@ -240,8 +240,8 @@ export function nextRecommendedAction(input: NextActionInput): NextAction {
   if (foliarRisk && progress.percent >= 30 && progress.percent <= 80 && !workedWithin('SPRAYING', 10)) {
     return result({
       code: 'FUNGICIDE',
-      action: 'Verifică bolile foliare și pregătește un tratament fungicid în 4 zile.',
-      reason: `Umiditate medie de ${Math.round(weather.meanHumidityPct)}% și ${weather.rainyDays} zile cu ploaie cresc riscul de boli foliare.`,
+      action: 'Check for foliar diseases and prepare a fungicide treatment within 4 days.',
+      reason: `Mean humidity of ${Math.round(weather.meanHumidityPct)}% and ${weather.rainyDays} rainy days raise the risk of foliar diseases.`,
       priority: 'HIGH',
       riskLevel: 'HIGH',
       dueInDays: 4,
@@ -250,8 +250,8 @@ export function nextRecommendedAction(input: NextActionInput): NextAction {
   if (NITROGEN_CROPS.includes(crop) && progress.percent >= 15 && progress.percent <= 45 && !workedWithin('FERTILIZING', 30)) {
     return result({
       code: 'NITROGEN',
-      action: 'Planifică fertilizarea cu azot.',
-      reason: `Cultura de ${name} este în creștere activă, iar în ultimele 30 de zile nu există o fertilizare înregistrată.`,
+      action: 'Plan a nitrogen fertilization.',
+      reason: `The ${name} crop is actively growing and no fertilization has been recorded in the last 30 days.`,
       priority: 'MEDIUM',
       riskLevel: 'MEDIUM',
       dueInDays: 7,
@@ -260,8 +260,8 @@ export function nextRecommendedAction(input: NextActionInput): NextAction {
   if (progress.percent <= 25 && !workedWithin('SPRAYING', 21)) {
     return result({
       code: 'WEEDS',
-      action: 'Verifică gradul de îmburuienare.',
-      reason: 'În primele stadii, buruienile concurează puternic cultura pentru apă și nutrienți.',
+      action: 'Check the level of weed infestation.',
+      reason: 'In the early stages, weeds compete strongly with the crop for water and nutrients.',
       priority: 'MEDIUM',
       riskLevel: 'MEDIUM',
       dueInDays: 5,
@@ -269,8 +269,8 @@ export function nextRecommendedAction(input: NextActionInput): NextAction {
   }
   return result({
     code: 'MONITOR',
-    action: 'Continuă monitorizarea culturii.',
-    reason: 'Datele disponibile nu indică o intervenție urgentă.',
+    action: 'Keep monitoring the crop.',
+    reason: 'The available data does not indicate an urgent intervention.',
     priority: 'LOW',
     riskLevel: 'LOW',
     dueInDays: 7,

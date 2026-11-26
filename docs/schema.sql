@@ -1,4 +1,4 @@
--- Migrare: 20261118000000_init
+-- Migration: 20261118000000_init
 -- CreateSchema
 CREATE SCHEMA IF NOT EXISTS "public";
 
@@ -596,7 +596,7 @@ ALTER TABLE "Notification" ADD CONSTRAINT "Notification_farmId_fkey" FOREIGN KEY
 ALTER TABLE "Notification" ADD CONSTRAINT "Notification_userId_fkey" FOREIGN KEY ("userId") REFERENCES "User"("id") ON DELETE CASCADE ON UPDATE CASCADE;
 
 
--- Migrare: 20261119000000_parcel_intelligence
+-- Migration: 20261119000000_parcel_intelligence
 -- AlterEnum
 ALTER TYPE "CostCategory" ADD VALUE 'LABOR';
 
@@ -748,7 +748,7 @@ ALTER TABLE "Photo" ADD CONSTRAINT "Photo_authorId_fkey" FOREIGN KEY ("authorId"
 ALTER TABLE "Income" ADD CONSTRAINT "Income_parcelId_fkey" FOREIGN KEY ("parcelId") REFERENCES "Parcel"("id") ON DELETE CASCADE ON UPDATE CASCADE;
 
 
--- Migrare: 20261120000000_map_and_parcel_plan
+-- Migration: 20261120000000_map_and_parcel_plan
 -- AlterEnum
 -- This migration adds more than one value to an enum.
 -- With PostgreSQL versions 11 and earlier, this is not possible
@@ -800,3 +800,52 @@ ALTER TABLE "ParcelPlan" ADD CONSTRAINT "ParcelPlan_parcelId_fkey" FOREIGN KEY (
 -- AddForeignKey
 ALTER TABLE "Task" ADD CONSTRAINT "Task_planId_fkey" FOREIGN KEY ("planId") REFERENCES "ParcelPlan"("id") ON DELETE SET NULL ON UPDATE CASCADE;
 
+
+-- Migration: 20261121000000_tillage_systems
+-- AlterTable
+ALTER TABLE "Parcel" ADD COLUMN     "tillageHistory" JSONB,
+ADD COLUMN     "tillageSystem" TEXT;
+
+-- AlterTable
+ALTER TABLE "Machine" ADD COLUMN     "tillageSystems" TEXT[] DEFAULT ARRAY[]::TEXT[];
+
+-- Migration: 20261122000000_euro_economics
+-- The farm now works in euro. Amounts recorded in lei are converted once,
+-- at 1 EUR = 4.97 RON. Back up the database before applying this migration.
+
+-- Recorded expenses and incomes carry their currency, so only lei rows change.
+UPDATE "CostEntry" SET "amount" = ROUND("amount" / 4.97, 2), "currency" = 'EUR' WHERE "currency" = 'RON';
+UPDATE "Income" SET "amount" = ROUND("amount" / 4.97, 2), "currency" = 'EUR' WHERE "currency" = 'RON';
+
+-- Season prices per tonne were entered in lei and have no currency column.
+UPDATE "CropSeason"
+SET "expectedPricePerT" = ROUND("expectedPricePerT" / 4.97, 2),
+    "actualPricePerT" = ROUND("actualPricePerT" / 4.97, 2)
+WHERE "expectedPricePerT" IS NOT NULL OR "actualPricePerT" IS NOT NULL;
+
+-- AlterTable
+ALTER TABLE "CostEntry" ALTER COLUMN "currency" SET DEFAULT 'EUR';
+ALTER TABLE "Income" ALTER COLUMN "currency" SET DEFAULT 'EUR';
+
+-- CreateTable
+CREATE TABLE "EconomicDocument" (
+    "id" UUID NOT NULL,
+    "farmId" UUID NOT NULL,
+    "key" TEXT NOT NULL,
+    "parcelId" UUID,
+    "year" INTEGER,
+    "data" JSONB NOT NULL,
+    "updatedAt" TIMESTAMP(3) NOT NULL,
+    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+
+    CONSTRAINT "EconomicDocument_pkey" PRIMARY KEY ("id")
+);
+
+-- CreateIndex
+CREATE INDEX "EconomicDocument_farmId_year_idx" ON "EconomicDocument"("farmId", "year");
+
+-- CreateIndex
+CREATE UNIQUE INDEX "EconomicDocument_farmId_key_key" ON "EconomicDocument"("farmId", "key");
+
+-- AddForeignKey
+ALTER TABLE "EconomicDocument" ADD CONSTRAINT "EconomicDocument_farmId_fkey" FOREIGN KEY ("farmId") REFERENCES "Farm"("id") ON DELETE CASCADE ON UPDATE CASCADE;

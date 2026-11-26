@@ -5,7 +5,7 @@ import { env } from '../config/env';
 
 const root = path.resolve(env.UPLOAD_DIR);
 
-/** Tipul real al imaginii, citit din conținut, nu din numele fișierului. */
+/** The real image type, read from the content, not from the file name. */
 export function detectImageType(buffer: Buffer): { contentType: string; extension: string } | null {
   if (buffer.length > 3 && buffer[0] === 0xff && buffer[1] === 0xd8 && buffer[2] === 0xff) {
     return { contentType: 'image/jpeg', extension: 'jpg' };

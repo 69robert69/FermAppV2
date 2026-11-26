@@ -10,13 +10,13 @@ import { CalendarList, PlanChecklist, PlanReport, PlanResources, stepsToCalendar
 type PlanView = 'steps' | 'calendar' | 'resources' | 'report';
 
 const VIEWS: { value: PlanView; label: string }[] = [
-  { value: 'steps', label: 'Plan tehnologic' },
+  { value: 'steps', label: 'Technology plan' },
   { value: 'calendar', label: 'Calendar' },
-  { value: 'resources', label: 'Apă și nutrienți' },
-  { value: 'report', label: 'Raport' },
+  { value: 'resources', label: 'Water and nutrients' },
+  { value: 'report', label: 'Report' },
 ];
 
-/** Planul activ al parcelei, în panoul de informații. */
+/** The parcel's active plan, in the information panel. */
 export function PlanSection({
   data,
   canEdit,
@@ -34,10 +34,10 @@ export function PlanSection({
 
   if (!data.plan) {
     return (
-      <Section title="Plan tehnologic">
+      <Section title="Technology plan">
         <Panel>
-          <Txt>Parcela nu are încă un plan pentru sezonul următor.</Txt>
-          {canEdit ? <Button mode="contained" onPress={onConfigure}>Creează planul</Button> : null}
+          <Txt>The parcel does not have a plan for next season yet.</Txt>
+          {canEdit ? <Button mode="contained" onPress={onConfigure}>Create plan</Button> : null}
         </Panel>
       </Section>
     );
@@ -63,15 +63,15 @@ export function PlanSection({
           <PlanReport report={plan.report} />
           {data.planHistory.length > 1 ? (
             <Panel>
-              <Txt variant="subtitle">Rapoarte salvate</Txt>
+              <Txt variant="subtitle">Saved reports</Txt>
               {data.planHistory.map((item) => (
-                <Row key={item.id} label={shortDate(item.createdAt)} value={`${item.cropName} ${item.year}${item.active ? ', activ' : ''}`} />
+                <Row key={item.id} label={shortDate(item.createdAt)} value={`${item.cropName} ${item.year}${item.active ? ', active' : ''}`} />
               ))}
             </Panel>
           ) : null}
         </View>
       ) : null}
-      {canEdit ? <Button mode="outlined" onPress={onConfigure}>Schimbă cultura planificată</Button> : null}
+      {canEdit ? <Button mode="outlined" onPress={onConfigure}>Change the planned crop</Button> : null}
     </Section>
   );
 }

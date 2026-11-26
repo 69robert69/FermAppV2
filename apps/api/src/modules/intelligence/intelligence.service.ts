@@ -26,7 +26,7 @@ import { serializeWork, workInclude } from '../work/work.service';
 const DAY_MS = 86_400_000;
 const round = (value: number, digits = 1) => Math.round(value * 10 ** digits) / 10 ** digits;
 
-const SYSTEM_LABELS = { REEL: 'Tambur', PIVOT: 'Pivot', LINEAR: 'Liniar' } as const;
+const SYSTEM_LABELS = { REEL: 'Hose reel', PIVOT: 'Pivot', LINEAR: 'Linear' } as const;
 
 export async function parcelWeather(parcel: Pick<Parcel, 'id' | 'centerLat' | 'centerLng'>) {
   const forecast = await getForecast(parcel.centerLat, parcel.centerLng);
@@ -42,7 +42,7 @@ export async function parcelWeather(parcel: Pick<Parcel, 'id' | 'centerLat' | 'c
     .filter((day) => day.date >= today)
     .map((day) => ({ ...day, rainProbabilityPct: rainChance.get(day.date) ?? null }));
 
-  // Istoricul zilnic se păstrează pentru analize, iar o eroare aici nu afectează prognoza.
+  // Daily history is kept for analysis, and an error here does not affect the forecast.
   const current = days[0];
   if (current) {
     const values = {
@@ -59,7 +59,7 @@ export async function parcelWeather(parcel: Pick<Parcel, 'id' | 'centerLat' | 'c
         create: { ...values, parcelId: parcel.id, date: new Date(current.date) },
         update: values,
       })
-      .catch((error) => logger.warn('Salvare meteo eșuată', (error as Error).message));
+      .catch((error) => logger.warn('Saving weather failed', (error as Error).message));
   }
 
   return {
@@ -135,7 +135,7 @@ export async function economicsFor(parcel: Pick<Parcel, 'id' | 'areaHa'>, year =
   };
 }
 
-/** Cea mai apropiată observație de data țintă, dacă există una în toleranța dată. */
+/** The observation closest to the target date, if one exists within the given tolerance. */
 function nearest(observations: SatelliteObservation[], target: number, toleranceDays: number, exclude?: string) {
   let best: SatelliteObservation | null = null;
   let bestDistance = toleranceDays * DAY_MS;
@@ -180,7 +180,7 @@ async function latestSoilMoisture(parcelId: string) {
   return reading?.value ?? null;
 }
 
-/** Pentru o cultură planificată, următoarea acțiune este primul pas nefinalizat din plan. */
+/** For a planned crop, the next action is the first unfinished step of the plan. */
 function nextPlanAction(
   plan: ParcelPlanData,
   tasks: readonly { planStepKey: string | null; status: string; title: string; dueDate: Date }[],
@@ -193,7 +193,7 @@ function nextPlanAction(
   return {
     code: 'PLAN_STEP',
     action: next.title,
-    reason: `Este următorul pas din planul tehnologic pentru ${plan.cropName.toLowerCase()}.`,
+    reason: `It is the next step in the technology plan for ${plan.cropName.toLowerCase()}.`,
     priority: 'MEDIUM',
     riskLevel: 'LOW',
     confidencePct: 80,
@@ -253,11 +253,11 @@ export async function buildIntelligence(auth: AuthContext, parcelId: string) {
   const planData = activePlan ? (activePlan.data as unknown as ParcelPlanData) : null;
 
   const weather = await parcelWeather(parcel).catch((error) => {
-    logger.warn('Meteo indisponibil în panoul parcelei', (error as Error).message);
+    logger.warn('Weather unavailable in the parcel panel', (error as Error).message);
     return null;
   });
 
-  // Ultima cultură declarată în wizard nu este cultura din câmp când planul începe într-un an viitor.
+  // The last crop declared in the wizard is not the crop in the field when the plan starts in a future year.
   const recorded = parcel.seasons[0] ?? null;
   const season = recorded && activePlan && activePlan.year > year && !recorded.sowingDate ? null : recorded;
   const progress = season
@@ -351,7 +351,7 @@ export async function buildIntelligence(auth: AuthContext, parcelId: string) {
     },
     weather,
     soil: soilSection(parcel.soilProfile),
-    // Datele financiare nu se trimit operatorilor.
+    // Financial data is not sent to operators.
     economics: auth.role === 'OPERATOR' ? null : await economicsFor(parcel, year),
     satellite: ndviComparison(parcel.satellite, now),
     photos,

@@ -5,7 +5,7 @@ import { Choice, Txt } from './ui';
 export function ParcelPicker({
   value,
   onChange,
-  label = 'Parcelă',
+  label = 'Parcel',
 }: {
   value: string | null;
   onChange: (id: string) => void;
@@ -17,7 +17,7 @@ export function ParcelPicker({
     [parcels.data],
   );
   if (parcels.data && options.length === 0) {
-    return <Txt variant="small">Adaugă mai întâi o parcelă din ecranul Hartă.</Txt>;
+    return <Txt variant="small">First add a parcel from the Map screen.</Txt>;
   }
   return <Choice label={label} options={options} value={value} onChange={onChange} />;
 }

@@ -14,7 +14,7 @@ import { useCatalogSeeds, useCatalogTractors } from './api';
 type Props = NativeStackScreenProps<RootStackParams, 'CatalogEditor'>;
 
 const NONE = 'NONE';
-const levelOptions = [{ value: NONE, label: 'Necompletat' }, ...(['LOW', 'MEDIUM', 'HIGH'] as CatalogLevel[]).map((value) => ({ value, label: LEVEL_LABELS[value] }))];
+const levelOptions = [{ value: NONE, label: 'Not filled in' }, ...(['LOW', 'MEDIUM', 'HIGH'] as CatalogLevel[]).map((value) => ({ value, label: LEVEL_LABELS[value] }))];
 const toText = (value: number | null | undefined) => (value == null ? '' : String(value));
 const toNumber = (value: string) => (isPositive(value) ? parseNumber(value) : null);
 const validOptional = (value: string) => !value.trim() || isPositive(value);
@@ -80,24 +80,24 @@ function SeedForm({ id, onDone }: { id?: string; onDone: () => void }) {
   const numbersValid = [fao, days, yieldMin, yieldMax].every(validOptional);
   return (
     <Panel>
-      <Field label="Nume hibrid sau soi" value={name} onChangeText={setName} />
-      <Field label="Producător" value={brand} onChangeText={setBrand} />
-      <Choice label="Cultură" options={CROP_CODES.map((value) => ({ value, label: CROPS[value].name }))} value={crop} onChange={setCrop} />
-      <Choice label="Tip" options={(Object.keys(SEED_TYPE_LABELS) as SeedType[]).map((value) => ({ value, label: SEED_TYPE_LABELS[value] }))} value={type} onChange={setType} />
+      <Field label="Hybrid or variety name" value={name} onChangeText={setName} />
+      <Field label="Manufacturer" value={brand} onChangeText={setBrand} />
+      <Choice label="Crop" options={CROP_CODES.map((value) => ({ value, label: CROPS[value].name }))} value={crop} onChange={setCrop} />
+      <Choice label="Type" options={(Object.keys(SEED_TYPE_LABELS) as SeedType[]).map((value) => ({ value, label: SEED_TYPE_LABELS[value] }))} value={type} onChange={setType} />
       <View style={{ flexDirection: 'row', gap: space.sm }}>
         <Field style={{ flex: 1 }} label="FAO" value={fao} onChangeText={setFao} keyboardType="number-pad" />
-        <Field style={{ flex: 1 }} label="Zile vegetație" value={days} onChangeText={setDays} keyboardType="number-pad" />
+        <Field style={{ flex: 1 }} label="Growing days" value={days} onChangeText={setDays} keyboardType="number-pad" />
       </View>
       <View style={{ flexDirection: 'row', gap: space.sm }}>
-        <Field style={{ flex: 1 }} label="Producție min (t/ha)" value={yieldMin} onChangeText={setYieldMin} keyboardType="decimal-pad" />
-        <Field style={{ flex: 1 }} label="Producție max (t/ha)" value={yieldMax} onChangeText={setYieldMax} keyboardType="decimal-pad" />
+        <Field style={{ flex: 1 }} label="Min yield (t/ha)" value={yieldMin} onChangeText={setYieldMin} keyboardType="decimal-pad" />
+        <Field style={{ flex: 1 }} label="Max yield (t/ha)" value={yieldMax} onChangeText={setYieldMax} keyboardType="decimal-pad" />
       </View>
-      <Choice label="Necesar de apă" options={levelOptions} value={water} onChange={setWater} />
-      <Choice label="Toleranță la secetă" options={levelOptions} value={drought} onChange={setDrought} />
-      <Field label="Regiuni recomandate, separate prin virgulă" value={regions} onChangeText={setRegions} />
-      <Field label="Observații" value={notes} onChangeText={setNotes} multiline />
+      <Choice label="Water requirement" options={levelOptions} value={water} onChange={setWater} />
+      <Choice label="Drought tolerance" options={levelOptions} value={drought} onChange={setDrought} />
+      <Field label="Recommended regions, comma-separated" value={regions} onChangeText={setRegions} />
+      <Field label="Notes" value={notes} onChangeText={setNotes} multiline />
       <Button mode="contained" disabled={!name.trim() || !crop || !numbersValid || save.isPending} loading={save.isPending} onPress={() => save.mutate()}>
-        Salvează produsul
+        Save product
       </Button>
     </Panel>
   );
@@ -149,20 +149,20 @@ function TractorForm({ id, onDone }: { id?: string; onDone: () => void }) {
   const numbersValid = [fuelMin, fuelMax, tank, weight].every(validOptional);
   return (
     <Panel>
-      <Field label="Marcă" value={brand} onChangeText={setBrand} />
-      <Field label="Serie" value={series} onChangeText={setSeries} />
+      <Field label="Brand" value={brand} onChangeText={setBrand} />
+      <Field label="Series" value={series} onChangeText={setSeries} />
       <Field label="Model" value={model} onChangeText={setModel} />
-      <Field label="Putere (CP)" value={power} onChangeText={setPower} keyboardType="decimal-pad" />
+      <Field label="Power (HP)" value={power} onChangeText={setPower} keyboardType="decimal-pad" />
       <View style={{ flexDirection: 'row', gap: space.sm }}>
-        <Field style={{ flex: 1 }} label="Consum min (l/oră)" value={fuelMin} onChangeText={setFuelMin} keyboardType="decimal-pad" />
-        <Field style={{ flex: 1 }} label="Consum max (l/oră)" value={fuelMax} onChangeText={setFuelMax} keyboardType="decimal-pad" />
+        <Field style={{ flex: 1 }} label="Min consumption (l/hour)" value={fuelMin} onChangeText={setFuelMin} keyboardType="decimal-pad" />
+        <Field style={{ flex: 1 }} label="Max consumption (l/hour)" value={fuelMax} onChangeText={setFuelMax} keyboardType="decimal-pad" />
       </View>
       <View style={{ flexDirection: 'row', gap: space.sm }}>
-        <Field style={{ flex: 1 }} label="Rezervor (l)" value={tank} onChangeText={setTank} keyboardType="decimal-pad" />
-        <Field style={{ flex: 1 }} label="Greutate (kg)" value={weight} onChangeText={setWeight} keyboardType="decimal-pad" />
+        <Field style={{ flex: 1 }} label="Tank (l)" value={tank} onChangeText={setTank} keyboardType="decimal-pad" />
+        <Field style={{ flex: 1 }} label="Weight (kg)" value={weight} onChangeText={setWeight} keyboardType="decimal-pad" />
       </View>
       <Button mode="contained" disabled={!brand.trim() || !model.trim() || !isPositive(power) || !numbersValid || save.isPending} loading={save.isPending} onPress={() => save.mutate()}>
-        Salvează tractorul
+        Save tractor
       </Button>
     </Panel>
   );

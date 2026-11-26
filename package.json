@@ -2,7 +2,7 @@
   "name": "fermapp",
   "private": true,
   "version": "1.0.0",
-  "description": "Platformă de management agricol: parcele, culturi, lucrări, irigații, meteo, sol, satelit și AI.",
+  "description": "Farm management platform: parcels, crops, field work, irrigation, weather, soil, satellite and AI.",
   "workspaces": [
     "packages/*",
     "apps/*"

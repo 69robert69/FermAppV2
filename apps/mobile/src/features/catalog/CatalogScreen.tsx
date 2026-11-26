@@ -17,9 +17,9 @@ import { useCatalogImplements, useCatalogSeeds, useCatalogTractors } from './api
 type Tab = 'seeds' | 'tractors' | 'implements';
 
 const TABS: { value: Tab; label: string }[] = [
-  { value: 'seeds', label: 'Semințe' },
-  { value: 'tractors', label: 'Tractoare' },
-  { value: 'implements', label: 'Utilaje' },
+  { value: 'seeds', label: 'Seeds' },
+  { value: 'tractors', label: 'Tractors' },
+  { value: 'implements', label: 'Implements' },
 ];
 const ALL = 'ALL';
 const levels = (label: string) => [{ value: ALL, label }, ...(['LOW', 'MEDIUM', 'HIGH'] as CatalogLevel[]).map((value) => ({ value, label: LEVEL_LABELS[value] }))];
@@ -37,31 +37,31 @@ function SeedsTab() {
 
   return (
     <>
-      <Field label="Caută hibrid, soi sau producător" value={filters.search ?? ''} onChangeText={(search) => setSeeds({ search })} />
+      <Field label="Search hybrid, variety or manufacturer" value={filters.search ?? ''} onChangeText={(search) => setSeeds({ search })} />
       <Choice
-        options={[{ value: ALL, label: 'Toate culturile' }, ...crops.map((value) => ({ value, label: CROPS[value].name }))]}
+        options={[{ value: ALL, label: 'All crops' }, ...crops.map((value) => ({ value, label: CROPS[value].name }))]}
         value={filters.crop ?? ALL}
         onChange={(value) => setSeeds({ crop: value === ALL ? null : (value as CropCode) })}
       />
       <View style={{ flexDirection: 'row', gap: space.sm }}>
         <Button style={{ flex: 1 }} mode="outlined" icon="filter-variant" onPress={() => setShowFilters((value) => !value)}>
-          {showFilters ? 'Ascunde filtrele' : 'Filtre'}
+          {showFilters ? 'Hide filters' : 'Filters'}
         </Button>
-        <Button style={{ flex: 1 }} onPress={resetSeeds}>Resetează</Button>
+        <Button style={{ flex: 1 }} onPress={resetSeeds}>Reset</Button>
       </View>
       {showFilters ? (
         <Panel>
-          <Choice label="Producător" options={[{ value: ALL, label: 'Toți' }, ...brands.map((value) => ({ value, label: value }))]} value={filters.brand ?? ALL} onChange={(value) => setSeeds({ brand: value === ALL ? null : value })} />
+          <Choice label="Manufacturer" options={[{ value: ALL, label: 'All' }, ...brands.map((value) => ({ value, label: value }))]} value={filters.brand ?? ALL} onChange={(value) => setSeeds({ brand: value === ALL ? null : value })} />
           <View style={{ flexDirection: 'row', gap: space.sm }}>
-            <Field style={{ flex: 1 }} label="FAO minim" keyboardType="number-pad" value={filters.faoMin?.toString() ?? ''} onChangeText={(value) => setSeeds({ faoMin: faoValue(value) })} />
-            <Field style={{ flex: 1 }} label="FAO maxim" keyboardType="number-pad" value={filters.faoMax?.toString() ?? ''} onChangeText={(value) => setSeeds({ faoMax: faoValue(value) })} />
+            <Field style={{ flex: 1 }} label="Min FAO" keyboardType="number-pad" value={filters.faoMin?.toString() ?? ''} onChangeText={(value) => setSeeds({ faoMin: faoValue(value) })} />
+            <Field style={{ flex: 1 }} label="Max FAO" keyboardType="number-pad" value={filters.faoMax?.toString() ?? ''} onChangeText={(value) => setSeeds({ faoMax: faoValue(value) })} />
           </View>
-          <Choice label="Necesar de apă" options={levels('Oricare')} value={filters.waterRequirement ?? ALL} onChange={(value) => setSeeds({ waterRequirement: levelValue(value) })} />
-          <Choice label="Toleranță la secetă" options={levels('Oricare')} value={filters.droughtTolerance ?? ALL} onChange={(value) => setSeeds({ droughtTolerance: levelValue(value) })} />
-          <Choice label="Potențial de producție" options={levels('Oricare')} value={filters.yieldPotential ?? ALL} onChange={(value) => setSeeds({ yieldPotential: levelValue(value) })} />
+          <Choice label="Water requirement" options={levels('Any')} value={filters.waterRequirement ?? ALL} onChange={(value) => setSeeds({ waterRequirement: levelValue(value) })} />
+          <Choice label="Drought tolerance" options={levels('Any')} value={filters.droughtTolerance ?? ALL} onChange={(value) => setSeeds({ droughtTolerance: levelValue(value) })} />
+          <Choice label="Yield potential" options={levels('Any')} value={filters.yieldPotential ?? ALL} onChange={(value) => setSeeds({ yieldPotential: levelValue(value) })} />
           <Choice
-            label="Sortează după"
-            options={[{ value: 'name', label: 'Nume' }, { value: 'fao', label: 'FAO' }, { value: 'yield', label: 'Producție' }]}
+            label="Sort by"
+            options={[{ value: 'name', label: 'Name' }, { value: 'fao', label: 'FAO' }, { value: 'yield', label: 'Yield' }]}
             value={filters.sort ?? 'name'}
             onChange={(sort) => setSeeds({ sort })}
           />
@@ -70,7 +70,7 @@ function SeedsTab() {
       <QueryState query={seeds}>
         {() =>
           visible.length === 0 ? (
-            <Empty icon="seed-off-outline" title="Niciun produs găsit" hint="Schimbă filtrele sau caută alt nume." />
+            <Empty icon="seed-off-outline" title="No products found" hint="Change the filters or search for another name." />
           ) : (
             <>
               {visible.map((seed) => (
@@ -104,9 +104,9 @@ function TractorsTab() {
   );
   return (
     <>
-      <Field label="Caută marcă sau model" value={search} onChangeText={setSearch} />
-      <Choice options={[{ value: ALL, label: 'Toate mărcile' }, ...brands.map((value) => ({ value, label: value }))]} value={brand} onChange={setBrand} />
-      <Choice label="Sortează după" options={[{ value: 'name', label: 'Nume' }, { value: 'power', label: 'Putere' }]} value={sort} onChange={setSort} />
+      <Field label="Search brand or model" value={search} onChangeText={setSearch} />
+      <Choice options={[{ value: ALL, label: 'All brands' }, ...brands.map((value) => ({ value, label: value }))]} value={brand} onChange={setBrand} />
+      <Choice label="Sort by" options={[{ value: 'name', label: 'Name' }, { value: 'power', label: 'Power' }]} value={sort} onChange={setSort} />
       <QueryState query={tractors}>
         {() => (
           <>
@@ -114,7 +114,7 @@ function TractorsTab() {
               <Pressable key={tractor.id} accessibilityRole="button" onPress={() => navigation.navigate('CatalogDetail', { kind: 'tractor', id: tractor.id })}>
                 <Panel style={{ gap: 2 }}>
                   <Txt variant="subtitle">{`${tractor.brand} ${tractor.model}`}</Txt>
-                  <Txt variant="small">{`${tractor.horsePower} CP, ${number(tractor.fuelConsumptionMin)}-${number(tractor.fuelConsumptionMax)} l/oră${tractor.fuelEstimated ? ' (estimat)' : ''}, ${tractor.category}`}</Txt>
+                  <Txt variant="small">{`${tractor.horsePower} HP, ${number(tractor.fuelConsumptionMin)}-${number(tractor.fuelConsumptionMax)} l/hour${tractor.fuelEstimated ? ' (estimated)' : ''}, ${tractor.category}`}</Txt>
                 </Panel>
               </Pressable>
             ))}
@@ -131,11 +131,11 @@ function ImplementsTab() {
     <QueryState query={implementsList}>
       {(items) => (
         <>
-          <Txt variant="small">Valori orientative, folosite pentru estimarea duratei și a consumului.</Txt>
+          <Txt variant="small">Indicative values, used to estimate duration and consumption.</Txt>
           {items.map((item) => (
             <Panel key={item.id} style={{ gap: 2 }}>
               <Txt variant="subtitle">{item.name}</Txt>
-              <Txt variant="small">{`Lățimi ${item.widthsM.join(', ')} m, ${item.speedKmh} km/h, ${item.hpPerMeter} CP/m`}</Txt>
+              <Txt variant="small">{`Widths ${item.widthsM.join(', ')} m, ${item.speedKmh} km/h, ${item.hpPerMeter} HP/m`}</Txt>
             </Panel>
           ))}
         </>
@@ -156,8 +156,8 @@ export function CatalogScreen() {
       const file = picked.assets?.[0];
       if (picked.canceled || !file) return;
       const result = await apiUpload<{ imported: number; problems: string[] }>(`/catalog/import?kind=${kind}`, { uri: file.uri, name: file.name, mimeType: file.mimeType });
-      const skipped = result.problems.length ? `\n${result.problems.length} rânduri au fost ignorate. Primul motiv: ${result.problems[0]}` : '';
-      Alert.alert('Import finalizat', `Au fost adăugate ${result.imported} produse.${skipped}`);
+      const skipped = result.problems.length ? `\n${result.problems.length} rows were skipped. First reason: ${result.problems[0]}` : '';
+      Alert.alert('Import complete', `${result.imported} products were added.${skipped}`);
     },
     [['catalog']],
   );
@@ -168,10 +168,10 @@ export function CatalogScreen() {
       {role === 'ADMIN' && tab !== 'implements' ? (
         <View style={{ flexDirection: 'row', gap: space.sm }}>
           <Button style={{ flex: 1 }} mode="contained" icon="plus" onPress={() => navigation.navigate('CatalogEditor', { kind: tab === 'seeds' ? 'seed' : 'tractor' })}>
-            Adaugă
+            Add
           </Button>
           <Button style={{ flex: 1 }} mode="outlined" icon="file-import-outline" loading={importFile.isPending} disabled={importFile.isPending} onPress={() => importFile.mutate()}>
-            CSV sau Excel
+            CSV or Excel
           </Button>
         </View>
       ) : null}

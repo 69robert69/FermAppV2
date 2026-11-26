@@ -1,4 +1,4 @@
-import { fuelLitersPerHour, IMPLEMENT_CATALOG, workCost, type MachineRecommendation, type WorkOperation } from '@fermapp/domain';
+import { fuelLitersPerHour, IMPLEMENT_CATALOG, workCost, type MachineRecommendation, type WorkOperation, formatEuro } from '@fermapp/domain';
 import { View } from 'react-native';
 import { Button } from 'react-native-paper';
 import type { Machine } from '../../api/types';
@@ -9,7 +9,7 @@ import { colors, space } from '../../theme';
 import { useState } from 'react';
 import { useMachineRecommendation } from './api';
 
-/** Consumul orar al utilajului pentru lucrarea aleasă. */
+/** Hourly consumption of the machine for the chosen operation. */
 export function machineFuelLPerH(machine: Machine | undefined, operation: string | null) {
   if (!machine) return null;
   const load = IMPLEMENT_CATALOG.find((item) => item.operation === operation)?.fuelLoad;
@@ -19,7 +19,7 @@ export function machineFuelLPerH(machine: Machine | undefined, operation: string
   return machine.avgConsumptionLh;
 }
 
-/** Recomandarea de tractor și costul estimat al lucrării. */
+/** Tractor recommendation and estimated cost of the operation. */
 export function WorkCostPanel({
   parcelId,
   areaHa,
@@ -46,18 +46,18 @@ export function WorkCostPanel({
     <View style={{ gap: space.md }}>
       {best ? (
         <Panel style={{ borderWidth: 1, borderColor: colors.wheat }}>
-          <Txt variant="subtitle">{`Recomandat: ${best.tractorName}`}</Txt>
-          <Row label="Utilaj" value={`${best.implementName}, ${number(best.workingWidthM)} m`} />
-          <Row label="Durată estimată" value={hoursMinutes(best.durationHours * 3600)} />
-          <Row label="Motorină estimată" value={`${number(best.fuelLiters, 0)} l`} />
-          <Row label="Cost estimat" value={`${number(best.fuelCost, 0)} RON`} />
-          {!best.owned ? <Txt variant="small">Sugestie din catalog. Adaugă tractoarele fermei pentru o recomandare exactă.</Txt> : null}
-          <Button mode="outlined" onPress={() => onApply(best)}>Folosește recomandarea</Button>
+          <Txt variant="subtitle">{`Recommended: ${best.tractorName}`}</Txt>
+          <Row label="Implement" value={`${best.implementName}, ${number(best.workingWidthM)} m`} />
+          <Row label="Estimated duration" value={hoursMinutes(best.durationHours * 3600)} />
+          <Row label="Estimated diesel" value={`${number(best.fuelLiters, 0)} l`} />
+          <Row label="Estimated cost" value={formatEuro(best.fuelCost, 0)} />
+          {!best.owned ? <Txt variant="small">Catalog suggestion. Add the farm's tractors for an exact recommendation.</Txt> : null}
+          <Button mode="outlined" onPress={() => onApply(best)}>Use recommendation</Button>
         </Panel>
       ) : null}
-      {operation === 'HARVESTING' ? <Txt variant="small">Recoltarea se face cu combina, deci nu primește o recomandare de tractor.</Txt> : null}
+      {operation === 'HARVESTING' ? <Txt variant="small">Harvesting is done with a combine, so it does not get a tractor recommendation.</Txt> : null}
       <Field
-        label="Preț motorină (RON/l)"
+        label="Diesel price (€/l)"
         value={price}
         keyboardType="decimal-pad"
         onChangeText={(value) => {
@@ -67,10 +67,10 @@ export function WorkCostPanel({
       />
       {cost ? (
         <Panel>
-          <Row label="Consum" value={`${number(cost.fuelLPerH)} l/oră`} />
-          <Row label="Motorină" value={`${number(cost.fuelLiters, 0)} l`} />
-          <Row label="Cost motorină" value={`${number(cost.fuelCost, 0)} RON`} />
-          <Row label="Cost pe hectar" value={`${number(cost.costPerHa, 0)} RON/ha`} />
+          <Row label="Consumption" value={`${number(cost.fuelLPerH)} l/hour`} />
+          <Row label="Diesel" value={`${number(cost.fuelLiters, 0)} l`} />
+          <Row label="Diesel cost" value={formatEuro(cost.fuelCost, 0)} />
+          <Row label="Cost per hectare" value={`${formatEuro(cost.costPerHa, 2)}/ha`} />
         </Panel>
       ) : null}
     </View>

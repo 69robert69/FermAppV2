@@ -1,18 +1,18 @@
-import { buildFieldPath, positionOnPath, type CropCode, type Position } from '@fermapp/domain';
+import { buildFieldPath, FIELD_STATE_COLORS, positionOnPath, type CropCode, type FieldStatus, type Position } from '@fermapp/domain';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { useEffect, useMemo, useState, type ReactNode } from 'react';
 import { StyleSheet, View } from 'react-native';
-import { Marker, Polyline, type MapMarkerProps } from 'react-native-maps';
+import { Marker, type MapMarkerProps } from 'react-native-maps';
 import type { Parcel } from '../../api/types';
 import { Txt, type IconName } from '../../components/ui';
 import { clock, hoursMinutes, number } from '../../lib/format';
 import { runProgressAt } from '../../lib/hooks';
 import { colors, fonts, space } from '../../theme';
-import type { ActiveIrrigation, ActiveWork } from '../intelligence/api';
+import type { ActiveIrrigation } from '../intelligence/api';
+import { FieldStatusBadge } from '../fieldStatus';
+import { TillageBadge } from '../tillage/components';
 import type { MapParcelInfo } from './api';
 
-/** O poziție GPS mai veche de două minute nu mai descrie locul în care se află utilajul. */
-const GPS_FRESH_MS = 120_000;
 const REDRAW_MS = 700;
 
 const CROP_ICONS: Partial<Record<CropCode, IconName>> = {
@@ -29,7 +29,7 @@ const CROP_ICONS: Partial<Record<CropCode, IconName>> = {
   VEGETABLES: 'carrot',
 };
 
-/** Android redesenează conținutul unui marker doar cât timp urmărește schimbările. */
+/** Android redraws a marker's content only while it tracks changes. */
 function LiveMarker({ version, children, ...props }: MapMarkerProps & { version: string; children: ReactNode }) {
   const [tracking, setTracking] = useState(true);
   useEffect(() => {
@@ -63,84 +63,6 @@ function CardLine({ label, value }: { label: string; value: string }) {
 
 const outerRing = (parcel: Parcel): Position[] => parcel.geometry.coordinates[0] ?? [];
 
-export function WorkOverlay({
-  parcel,
-  work,
-  now,
-  detailed,
-  onPress,
-}: {
-  parcel: Parcel;
-  work: ActiveWork;
-  now: Date;
-  detailed: boolean;
-  onPress: () => void;
-}) {
-  const path = useMemo(
-    () => buildFieldPath(outerRing(parcel), { workingWidthM: work.workingWidthM }),
-    [parcel, work.workingWidthM],
-  );
-  const progress = runProgressAt(work, now);
-  const estimated = positionOnPath(path, progress.percent);
-  const location = work.lastLocation;
-  const gps = location && now.getTime() - new Date(location.recordedAt).getTime() < GPS_FRESH_MS ? location : null;
-  const latitude = gps?.lat ?? estimated?.lat;
-  const longitude = gps?.lng ?? estimated?.lng;
-  if (latitude === undefined || longitude === undefined) return null;
-
-  const paused = work.status === 'PAUSED';
-  const doneHa = (work.areaHa * progress.percent) / 100;
-  const color = paused ? colors.straw : colors.wheat;
-  const name = work.machine?.name ?? 'Utilaj';
-
-  return (
-    <>
-      {estimated && !gps && estimated.worked.length > 1 ? (
-        <Polyline
-          coordinates={estimated.worked.map(([lng, lat]) => ({ latitude: lat, longitude: lng }))}
-          strokeColor={`${colors.wheat}CC`}
-          strokeWidth={2}
-          zIndex={3}
-        />
-      ) : null}
-      <LiveMarker
-        version={`${Math.floor(progress.percent)}-${work.status}-${detailed}-${Math.round(estimated?.headingDeg ?? 0)}`}
-        coordinate={{ latitude, longitude }}
-        anchor={{ x: 0.5, y: detailed ? 0.16 : 0.5 }}
-        zIndex={6}
-        onPress={onPress}
-        accessibilityLabel={`${name}, ${Math.floor(progress.percent)}% realizat`}
-      >
-        <View style={styles.machineWrap}>
-          <View style={[styles.machine, { backgroundColor: color }]}>
-            <MaterialCommunityIcons name="tractor-variant" size={20} color={colors.wheatInk} />
-            {estimated ? (
-              <View style={styles.heading}>
-                <MaterialCommunityIcons
-                  name="navigation"
-                  size={11}
-                  color={colors.chaff}
-                  style={{ transform: [{ rotate: `${Math.round(estimated.headingDeg)}deg` }] }}
-                />
-              </View>
-            ) : null}
-          </View>
-          {detailed ? (
-            <View style={styles.card}>
-              <Txt variant="small" color={colors.chaff} style={styles.cardTitle} numberOfLines={1}>{name}</Txt>
-              <MiniBar percent={progress.percent} color={color} />
-              <CardLine label="Realizat" value={`${Math.floor(progress.percent)}%`} />
-              <CardLine label="Finalizat" value={`${number(doneHa)} ha`} />
-              <CardLine label="Rămas" value={`${number(Math.max(0, work.areaHa - doneHa))} ha`} />
-              <CardLine label="ETA" value={paused ? 'În pauză' : progress.eta ? clock(progress.eta) : '-'} />
-            </View>
-          ) : null}
-        </View>
-      </LiveMarker>
-    </>
-  );
-}
-
 export function IrrigationOverlay({
   parcel,
   run,
@@ -169,7 +91,7 @@ export function IrrigationOverlay({
       anchor={{ x: 0.5, y: detailed ? 0.2 : 0.5 }}
       zIndex={5}
       onPress={onPress}
-      accessibilityLabel={`${run.label}, acoperire ${Math.floor(progress.percent)}%. Deschide Irigații`}
+      accessibilityLabel={`${run.label}, coverage ${Math.floor(progress.percent)}%. Open Irrigation`}
     >
       <View style={styles.machineWrap}>
         <View style={[styles.machine, { backgroundColor: color }]}>
@@ -179,9 +101,9 @@ export function IrrigationOverlay({
           <View style={styles.card}>
             <Txt variant="small" color={colors.chaff} style={styles.cardTitle} numberOfLines={1}>{run.label}</Txt>
             <MiniBar percent={progress.percent} color={color} />
-            <CardLine label="Acoperire" value={`${Math.floor(progress.percent)}%`} />
-            <CardLine label="Rămas" value={hoursMinutes(progress.remainingSeconds)} />
-            <CardLine label="ETA" value={paused ? 'În pauză' : progress.eta ? clock(progress.eta) : '-'} />
+            <CardLine label="Coverage" value={`${Math.floor(progress.percent)}%`} />
+            <CardLine label="Remaining" value={hoursMinutes(progress.remainingSeconds)} />
+            <CardLine label="ETA" value={paused ? 'Paused' : progress.eta ? clock(progress.eta) : '-'} />
           </View>
         ) : null}
       </View>
@@ -189,61 +111,79 @@ export function IrrigationOverlay({
   );
 }
 
-/** Când harta este departe, parcelele mici rămân ușor de atins printr-un punct în centrul lor. */
-export function ParcelTapTarget({ parcel, onPress }: { parcel: Parcel; onPress: () => void }) {
+/** When the map is zoomed out, small parcels stay easy to tap via a dot at their centre. */
+export function ParcelTapTarget({ parcel, status, onPress }: { parcel: Parcel; status?: FieldStatus; onPress: () => void }) {
   return (
     <LiveMarker
-      version={parcel.id}
+      version={`${parcel.id}-${parcel.tillageSystem ?? ''}-${status?.state ?? ''}`}
       coordinate={{ latitude: parcel.centerLat, longitude: parcel.centerLng }}
-      anchor={{ x: 0.5, y: 0.5 }}
+      // With the badge under it, the dot sits in the top part of the marker (22 of 60 dp).
+      anchor={{ x: 0.5, y: parcel.tillageSystem ? 0.37 : 0.5 }}
       zIndex={3}
       onPress={onPress}
-      accessibilityLabel={`Deschide parcela ${parcel.name}`}
+      accessibilityLabel={`Open parcel ${parcel.name}${parcel.tillageSystem ? `, ${parcel.tillageSystem.replace(/_/g, " ").toLowerCase()}` : ""}`}
     >
-      <View style={styles.tapTarget}>
-        <View style={styles.tapDot} />
+      <View style={styles.tapWrap}>
+        <View style={styles.tapTarget}>
+          {/* The dot takes the plan status colour, so the state reads even when zoomed out. */}
+          <View style={[styles.tapDot, status ? { backgroundColor: FIELD_STATE_COLORS[status.state] } : null]} />
+        </View>
+        {/* The technology reads at a glance even when the parcel cards are hidden. */}
+        {parcel.tillageSystem ? <TillageBadge system={parcel.tillageSystem} size="sm" /> : null}
       </View>
     </LiveMarker>
   );
 }
 
-/** Situația parcelei, vizibilă direct pe hartă. */
+/** The parcel status, visible directly on the map. */
 export function ParcelInfoOverlay({
   parcel,
   info,
   now,
   selected,
+  favorite = false,
+  status,
   onPress,
 }: {
   parcel: Parcel;
   info: MapParcelInfo;
   now: Date;
   selected: boolean;
+  /** Priority parcels carry a star next to their name. */
+  favorite?: boolean;
+  /** Plan status of the parcel, shown as a badge with the field completion score. */
+  status?: FieldStatus;
   onPress: () => void;
 }) {
   const run = info.irrigation[0];
   const irrigationPct = run ? Math.floor(runProgressAt(run, now).percent) : null;
   const icon = info.crop ? (CROP_ICONS[info.crop.code] ?? 'sprout') : 'help-circle-outline';
-  const cropLabel = info.crop ? `${info.crop.name}${info.crop.planned ? ` ${info.crop.year}` : ''}` : 'Fără cultură';
+  const cropLabel = info.crop ? `${info.crop.name}${info.crop.planned ? ` ${info.crop.year}` : ''}` : 'No crop';
 
   return (
     <LiveMarker
-      version={[info.crop?.code, info.growthPct, irrigationPct, info.openTasks, info.ndvi, selected].join('-')}
+      version={[info.crop?.code, info.growthPct, irrigationPct, info.openTasks, info.ndvi, selected, favorite, parcel.tillageSystem, status?.state, status?.badge, status?.completionScore].join('-')}
       coordinate={{ latitude: parcel.centerLat, longitude: parcel.centerLng }}
       anchor={{ x: 0.5, y: 1 }}
       zIndex={4}
       onPress={onPress}
-      accessibilityLabel={`Parcela ${parcel.name}, ${cropLabel}, ${info.openTasks} task-uri`}
+      accessibilityLabel={`Parcel ${parcel.name}, ${cropLabel}, ${info.openTasks} tasks`}
     >
       <View style={[styles.info, selected && styles.infoSelected]}>
-        <Txt variant="small" color={colors.chaff} style={styles.cardTitle} numberOfLines={1}>{parcel.name}</Txt>
+        <View style={styles.cropRow}>
+          <Txt variant="small" color={colors.chaff} style={[styles.cardTitle, { flex: 1 }]} numberOfLines={1}>{parcel.name}</Txt>
+          {favorite ? <MaterialCommunityIcons name="star" size={13} color={colors.wheat} /> : null}
+        </View>
+        {parcel.tillageSystem ? <TillageBadge system={parcel.tillageSystem} size="sm" /> : null}
+        {status ? <FieldStatusBadge status={status} compact /> : null}
         <View style={styles.cropRow}>
           <MaterialCommunityIcons name={icon} size={14} color={colors.wheat} />
           <Txt variant="small" color={colors.chaff} style={styles.cropName} numberOfLines={1}>{cropLabel}</Txt>
         </View>
-        {info.growthPct !== null ? <CardLine label="Creștere" value={`${info.growthPct}%`} /> : null}
-        {irrigationPct !== null ? <CardLine label="Irigare" value={`${irrigationPct}%`} /> : null}
-        <CardLine label="Task-uri" value={String(info.openTasks)} />
+        {info.growthPct !== null ? <CardLine label="Growth" value={`${info.growthPct}%`} /> : null}
+        {irrigationPct !== null ? <CardLine label="Irrigation" value={`${irrigationPct}%`} /> : null}
+        <CardLine label="Tasks" value={String(info.openTasks)} />
+        {status?.completionScore != null ? <CardLine label="Completion" value={`${status.completionScore}%`} /> : null}
         {info.ndvi !== null ? <CardLine label="NDVI" value={number(info.ndvi, 2)} /> : null}
       </View>
     </LiveMarker>
@@ -251,11 +191,11 @@ export function ParcelInfoOverlay({
 }
 
 const styles = StyleSheet.create({
+  tapWrap: { alignItems: 'center', marginTop: -2 },
   tapTarget: { width: 44, height: 44, alignItems: 'center', justifyContent: 'center' },
   tapDot: { width: 14, height: 14, borderRadius: 7, borderWidth: 2, borderColor: colors.loam, backgroundColor: colors.wheat },
   machineWrap: { alignItems: 'center', width: 136 },
   machine: { width: 36, height: 36, borderRadius: 18, borderWidth: 2, borderColor: colors.loam, alignItems: 'center', justifyContent: 'center' },
-  heading: { position: 'absolute', right: -7, top: -7, width: 18, height: 18, borderRadius: 9, backgroundColor: colors.loam, alignItems: 'center', justifyContent: 'center' },
   card: { width: 136, marginTop: space.xs, padding: space.sm, gap: 3, borderRadius: 6, backgroundColor: `${colors.loam}F2` },
   cardTitle: { fontFamily: fonts.semibold, fontSize: 13, lineHeight: 16 },
   track: { height: 5, borderRadius: 3, backgroundColor: colors.ridge, overflow: 'hidden' },
@@ -263,7 +203,7 @@ const styles = StyleSheet.create({
   line: { flexDirection: 'row', justifyContent: 'space-between', gap: space.xs },
   lineLabel: { fontSize: 11, lineHeight: 14 },
   lineValue: { fontFamily: fonts.medium, fontSize: 11, lineHeight: 14 },
-  info: { width: 124, padding: space.sm, gap: 2, borderRadius: 6, borderWidth: 1, borderColor: colors.line, backgroundColor: `${colors.furrow}F2` },
+  info: { width: 150, padding: space.sm, gap: 2, borderRadius: 6, borderWidth: 1, borderColor: colors.line, backgroundColor: `${colors.furrow}F2` },
   infoSelected: { borderColor: colors.chaff },
   cropRow: { flexDirection: 'row', alignItems: 'center', gap: space.xs, marginBottom: 2 },
   cropName: { flex: 1, fontFamily: fonts.medium, fontSize: 12, lineHeight: 15 },

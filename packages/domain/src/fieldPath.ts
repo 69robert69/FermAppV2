@@ -7,7 +7,7 @@ const MAX_PASSES = 41;
 
 type Point = readonly [x: number, y: number];
 
-/** Proiecție plană locală, suficient de exactă la dimensiunea unei parcele. */
+/** Local planar projection, accurate enough at the scale of a parcel. */
 function projection(ring: Position[]) {
   const origin = ring[0]!;
   const cosLat = Math.cos((origin[1] * Math.PI) / 180);
@@ -28,7 +28,7 @@ const rotate = ([x, y]: Point, angle: number): Point => [
   x * Math.sin(angle) + y * Math.cos(angle),
 ];
 
-/** Utilajele lucrează de obicei paralel cu latura cea mai lungă a parcelei. */
+/** Machines usually work parallel to the longest side of the parcel. */
 function workAngle(points: Point[]): number {
   let longest = 0;
   let angle = 0;
@@ -44,7 +44,7 @@ function workAngle(points: Point[]): number {
   return angle;
 }
 
-/** Cel mai lung segment al liniei orizontale y aflat în interiorul poligonului. */
+/** Longest segment of the horizontal line y that lies inside the polygon. */
 function passSegment(points: Point[], y: number): [number, number] | null {
   const crossings: number[] = [];
   for (let i = 1; i < points.length; i += 1) {
@@ -62,15 +62,15 @@ function passSegment(points: Point[], y: number): [number, number] | null {
 }
 
 export interface FieldPathOptions {
-  /** Lățimea de lucru, din care rezultă numărul de treceri. */
+  /** Working width, which determines the number of passes. */
   workingWidthM?: number;
-  /** Număr fix de treceri. O singură trecere traversează parcela prin mijloc. */
+  /** Fixed number of passes. A single pass crosses the parcel through the middle. */
   passes?: number;
 }
 
 /**
- * Traseul dus-întors al unui utilaj pe parcelă.
- * Numărul de treceri este impar, astfel încât la 50% utilajul să fie în centrul parcelei.
+ * Back-and-forth path of a machine across the parcel.
+ * The number of passes is odd, so that at 50% the machine is in the centre of the parcel.
  */
 export function buildFieldPath(outerRing: Position[], options: FieldPathOptions = {}): Position[] {
   const ring = closeRing(outerRing);
@@ -103,13 +103,13 @@ export function buildFieldPath(outerRing: Position[], options: FieldPathOptions 
 export interface FieldPosition {
   lng: number;
   lat: number;
-  /** Direcția de deplasare, în grade față de nord. */
+  /** Heading, in degrees from north. */
   headingDeg: number;
-  /** Porțiunea de traseu deja parcursă. */
+  /** Portion of the path already covered. */
   worked: Position[];
 }
 
-/** Poziția pe traseu corespunzătoare procentului de progres. */
+/** Position on the path corresponding to the progress percentage. */
 export function positionOnPath(path: Position[], percent: number): FieldPosition | null {
   const start = path[0];
   if (!start) return null;
@@ -140,7 +140,7 @@ export function positionOnPath(path: Position[], percent: number): FieldPosition
   return { lng: start[0], lat: start[1], headingDeg: 0, worked };
 }
 
-/** Verifică dacă un punct se află în interiorul conturului. */
+/** Checks whether a point lies inside the outline. */
 export function pointInRing(point: Position, ring: Position[]): boolean {
   let inside = false;
   for (let i = 0, j = ring.length - 1; i < ring.length; j = i, i += 1) {

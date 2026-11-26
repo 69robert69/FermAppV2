@@ -1,5 +1,5 @@
 export interface HourlyWeather {
-  /** Ora locală a parcelei: YYYY-MM-DDTHH:mm. */
+  /** Local time at the parcel: YYYY-MM-DDTHH:mm. */
   time: string;
   temperatureC: number;
   humidityPct: number;
@@ -11,10 +11,10 @@ export interface HourlyWeather {
 export type FieldOperation = 'SPRAYING' | 'FERTILIZING' | 'SOWING' | 'HARVESTING';
 
 export const OPERATION_LABELS: Record<FieldOperation, string> = {
-  SPRAYING: 'erbicidare',
-  FERTILIZING: 'fertilizare',
-  SOWING: 'semănat',
-  HARVESTING: 'recoltare',
+  SPRAYING: 'spraying',
+  FERTILIZING: 'fertilizing',
+  SOWING: 'sowing',
+  HARVESTING: 'harvesting',
 };
 
 interface OperationRule {
@@ -23,7 +23,7 @@ interface OperationRule {
   humidityPct: readonly [number, number];
   maxRainProbabilityPct: number;
   maxHourlyRainMm: number;
-  /** Ploaia maximă acceptată în orele anterioare (teren sau plante ude). */
+  /** Maximum rain accepted in the preceding hours (wet ground or plants). */
   maxRecentRainMm: number;
   recentHours: number;
   idealWindKmh: number;
@@ -46,7 +46,7 @@ export interface WorkWindow {
   label: string;
 }
 
-const DAY_NAMES = ['Duminică', 'Luni', 'Marți', 'Miercuri', 'Joi', 'Vineri', 'Sâmbătă'];
+const DAY_NAMES = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
 
 const dayName = (time: string) => {
   const [year, month, day] = time.slice(0, 10).split('-').map(Number);
@@ -60,7 +60,7 @@ function addHour(time: string): string {
   return new Date(Date.UTC(year!, month! - 1, day!, hour! + 1, minute!)).toISOString().slice(0, 16);
 }
 
-/** Intervalele care trec de miezul nopții își afișează și ziua de final. */
+/** Intervals that cross midnight also show their end day. */
 function windowLabel(start: string, end: string): string {
   const startClock = start.slice(11, 16);
   const endClock = end.slice(11, 16);
@@ -94,8 +94,8 @@ function isSuitable(hours: readonly HourlyWeather[], index: number, rule: Operat
 }
 
 /**
- * Găsește intervalele continue potrivite, ordonate de la cel mai bun.
- * Orele dinaintea lui `from` contează doar pentru ploaia recentă.
+ * Finds suitable continuous intervals, ordered from best.
+ * Hours before `from` only count towards recent rain.
  */
 export function findWorkWindows(
   operation: FieldOperation,
@@ -142,6 +142,6 @@ export function bestWindowMessage(operation: FieldOperation, windows: readonly W
   const best = windows[0];
   const name = OPERATION_LABELS[operation];
   return best
-    ? `Interval optim pentru ${name}: ${best.label}`
-    : `Niciun interval potrivit pentru ${name} în perioada analizată.`;
+    ? `Best window for ${name}: ${best.label}`
+    : `No suitable window for ${name} in the analysed period.`;
 }

@@ -4,25 +4,25 @@ export interface WorkParams {
   efficiencyPct: number;
 }
 
-/** Capacitate (ha/oră) = Lățime (m) × Viteză (km/h) × Eficiență / 10. */
+/** Capacity (ha/hour) = Width (m) × Speed (km/h) × Efficiency / 10. */
 export function workCapacityHaH({ workingWidthM, speedKmh, efficiencyPct }: WorkParams): number {
   if (workingWidthM <= 0 || speedKmh <= 0 || efficiencyPct <= 0 || efficiencyPct > 100) {
-    throw new RangeError('Lățimea, viteza și eficiența (1-100%) trebuie să fie pozitive.');
+    throw new RangeError('Width, speed and efficiency (1-100%) must be positive.');
   }
   return (workingWidthM * speedKmh * (efficiencyPct / 100)) / 10;
 }
 
 export function workDurationHours(areaHa: number, capacityHaH: number): number {
-  if (areaHa <= 0 || capacityHaH <= 0) throw new RangeError('Suprafața și capacitatea trebuie să fie pozitive.');
+  if (areaHa <= 0 || capacityHaH <= 0) throw new RangeError('Area and capacity must be positive.');
   return areaHa / capacityHaH;
 }
 
 export interface TimedProgressInput {
   startedAt: Date;
   durationMs: number;
-  /** Timp acumulat în pauze încheiate. */
+  /** Time accumulated in completed pauses. */
   pausedMs?: number;
-  /** Momentul începerii pauzei curente, dacă lucrarea e în pauză. */
+  /** Moment the current pause started, if the job is paused. */
   pausedAt?: Date | null;
   now?: Date;
 }
@@ -35,7 +35,7 @@ export interface TimedProgress {
   finished: boolean;
 }
 
-/** Progresul unei operațiuni cu durată cunoscută; pauzele opresc cronometrul. */
+/** Progress of an operation with known duration; pauses stop the timer. */
 export function timedProgress(input: TimedProgressInput): TimedProgress {
   const now = input.now ?? new Date();
   const reference = input.pausedAt ?? now;

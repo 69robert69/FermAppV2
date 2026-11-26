@@ -29,25 +29,25 @@ export interface CropProfile {
   code: CropCode;
   name: string;
   family: CropFamily;
-  /** Ani întregi fără cultură, între două culturi identice pe aceeași parcelă. */
+  /** Full years without the crop, between two identical crops on the same parcel. */
   minBreakYears: number;
-  /** Necesar de apă pe sezon, în mm. */
+  /** Seasonal water requirement, in mm. */
   waterMm: readonly [min: number, max: number];
   phRange: readonly [min: number, max: number];
-  /** Temperatura medie optimă a sezonului de vegetație, în °C. */
+  /** Optimal mean temperature of the growing season, in °C. */
   seasonTempC: readonly [min: number, max: number];
   gddBaseC: number;
   gddCapC: number;
   gddToMaturity: number;
   textures: readonly SoilTexture[];
-  /** Producție orientativă, în t/ha. */
+  /** Indicative yield, in t/ha. */
   referenceYieldTHa: number;
 }
 
 export const CROPS: Record<CropCode, CropProfile> = {
   WHEAT: {
     code: 'WHEAT',
-    name: 'Grâu',
+    name: 'Wheat',
     family: 'CEREAL',
     minBreakYears: 1,
     waterMm: [350, 600],
@@ -61,7 +61,7 @@ export const CROPS: Record<CropCode, CropProfile> = {
   },
   BARLEY: {
     code: 'BARLEY',
-    name: 'Orz',
+    name: 'Barley',
     family: 'CEREAL',
     minBreakYears: 1,
     waterMm: [300, 500],
@@ -75,7 +75,7 @@ export const CROPS: Record<CropCode, CropProfile> = {
   },
   CORN: {
     code: 'CORN',
-    name: 'Porumb',
+    name: 'Corn',
     family: 'CEREAL',
     minBreakYears: 1,
     waterMm: [450, 800],
@@ -89,7 +89,7 @@ export const CROPS: Record<CropCode, CropProfile> = {
   },
   SUNFLOWER: {
     code: 'SUNFLOWER',
-    name: 'Floarea-soarelui',
+    name: 'Sunflower',
     family: 'ASTERACEAE',
     minBreakYears: 4,
     waterMm: [400, 700],
@@ -103,7 +103,7 @@ export const CROPS: Record<CropCode, CropProfile> = {
   },
   RAPESEED: {
     code: 'RAPESEED',
-    name: 'Rapiță',
+    name: 'Rapeseed',
     family: 'BRASSICA',
     minBreakYears: 3,
     waterMm: [400, 600],
@@ -117,7 +117,7 @@ export const CROPS: Record<CropCode, CropProfile> = {
   },
   SOY: {
     code: 'SOY',
-    name: 'Soia',
+    name: 'Soybean',
     family: 'LEGUME',
     minBreakYears: 2,
     waterMm: [450, 700],
@@ -131,7 +131,7 @@ export const CROPS: Record<CropCode, CropProfile> = {
   },
   ALFALFA: {
     code: 'ALFALFA',
-    name: 'Lucernă',
+    name: 'Alfalfa',
     family: 'LEGUME',
     minBreakYears: 3,
     waterMm: [600, 1000],
@@ -145,7 +145,7 @@ export const CROPS: Record<CropCode, CropProfile> = {
   },
   OAT: {
     code: 'OAT',
-    name: 'Ovăz',
+    name: 'Oats',
     family: 'CEREAL',
     minBreakYears: 2,
     waterMm: [350, 550],
@@ -159,7 +159,7 @@ export const CROPS: Record<CropCode, CropProfile> = {
   },
   POTATO: {
     code: 'POTATO',
-    name: 'Cartof',
+    name: 'Potato',
     family: 'SOLANACEAE',
     minBreakYears: 3,
     waterMm: [500, 700],
@@ -173,7 +173,7 @@ export const CROPS: Record<CropCode, CropProfile> = {
   },
   BEET: {
     code: 'BEET',
-    name: 'Sfeclă',
+    name: 'Beet',
     family: 'CHENOPOD',
     minBreakYears: 3,
     waterMm: [550, 750],
@@ -187,7 +187,7 @@ export const CROPS: Record<CropCode, CropProfile> = {
   },
   VEGETABLES: {
     code: 'VEGETABLES',
-    name: 'Legume',
+    name: 'Vegetables',
     family: 'VEGETABLE',
     minBreakYears: 2,
     waterMm: [400, 800],

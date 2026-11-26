@@ -1,7 +1,7 @@
 import { DarkTheme as NavigationDark, type Theme as NavigationTheme } from '@react-navigation/native';
 import { configureFonts, MD3DarkTheme, type MD3Theme } from 'react-native-paper';
 
-/** Paleta pornește de la câmp: pământ afânat, paie, grâu copt, frunză, apă și rugină. */
+/** The palette starts from the field: loose soil, straw, ripe wheat, leaf, water and rust. */
 export const colors = {
   loam: '#181B13',
   furrow: '#22261B',

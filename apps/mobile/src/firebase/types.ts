@@ -17,6 +17,7 @@ export const COLLECTIONS = [
   'expenses',
   'cropPlans',
   'reports',
+  'economics',
   'notifications',
   'photos',
   'observations',
@@ -55,9 +56,9 @@ export interface ParcelDoc extends FarmDoc {
   locality: string | null;
   centerLat: number;
   centerLng: number;
-  /** Conturul exterior. Firestore nu acceptă liste în liste, deci punctele sunt obiecte. */
+  /** The outer outline. Firestore does not accept nested lists, so the points are objects. */
   coordinates: { lat: number; lng: number }[];
-  /** Poligonul GeoJSON complet, salvat ca text. */
+  /** The full GeoJSON polygon, saved as text. */
   geometry: string;
   currentCrop: CropCode | null;
   plannedCrop: CropCode | null;
@@ -66,6 +67,10 @@ export interface ParcelDoc extends FarmDoc {
   ndviScore: number | null;
   notes?: string | null;
   irrigatedAreaHa?: number | null;
+  /** Soil tillage technology in use, see TILLAGE_SYSTEMS. */
+  tillageSystem?: string | null;
+  /** One entry per year, oldest first. */
+  tillageHistory?: { year: number; system: string }[] | null;
   archivedAt: string | null;
   ownerId: string;
 }
@@ -79,7 +84,7 @@ export interface CropHistoryDoc extends FarmDoc {
   yieldT?: number | null;
   harvestMoisture?: number | null;
   notes?: string | null;
-  /** Hibridul sau soiul ales din catalog. */
+  /** The hybrid or variety chosen from the catalog. */
   seedId?: string | null;
   seedName?: string | null;
   expectedYieldTHa?: number | null;
@@ -95,6 +100,14 @@ export interface ExpenseDoc extends FarmDoc {
   currency: string;
   date: string;
   notes: string | null;
+}
+
+/** Economic settings of the farm, one sheet per parcel and season, and the currency marker. Amounts in euro. */
+export interface EconomicDoc extends FarmDoc {
+  kind: 'settings' | 'sheet' | 'currency';
+  parcelId: string | null;
+  year: number | null;
+  data?: unknown;
 }
 
 export interface SoilAnalysisDoc extends FarmDoc {
@@ -125,6 +138,15 @@ export interface TaskDoc extends FarmDoc {
   completedAt: string | null;
   planId: string | null;
   planStepKey: string | null;
+  /** Who created the task. Missing on tasks created before the copilot. */
+  source?: 'USER' | 'AI' | 'PLAN';
+  category?: string | null;
+  machineId?: string | null;
+  /** Suggested time window, YYYY-MM-DD. */
+  windowStart?: string | null;
+  windowEnd?: string | null;
+  /** Why the copilot recommended it. */
+  aiReason?: string | null;
 }
 
 export interface MachineDoc extends FarmDoc {
@@ -136,6 +158,8 @@ export interface MachineDoc extends FarmDoc {
   fuelConsumptionMax?: number | null;
   tankCapacity?: number | null;
   weight?: number | null;
+  /** Tillage technologies the machine suits; empty uses the defaults of its type. */
+  tillageSystems?: string[] | null;
   brand: string | null;
   model: string | null;
   operator: string | null;
@@ -164,7 +188,7 @@ export interface MachineWorkDoc extends TimedRunDoc {
   workingWidthM: number;
   speedKmh: number;
   efficiencyPct: number;
-  /** Consumul și prețul motorinei de la pornirea lucrării. */
+  /** Diesel consumption and price when the operation started. */
   fuelLPerH?: number | null;
   fuelPricePerL?: number | null;
   lastLocation?: { lat: number; lng: number; headingDeg: number | null; speedKmh: number | null; recordedAt: string } | null;
@@ -179,7 +203,7 @@ export interface IrrigationDoc extends TimedRunDoc {
   eta: string | null;
 }
 
-/** Planul fără date financiare, vizibil pentru toată echipa. */
+/** The plan without financial data, visible to the whole team. */
 export type CropPlanDoc = FarmDoc &
   Omit<ParcelPlanData, 'report'> & {
     parcelId: string;
@@ -188,7 +212,7 @@ export type CropPlanDoc = FarmDoc &
     report: Omit<ParcelReport, 'expectedProfitEurHa' | 'priceEurPerT' | 'costEurHa'>;
   };
 
-/** Estimările financiare ale planului, ascunse operatorilor prin regulile de securitate. */
+/** The plan's financial estimates, hidden from operators by the security rules. */
 export interface ReportDoc extends FarmDoc {
   parcelId: string;
   planId: string;
@@ -212,7 +236,7 @@ export interface NotificationDoc extends FarmDoc {
 export interface PhotoDoc extends FarmDoc {
   parcelId: string;
   authorId: string;
-  /** Imaginea micșorată, codată pentru a încăpea într-un document Firestore. */
+  /** The shrunk image, encoded to fit in a Firestore document. */
   imageBase64: string;
   notes: string | null;
 }

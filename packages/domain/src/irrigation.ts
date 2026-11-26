@@ -1,6 +1,6 @@
 export function irrigationDurationHours(routeLengthM: number, speedMPerH: number): number {
   if (routeLengthM <= 0 || speedMPerH <= 0) {
-    throw new RangeError('Lungimea traseului și viteza trebuie să fie pozitive.');
+    throw new RangeError('Path length and speed must be positive.');
   }
   return routeLengthM / speedMPerH;
 }

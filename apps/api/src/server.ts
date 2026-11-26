@@ -13,13 +13,13 @@ initRealtime(server);
 startMqttBridge();
 if (env.JOBS_ENABLED) startScheduler();
 
-server.listen(env.PORT, () => logger.info(`API pornit pe portul ${env.PORT}`));
+server.listen(env.PORT, () => logger.info(`API started on port ${env.PORT}`));
 
 let closing = false;
 async function shutdown(signal: string) {
   if (closing) return;
   closing = true;
-  logger.info(`Oprire la semnalul ${signal}`);
+  logger.info(`Shutting down on signal ${signal}`);
   stopScheduler();
   stopMqttBridge();
   closeRealtime();

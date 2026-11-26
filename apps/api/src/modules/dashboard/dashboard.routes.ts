@@ -9,7 +9,7 @@ export const dashboardRoutes = new ApiRouter('', 'Dashboard');
 
 const round = (value: number) => Math.round(value * 100) / 100;
 
-dashboardRoutes.get('/dashboard', { summary: 'Indicatorii principali ai fermei', roles: ROLES.all }, async ({ auth }) => {
+dashboardRoutes.get('/dashboard', { summary: 'Main farm indicators', roles: ROLES.all }, async ({ auth }) => {
   const year = new Date().getFullYear();
   const farmId = auth.farmId;
   const [parcels, seasons, activeWork, activeIrrigation, openTasks, overdueTasks, alerts] = await Promise.all([
@@ -64,7 +64,7 @@ dashboardRoutes.get('/dashboard', { summary: 'Indicatorii principali ai fermei',
 dashboardRoutes.get(
   '/sync/changes',
   {
-    summary: 'Modificările de după ultima sincronizare offline',
+    summary: 'Changes since the last offline sync',
     roles: ROLES.all,
     query: z.object({ since: z.coerce.date().optional() }),
   },
@@ -93,7 +93,7 @@ dashboardRoutes.get(
       tasks,
       work: work.map((item) => serializeWork(item)),
       irrigation: irrigation.map((item) => serializeIrrigation(item)),
-      // Lista completă de id-uri permite aplicației să elimine local task-urile șterse.
+      // The full list of ids lets the app remove deleted tasks locally.
       taskIds: taskIds.map((task) => task.id),
     };
   },

@@ -6,6 +6,8 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { apiSend, isQueued } from '../api/client';
 import { ParcelPicker } from '../components/pickers';
 import { Field, IconButton, OfflineBanner, Txt } from '../components/ui';
+import { CopilotScreen } from '../features/copilot/CopilotScreen';
+import { usesFirebase } from '../firebase/config';
 import { errorMessage } from '../lib/hooks';
 import { colors, space } from '../theme';
 
@@ -17,12 +19,20 @@ interface Message {
 }
 
 const SUGGESTIONS = [
-  'Ce cultură recomanzi pentru sezonul următor?',
-  'Sunt condiții bune de erbicidare săptămâna aceasta?',
-  'Care sunt riscurile principale pe această parcelă?',
+  'Which crop do you recommend for next season?',
+  'Are conditions good for spraying herbicide this week?',
+  'What are the main risks on this parcel?',
 ];
 
+/**
+ * The AI tab. In Firebase mode the copilot reads the farm data on the phone and plans tasks;
+ * the server mode keeps its own assistant, which answers from the server database.
+ */
 export function AssistantScreen() {
+  return usesFirebase ? <CopilotScreen /> : <ServerAssistantScreen />;
+}
+
+function ServerAssistantScreen() {
   const insets = useSafeAreaInsets();
   const scroll = useRef<ComponentRef<typeof ScrollView>>(null);
   const [parcelId, setParcelId] = useState<string | null>(null);
@@ -49,7 +59,7 @@ export function AssistantScreen() {
           id: result.message.id,
           role: 'assistant',
           content: result.message.content,
-          note: result.message.source === 'rules' ? 'Rezumat calculat din datele parcelei' : undefined,
+          note: result.message.source === 'rules' ? 'Summary calculated from the parcel data' : undefined,
         },
       ]);
     },
@@ -71,8 +81,8 @@ export function AssistantScreen() {
       <View style={{ paddingTop: insets.top }}>
         <OfflineBanner />
         <View style={styles.head}>
-          <Txt variant="display">Asistent</Txt>
-          <ParcelPicker value={parcelId} onChange={setParcelId} label="Analizează parcela" />
+          <Txt variant="display">Assistant</Txt>
+          <ParcelPicker value={parcelId} onChange={setParcelId} label="Analyse parcel" />
         </View>
       </View>
 
@@ -85,7 +95,7 @@ export function AssistantScreen() {
       >
         {messages.length === 0 ? (
           <View style={{ gap: space.sm }}>
-            <Txt color={colors.straw}>Alege o parcelă și întreabă despre rotație, sol, vreme sau lucrări.</Txt>
+            <Txt color={colors.straw}>Choose a parcel and ask about rotation, soil, weather or field work.</Txt>
             {SUGGESTIONS.map((suggestion) => (
               <Pressable key={suggestion} accessibilityRole="button" style={styles.suggestion} onPress={() => send(suggestion)}>
                 <Txt>{suggestion}</Txt>
@@ -99,12 +109,12 @@ export function AssistantScreen() {
             {message.note ? <Txt variant="small">{message.note}</Txt> : null}
           </View>
         ))}
-        {ask.isPending ? <ActivityIndicator color={colors.wheat} style={{ alignSelf: 'flex-start' }} accessibilityLabel="Asistentul răspunde" /> : null}
+        {ask.isPending ? <ActivityIndicator color={colors.wheat} style={{ alignSelf: 'flex-start' }} accessibilityLabel="The assistant is answering" /> : null}
       </ScrollView>
 
       <View style={styles.composer}>
-        <Field style={{ flex: 1 }} label="Întrebarea ta" value={draft} onChangeText={setDraft} multiline maxLength={4000} />
-        <IconButton icon="send" label="Trimite întrebarea" color={colors.wheat} onPress={() => send(draft)} />
+        <Field style={{ flex: 1 }} label="Your question" value={draft} onChangeText={setDraft} multiline maxLength={4000} />
+        <IconButton icon="send" label="Send question" color={colors.wheat} onPress={() => send(draft)} />
       </View>
     </KeyboardAvoidingView>
   );

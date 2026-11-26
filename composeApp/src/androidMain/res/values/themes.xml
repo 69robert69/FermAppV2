@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Dark soil background from the first frame, so there is no white flash before Compose draws. -->
+    <style name="Theme.FermApp" parent="android:Theme.Material.NoActionBar">
+        <item name="android:windowBackground">@color/loam</item>
+        <item name="android:statusBarColor">@android:color/transparent</item>
+        <item name="android:navigationBarColor">@color/furrow</item>
+    </style>
+</resources>

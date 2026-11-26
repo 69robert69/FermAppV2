@@ -1,4 +1,4 @@
-# Se construiește din rădăcina monorepo-ului:
+# Built from the root of the monorepo:
 #   docker build -f apps/api/Dockerfile -t fermapp-api .
 FROM node:22-bookworm-slim AS build
 WORKDIR /repo
@@ -10,7 +10,7 @@ COPY apps/mobile/package.json apps/mobile/
 RUN npm ci --workspace @fermapp/api --workspace @fermapp/domain --include-workspace-root
 COPY packages/domain packages/domain
 COPY apps/api apps/api
-RUN npx --workspace @fermapp/api prisma generate --schema apps/api/prisma/schema.prisma
+RUN npx --workspace @fermapp/api prisma generate --schema prisma/schema.prisma
 RUN npm run build --workspace @fermapp/api
 RUN npm prune --omit=dev --workspace @fermapp/api --workspace @fermapp/domain --include-workspace-root
 

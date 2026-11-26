@@ -15,7 +15,7 @@ export function useNow(intervalMs = 1000, active = true) {
   return now;
 }
 
-/** Progresul unei operațiuni la momentul dat, calculat pe telefon. */
+/** Progress of an operation at the given moment, computed on the phone. */
 export function runProgressAt(run: TimedRun, now: Date) {
   if (run.status !== 'RUNNING' && run.status !== 'PAUSED') return run.progress;
   const running = run.status === 'RUNNING';
@@ -35,7 +35,7 @@ export function runProgressAt(run: TimedRun, now: Date) {
   };
 }
 
-/** Cronometru local, ca progresul să avanseze și între actualizările serverului. */
+/** Local timer, so progress advances between server updates too. */
 export function useLiveProgress(run: TimedRun) {
   const now = useNow(1000, run.status === 'RUNNING');
   return runProgressAt(run, now);
@@ -49,10 +49,10 @@ export const errorMessage = (error: unknown) => {
     const detail = error.details?.[0]?.message;
     return detail ?? error.message;
   }
-  return 'A apărut o problemă neașteptată. Încearcă din nou.';
+  return 'An unexpected problem occurred. Try again.';
 };
 
-/** Mutație care reîmprospătează listele afectate și afișează eroarea exactă. */
+/** Mutation that refreshes the affected lists and shows the exact error. */
 export function useAction<TVariables = void, TResult = unknown>(
   action: (variables: TVariables) => Promise<TResult>,
   invalidate: QueryKey[],
@@ -65,6 +65,6 @@ export function useAction<TVariables = void, TResult = unknown>(
       await Promise.all(invalidate.map((queryKey) => client.invalidateQueries({ queryKey })));
       onSuccess?.(result);
     },
-    onError: (error) => Alert.alert('Acțiunea nu a reușit', errorMessage(error)),
+    onError: (error) => Alert.alert('The action failed', errorMessage(error)),
   });
 }

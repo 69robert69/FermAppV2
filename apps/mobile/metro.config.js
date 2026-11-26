@@ -11,12 +11,12 @@ config.resolver.nodeModulesPaths = [
   path.resolve(projectRoot, 'node_modules'),
   path.resolve(workspaceRoot, 'node_modules'),
 ];
-// Pachetul comun se încarcă direct din sursă.
+// The shared package is loaded directly from source.
 config.resolver.extraNodeModules = {
   '@fermapp/domain': path.resolve(workspaceRoot, 'packages/domain'),
 };
 
-// Arhivele Shapefile se deschid cu JSZip, deoarece acest pachet nu funcționează pe telefon.
+// Shapefile archives are opened with JSZip, because this package does not work on the phone.
 config.resolver.resolveRequest = (context, moduleName, platform) =>
   moduleName === 'but-unzip' ? { type: 'empty' } : context.resolveRequest(context, moduleName, platform);
 

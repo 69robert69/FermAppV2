@@ -23,19 +23,19 @@ const yearQuery = z.object({ year: z.coerce.number().int().min(2000).max(2100).o
 
 intelligenceRoutes.get(
   '/intelligence',
-  { summary: 'Toate datele panoului Parcel Intelligence', roles: ROLES.all, params: idParams },
+  { summary: 'All data for the Parcel Intelligence panel', roles: ROLES.all, params: idParams },
   async ({ auth, params }) => buildIntelligence(auth, params.id),
 );
 
 intelligenceRoutes.get(
   '/weather',
-  { summary: 'Vremea de azi, prognoza pe 7 și 14 zile și alertele de stropire', roles: ROLES.all, params: idParams },
+  { summary: 'Today’s weather, 7- and 14-day forecast and spraying alerts', roles: ROLES.all, params: idParams },
   async ({ auth, params }) => parcelWeather(await requireParcel(auth.farmId, params.id)),
 );
 
 intelligenceRoutes.get(
   '/rotation-score',
-  { summary: 'Scorul de rotație și istoricul culturilor', roles: ROLES.all, params: idParams },
+  { summary: 'Rotation score and crop history', roles: ROLES.all, params: idParams },
   async ({ auth, params }) => {
     await requireParcel(auth.farmId, params.id);
     return rotationScore(params.id);
@@ -44,14 +44,14 @@ intelligenceRoutes.get(
 
 intelligenceRoutes.get(
   '/economics',
-  { summary: 'Costuri, venit estimat, profit, marjă și ROI', roles: ROLES.planners, params: idParams, query: yearQuery },
+  { summary: 'Costs, estimated revenue, profit, margin and ROI', roles: ROLES.planners, params: idParams, query: yearQuery },
   async ({ auth, params, query }) => economicsFor(await requireParcel(auth.farmId, params.id), query.year),
 );
 
 intelligenceRoutes.post(
   '/incomes',
   {
-    summary: 'Înregistrează un venit realizat',
+    summary: 'Record realized revenue',
     roles: ROLES.managers,
     params: idParams,
     body: z.object({
@@ -71,7 +71,7 @@ intelligenceRoutes.post(
 
 intelligenceRoutes.get(
   '/ndvi',
-  { summary: 'NDVI, NDRE și starea vegetației: acum, acum 7 și 30 de zile', roles: ROLES.all, params: idParams },
+  { summary: 'NDVI, NDRE and vegetation status: now, 7 and 30 days ago', roles: ROLES.all, params: idParams },
   async ({ auth, params }) => {
     await requireParcel(auth.farmId, params.id);
     const observations = await prisma.satelliteObservation.findMany({
@@ -85,7 +85,7 @@ intelligenceRoutes.get(
 
 intelligenceRoutes.get(
   '/tasks',
-  { summary: 'Task-urile parcelei și sumarul pe status', roles: ROLES.all, params: idParams },
+  { summary: 'Parcel tasks and status summary', roles: ROLES.all, params: idParams },
   async ({ auth, params }) => {
     await requireParcel(auth.farmId, params.id);
     const items = await prisma.task.findMany({
@@ -100,7 +100,7 @@ intelligenceRoutes.get(
 
 intelligenceRoutes.get(
   '/observations',
-  { summary: 'Observațiile din teren', roles: ROLES.all, params: idParams },
+  { summary: 'Field observations', roles: ROLES.all, params: idParams },
   async ({ auth, params }) => {
     await requireParcel(auth.farmId, params.id);
     return prisma.observation.findMany({
@@ -115,7 +115,7 @@ intelligenceRoutes.get(
 intelligenceRoutes.post(
   '/observations',
   {
-    summary: 'Adaugă o observație din teren',
+    summary: 'Add a field observation',
     roles: ROLES.all,
     params: idParams,
     body: z.object({
@@ -137,7 +137,7 @@ intelligenceRoutes.post(
 
 intelligenceRoutes.get(
   '/photos',
-  { summary: 'Galeria foto a parcelei', roles: ROLES.all, params: idParams },
+  { summary: 'Parcel photo gallery', roles: ROLES.all, params: idParams },
   async ({ auth, params }) => {
     await requireParcel(auth.farmId, params.id);
     return prisma.photo.findMany({ where: { parcelId: params.id }, orderBy: { createdAt: 'desc' }, take: 200 });
@@ -147,7 +147,7 @@ intelligenceRoutes.get(
 intelligenceRoutes.post(
   '/photos',
   {
-    summary: 'Încarcă o fotografie cu note',
+    summary: 'Upload a photo with notes',
     roles: ROLES.all,
     file: true,
     params: idParams,
@@ -155,10 +155,10 @@ intelligenceRoutes.post(
   },
   async ({ auth, params, body, file }) => {
     await requireParcel(auth.farmId, params.id);
-    if (!file) throw badRequest('Atașează fotografia în câmpul „file”.');
-    if (file.size > MAX_PHOTO_BYTES) throw badRequest('Fotografia depășește limita de 10 MB.');
+    if (!file) throw badRequest('Attach the photo in the "file" field.');
+    if (file.size > MAX_PHOTO_BYTES) throw badRequest('The photo exceeds the 10 MB limit.');
     const type = detectImageType(file.buffer);
-    if (!type) throw badRequest('Fișierul trebuie să fie o imagine JPEG, PNG, WEBP sau HEIC.');
+    if (!type) throw badRequest('The file must be a JPEG, PNG, WEBP or HEIC image.');
     const storageKey = await saveFile(`parcels/${params.id}`, type.extension, file.buffer);
     const photo = await prisma.photo.create({
       data: {
@@ -177,29 +177,29 @@ intelligenceRoutes.post(
 
 async function requirePhoto(farmId: string, parcelId: string, photoId: string) {
   const photo = await prisma.photo.findFirst({ where: { id: photoId, parcelId, parcel: { farmId } } });
-  if (!photo) throw notFound('Fotografia');
+  if (!photo) throw notFound('Photo');
   return photo;
 }
 
 intelligenceRoutes.get(
   '/photos/:photoId/file',
-  { summary: 'Conținutul fotografiei', roles: ROLES.all, produces: 'image/jpeg', params: photoParams },
+  { summary: 'Photo content', roles: ROLES.all, produces: 'image/jpeg', params: photoParams },
   async ({ auth, params }) => {
     const photo = await requirePhoto(auth.farmId, params.id, params.photoId);
     const buffer = await loadFile(photo.storageKey).catch(() => {
-      throw notFound('Fișierul fotografiei');
+      throw notFound('Photo file');
     });
-    return new FileResult(buffer, photo.contentType, `foto-${photo.id}`, true);
+    return new FileResult(buffer, photo.contentType, `photo-${photo.id}`, true);
   },
 );
 
 intelligenceRoutes.delete(
   '/photos/:photoId',
-  { summary: 'Șterge o fotografie', roles: ROLES.all, params: photoParams },
+  { summary: 'Delete a photo', roles: ROLES.all, params: photoParams },
   async ({ auth, params }) => {
     const photo = await requirePhoto(auth.farmId, params.id, params.photoId);
     const mayDelete = auth.role === 'ADMIN' || auth.role === 'FARM_MANAGER' || photo.authorId === auth.userId;
-    if (!mayDelete) throw forbidden('Poți șterge doar fotografiile proprii.');
+    if (!mayDelete) throw forbidden('You can only delete your own photos.');
     await prisma.photo.delete({ where: { id: photo.id } });
     await removeFile(photo.storageKey);
     emitToFarm(auth.farmId, 'parcel:updated', { parcelId: params.id });
@@ -208,42 +208,42 @@ intelligenceRoutes.delete(
 
 intelligenceRoutes.get(
   '/report',
-  { summary: 'Raport PDF pentru parcelă', roles: ROLES.all, produces: 'application/pdf', params: idParams },
+  { summary: 'PDF report for the parcel', roles: ROLES.all, produces: 'application/pdf', params: idParams },
   async ({ auth, params }) => {
     const data = await buildIntelligence(auth, params.id);
     const farm = await prisma.farm.findUniqueOrThrow({ where: { id: auth.farmId } });
     const rows: [string, string, string | number | null | undefined][] = [
-      ['Parcelă', 'Cod', data.header.code],
-      ['Parcelă', 'Suprafață (ha)', data.header.areaHa],
-      ['Parcelă', 'Localitate', [data.header.locality, data.header.county].filter(Boolean).join(', ')],
-      ['Cultură', 'Cultura curentă', data.crop?.name ?? 'Neînregistrată'],
-      ['Cultură', 'Progres (%)', data.crop?.percent],
-      ['Rotație', 'Scor', data.rotation.score],
-      ['Rotație', 'Verdict', data.rotation.label.replace(/^\S+\s/, '')],
-      ['Rotație', 'Explicație', data.rotation.explanation],
-      ...data.rotation.history.map((item): [string, string, string] => ['Istoric', String(item.year), CROPS[item.crop].name]),
-      ['Recomandare', 'Următoarea acțiune', data.nextAction.action],
-      ['Recomandare', 'Motiv', data.nextAction.reason],
-      ['Sol', 'Clasificare', 'label' in data.soil ? data.soil.label : null],
-      ['Task-uri', 'Deschise', data.tasks.summary.todo + data.tasks.summary.inProgress],
+      ['Parcel', 'Code', data.header.code],
+      ['Parcel', 'Area (ha)', data.header.areaHa],
+      ['Parcel', 'Locality', [data.header.locality, data.header.county].filter(Boolean).join(', ')],
+      ['Crop', 'Current crop', data.crop?.name ?? 'Not recorded'],
+      ['Crop', 'Progress (%)', data.crop?.percent],
+      ['Rotation', 'Score', data.rotation.score],
+      ['Rotation', 'Verdict', data.rotation.label.replace(/^\S+\s/, '')],
+      ['Rotation', 'Explanation', data.rotation.explanation],
+      ...data.rotation.history.map((item): [string, string, string] => ['History', String(item.year), CROPS[item.crop].name]),
+      ['Recommendation', 'Next action', data.nextAction.action],
+      ['Recommendation', 'Reason', data.nextAction.reason],
+      ['Soil', 'Classification', 'label' in data.soil ? data.soil.label : null],
+      ['Tasks', 'Open', data.tasks.summary.todo + data.tasks.summary.inProgress],
       ...(data.economics
         ? ([
-            ['Economie', 'Cost total (lei)', data.economics.totalCost],
-            ['Economie', 'Cost/ha (lei)', data.economics.costPerHa],
-            ['Economie', 'Profit estimat (lei)', data.economics.expectedProfit],
+            ['Economics', 'Total cost (EUR)', data.economics.totalCost],
+            ['Economics', 'Cost/ha (EUR)', data.economics.costPerHa],
+            ['Economics', 'Estimated profit (EUR)', data.economics.expectedProfit],
           ] as [string, string, number | null][])
         : []),
     ];
     const report: Report = {
-      title: `Parcela ${data.header.name}`,
-      period: `Generat la ${data.generatedAt.slice(0, 10)}`,
+      title: `Parcel ${data.header.name}`,
+      period: `Generated on ${data.generatedAt.slice(0, 10)}`,
       columns: [
-        { key: 'section', label: 'Secțiune', width: 1 },
+        { key: 'section', label: 'Section', width: 1 },
         { key: 'indicator', label: 'Indicator', width: 1.4 },
-        { key: 'value', label: 'Valoare', width: 3.6 },
+        { key: 'value', label: 'Value', width: 3.6 },
       ],
-      rows: rows.map(([section, indicator, value]) => ({ section, indicator, value: value ?? 'Date indisponibile' })),
+      rows: rows.map(([section, indicator, value]) => ({ section, indicator, value: value ?? 'Data unavailable' })),
     };
-    return new FileResult(await reportToPdf(report, farm.name), 'application/pdf', `parcela-${data.header.code}.pdf`);
+    return new FileResult(await reportToPdf(report, farm.name), 'application/pdf', `parcel-${data.header.code}.pdf`);
   },
 );

@@ -30,19 +30,19 @@ async function sendPush(tokens: string[], title: string, body: string, data?: Re
         body: JSON.stringify(batch.map((to) => ({ to, title, body, data, sound: 'default', priority: 'high' }))),
       });
       if (!response.ok) {
-        logger.warn('Expo Push a respins lotul', response.status);
+        logger.warn('Expo Push rejected the batch', response.status);
         continue;
       }
       const result = (await response.json()) as { data?: { status: string; details?: { error?: string } }[] };
       const stale = batch.filter((_, index) => result.data?.[index]?.details?.error === 'DeviceNotRegistered');
       if (stale.length > 0) await prisma.pushDevice.deleteMany({ where: { token: { in: stale } } });
     } catch (error) {
-      logger.warn('Trimitere push eșuată', (error as Error).message);
+      logger.warn('Push delivery failed', (error as Error).message);
     }
   }
 }
 
-/** Salvează notificarea, o trimite live în aplicație și prin push. */
+/** Saves the notification and sends it live in the app and via push. */
 export async function notify(input: NotificationInput) {
   const { farmId, userIds, roles, title, body, data } = input;
   const members = await prisma.farmMembership.findMany({

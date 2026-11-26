@@ -6,7 +6,7 @@ export type CatalogLevel = 'LOW' | 'MEDIUM' | 'HIGH';
 export type SeedType = 'HYBRID' | 'VARIETY';
 export type WorkOperation = 'PLOWING' | 'DISCING' | 'SUBSOILING' | 'SOWING' | 'FERTILIZING' | 'SPRAYING' | 'HARVESTING';
 
-/** Valorile necunoscute rămân goale. Ele se completează din fișa tehnică a producătorului. */
+/** Unknown values stay empty. They are filled in from the manufacturer's data sheet. */
 export interface SeedEntry {
   id: string;
   brand: string | null;
@@ -35,7 +35,7 @@ export interface TractorEntry {
   horsePower: number;
   fuelConsumptionMin: number;
   fuelConsumptionMax: number;
-  /** Consumul este estimat din putere, deoarece nu a fost introdus din fișa tehnică. */
+  /** Consumption is estimated from power, because it was not entered from the data sheet. */
   fuelEstimated: boolean;
   tankCapacity: number | null;
   weight: number | null;
@@ -51,24 +51,24 @@ export interface ImplementEntry {
   widthsM: number[];
   speedKmh: number;
   efficiencyPct: number;
-  /** Puterea necesară pentru fiecare metru de lucru. */
+  /** Power required for each metre of working width. */
   hpPerMeter: number;
-  /** Partea din intervalul de consum al tractorului folosită la această lucrare. */
+  /** Share of the tractor's consumption range used for this operation. */
   fuelLoad: number;
 }
 
-export const LEVEL_LABELS: Record<CatalogLevel, string> = { LOW: 'Scăzută', MEDIUM: 'Medie', HIGH: 'Ridicată' };
-export const SEED_TYPE_LABELS: Record<SeedType, string> = { HYBRID: 'Hibrid', VARIETY: 'Soi' };
+export const LEVEL_LABELS: Record<CatalogLevel, string> = { LOW: 'Low', MEDIUM: 'Medium', HIGH: 'High' };
+export const SEED_TYPE_LABELS: Record<SeedType, string> = { HYBRID: 'Hybrid', VARIETY: 'Variety' };
 
 export function maturityGroupFor(fao: number | null) {
   if (fao === null) return null;
-  if (fao < 300) return 'Timpuriu';
-  if (fao < 400) return 'Semitimpuriu';
-  if (fao < 500) return 'Semitardiv';
-  return 'Tardiv';
+  if (fao < 300) return 'Early';
+  if (fao < 400) return 'Medium-early';
+  if (fao < 500) return 'Medium-late';
+  return 'Late';
 }
 
-/** Potențialul de producție raportat la producția de referință a culturii. */
+/** Yield potential relative to the crop's reference yield. */
 export function yieldLevelFor(crop: CropCode, expectedYieldMax: number | null): CatalogLevel | null {
   if (expectedYieldMax === null) return null;
   const ratio = expectedYieldMax / CROPS[crop].referenceYieldTHa;
@@ -105,7 +105,7 @@ export function createSeedEntry(input: Partial<SeedEntry> & Pick<SeedEntry, 'nam
 const seedsOf = (crop: CropCode, type: SeedType, items: (Partial<SeedEntry> & { name: string })[]) =>
   items.map((item) => createSeedEntry({ ...item, crop, type }));
 
-/** Produsele de pornire ale catalogului. Administratorul fermei completează restul datelor. */
+/** Starter catalog products. The farm administrator fills in the rest of the data. */
 export const SEED_CATALOG: SeedEntry[] = [
   ...seedsOf('CORN', 'HYBRID', [
     { name: 'Pioneer P0710', brand: 'Pioneer', fao: 410, vegetationDays: 160, droughtTolerance: 'HIGH', expectedYieldMin: 10, expectedYieldMax: 16 },
@@ -143,9 +143,9 @@ export const SEED_CATALOG: SeedEntry[] = [
 ];
 
 function tractorCategory(horsePower: number) {
-  if (horsePower < 150) return { category: 'Utilitar', recommendedUsage: 'Lucrări ușoare, transport și erbicidat.' };
-  if (horsePower < 250) return { category: 'Mediu', recommendedUsage: 'Semănat, fertilizat și pregătirea terenului.' };
-  return { category: 'Mare', recommendedUsage: 'Arat, scarificat și utilaje late pe suprafețe mari.' };
+  if (horsePower < 150) return { category: 'Utility', recommendedUsage: 'Light work, transport and spraying.' };
+  if (horsePower < 250) return { category: 'Medium', recommendedUsage: 'Sowing, fertilizing and seedbed preparation.' };
+  return { category: 'Large', recommendedUsage: 'Ploughing, subsoiling and wide implements on large areas.' };
 }
 
 export function createTractorEntry(
@@ -190,20 +190,21 @@ export const TRACTOR_CATALOG: TractorEntry[] = [
   createTractorEntry({ brand: 'Claas', series: 'Axion 900', model: 'Axion 960', horsePower: 445 }),
 ];
 
-/** Valori orientative pentru utilaje tractate uzuale. */
+/** Indicative values for common trailed implements. */
 export const IMPLEMENT_CATALOG: ImplementEntry[] = [
-  { id: 'plug', name: 'Plug reversibil', operation: 'PLOWING', widthsM: [1.6, 2.1, 2.8, 3.5], speedKmh: 7, efficiencyPct: 80, hpPerMeter: 90, fuelLoad: 0.8 },
-  { id: 'disc', name: 'Grapă cu discuri', operation: 'DISCING', widthsM: [3, 4, 6, 8], speedKmh: 11, efficiencyPct: 80, hpPerMeter: 30, fuelLoad: 0.6 },
-  { id: 'scarificator', name: 'Scarificator', operation: 'SUBSOILING', widthsM: [2.5, 3, 4, 5], speedKmh: 8, efficiencyPct: 80, hpPerMeter: 70, fuelLoad: 0.8 },
-  { id: 'semanatoare', name: 'Semănătoare', operation: 'SOWING', widthsM: [3, 4.5, 6, 8, 12], speedKmh: 8, efficiencyPct: 70, hpPerMeter: 22, fuelLoad: 0.35 },
-  { id: 'fertilizator', name: 'Mașină de fertilizat', operation: 'FERTILIZING', widthsM: [12, 18, 24], speedKmh: 12, efficiencyPct: 70, hpPerMeter: 3, fuelLoad: 0.25 },
-  { id: 'erbicidator', name: 'Mașină de erbicidat', operation: 'SPRAYING', widthsM: [18, 24, 28], speedKmh: 10, efficiencyPct: 70, hpPerMeter: 4, fuelLoad: 0.25 },
+  { id: 'plug', name: 'Reversible plough', operation: 'PLOWING', widthsM: [1.6, 2.1, 2.8, 3.5], speedKmh: 7, efficiencyPct: 80, hpPerMeter: 90, fuelLoad: 0.8 },
+  { id: 'disc', name: 'Disc harrow', operation: 'DISCING', widthsM: [3, 4, 6, 8], speedKmh: 11, efficiencyPct: 80, hpPerMeter: 30, fuelLoad: 0.6 },
+  { id: 'scarificator', name: 'Subsoiler', operation: 'SUBSOILING', widthsM: [2.5, 3, 4, 5], speedKmh: 8, efficiencyPct: 80, hpPerMeter: 70, fuelLoad: 0.8 },
+  { id: 'semanatoare', name: 'Seed drill', operation: 'SOWING', widthsM: [3, 4.5, 6, 8, 12], speedKmh: 8, efficiencyPct: 70, hpPerMeter: 22, fuelLoad: 0.35 },
+  { id: 'fertilizator', name: 'Fertilizer spreader', operation: 'FERTILIZING', widthsM: [12, 18, 24], speedKmh: 12, efficiencyPct: 70, hpPerMeter: 3, fuelLoad: 0.25 },
+  { id: 'erbicidator', name: 'Field sprayer', operation: 'SPRAYING', widthsM: [18, 24, 28], speedKmh: 10, efficiencyPct: 70, hpPerMeter: 4, fuelLoad: 0.25 },
 ];
 
-export const DEFAULT_FUEL_PRICE_RON = 7.2;
+/** Diesel price in euro per litre. */
+export const DEFAULT_FUEL_PRICE_EUR = 1.45;
 const DEFAULT_FUEL_LOAD = 0.35;
-/** Costul orar al operatorului departajează tractoarele mici, lente, de cele mari, rapide. */
-const OPERATOR_COST_RON_H = 50;
+/** The operator's hourly cost separates small, slow tractors from large, fast ones. */
+const OPERATOR_COST_EUR_H = 10;
 const SLOPE_POWER_LOSS_PER_PCT = 0.02;
 
 const round = (value: number, digits = 1) => Math.round(value * 10 ** digits) / 10 ** digits;
@@ -229,7 +230,7 @@ export interface TractorOption {
   horsePower: number;
   fuelConsumptionMin?: number | null;
   fuelConsumptionMax?: number | null;
-  /** Tractorul există în parcul fermei sau este doar o sugestie din catalog. */
+  /** The tractor exists in the farm's fleet or is only a catalog suggestion. */
   owned: boolean;
 }
 
@@ -246,7 +247,7 @@ export interface MachineRecommendation extends WorkCost {
   reason: string;
 }
 
-/** Alege tractorul cu cel mai mic cost total pentru lucrare, dintre cele cu putere suficientă. */
+/** Picks the tractor with the lowest total cost for the job, among those with enough power. */
 export function recommendMachine(input: {
   areaHa: number;
   operation: WorkOperation;
@@ -255,7 +256,7 @@ export function recommendMachine(input: {
   fuelPricePerL?: number;
   slopePct?: number | null;
 }): MachineRecommendation | null {
-  const { areaHa, operation, tractors, fuelPricePerL = DEFAULT_FUEL_PRICE_RON, slopePct } = input;
+  const { areaHa, operation, tractors, fuelPricePerL = DEFAULT_FUEL_PRICE_EUR, slopePct } = input;
   const implement = (input.implements ?? IMPLEMENT_CATALOG).find((item) => item.operation === operation);
   if (!implement || areaHa <= 0) return null;
   const powerShare = 1 - Math.min(0.5, Math.max(0, slopePct ?? 0) * SLOPE_POWER_LOSS_PER_PCT);
@@ -280,11 +281,11 @@ export function recommendMachine(input: {
       efficiencyPct: implement.efficiencyPct,
       capacityHaH,
       durationHours,
-      reason: `${implement.name} de ${workingWidthM} m lucrează ${capacityHaH} ha/oră cu ${tractor.horsePower} CP.`,
-      rank: cost.fuelCost + durationHours * OPERATOR_COST_RON_H,
+      reason: `${implement.name} of ${workingWidthM} m covers ${capacityHaH} ha/hour with ${tractor.horsePower} HP.`,
+      rank: cost.fuelCost + durationHours * OPERATOR_COST_EUR_H,
     }];
   });
-  // Tractoarele din parcul fermei au prioritate față de sugestiile din catalog.
+  // Tractors from the farm's fleet take priority over catalog suggestions.
   const owned = options.filter((option) => option.owned);
   const best = (owned.length ? owned : options).sort((a, b) => a.rank - b.rank)[0];
   if (!best) return null;
@@ -300,11 +301,11 @@ export interface SeedCompatibility {
 }
 
 const NEUTRAL_FIT = 0.65;
-/** Aproximare uzuală: un punct FAO corespunde la circa 3,5 grade-zile peste 10 °C. */
+/** Common approximation: one FAO point corresponds to about 3.5 degree-days above 10 °C. */
 const GDD_PER_FAO = 3.5;
 const DROUGHT_FIT: Record<CatalogLevel, number> = { LOW: 0.4, MEDIUM: 0.7, HIGH: 0.95 };
 
-/** Ordonează produsele compatibile după sol, climă, rotație și irigații. */
+/** Ranks compatible products by soil, climate, rotation and irrigation. */
 export function rankSeedsForParcel<T extends SeedEntry>(input: {
   seeds: readonly T[];
   crop: CropCode;
@@ -331,8 +332,8 @@ export function rankSeedsForParcel<T extends SeedEntry>(input: {
         const needed = seed.fao * GDD_PER_FAO;
         const fit = climate.gddBase10 >= needed ? 1 : Math.max(0, 1 - (needed - climate.gddBase10) / 400);
         fits.push(fit);
-        if (fit === 1) good.push(`FAO ${seed.fao} ajunge la maturitate în clima parcelei`);
-        else weak.push(`FAO ${seed.fao} are nevoie de un sezon mai lung decât cel local`);
+        if (fit === 1) good.push(`FAO ${seed.fao} reaches maturity in the parcel's climate`);
+        else weak.push(`FAO ${seed.fao} needs a longer season than the local one`);
       } else {
         fits.push(NEUTRAL_FIT);
         if (seed.fao === null) missingData.push('FAO');
@@ -340,35 +341,35 @@ export function rankSeedsForParcel<T extends SeedEntry>(input: {
 
       if (irrigated) {
         fits.push(1);
-        good.push('parcela are irigații');
+        good.push('the parcel is irrigated');
       } else if (climate && climate.annualPrecipitationMm >= requiredMm) {
         fits.push(1);
-        good.push('precipitațiile acoperă necesarul de apă');
+        good.push('rainfall covers the water requirement');
       } else if (seed.droughtTolerance) {
         fits.push(DROUGHT_FIT[seed.droughtTolerance]);
-        if (seed.droughtTolerance === 'HIGH') good.push('tolerează bine seceta');
-        else weak.push('toleranța la secetă este limitată pentru o parcelă neirigată');
+        if (seed.droughtTolerance === 'HIGH') good.push('it tolerates drought well');
+        else weak.push('drought tolerance is limited for a non-irrigated parcel');
       } else {
         fits.push(NEUTRAL_FIT);
-        missingData.push('toleranța la secetă');
+        missingData.push('drought tolerance');
       }
 
       if (soil && seed.soilPreference.length > 0) {
         const matches = seed.soilPreference.includes(soil.texture);
         fits.push(matches ? 1 : 0.5);
-        if (matches) good.push('textura solului este potrivită');
-        else weak.push('textura solului nu este printre cele preferate');
+        if (matches) good.push('the soil texture is suitable');
+        else weak.push('the soil texture is not among the preferred ones');
       }
 
       const fit = fits.reduce((sum, value) => sum + value, 0) / fits.length;
       const score = Math.round(base.score * 0.6 + fit * 40);
-      const list = (items: string[]) => (items.length < 2 ? (items[0] ?? '') : `${items.slice(0, -1).join(', ')} și ${items[items.length - 1]}`);
+      const list = (items: string[]) => (items.length < 2 ? (items[0] ?? '') : `${items.slice(0, -1).join(', ')} and ${items[items.length - 1]}`);
       const sentences = [
-        good.length ? `${seed.name} se potrivește deoarece ${list(good)}.` : '',
-        weak.length ? `Atenție: ${list(weak)}.` : '',
-        missingData.length ? `Scor orientativ, lipsesc: ${list(missingData)}.` : '',
+        good.length ? `${seed.name} is a good fit because ${list(good)}.` : '',
+        weak.length ? `Note: ${list(weak)}.` : '',
+        missingData.length ? `Indicative score, missing: ${list(missingData)}.` : '',
       ].filter(Boolean);
-      return { seed, score, reason: sentences.join(' ') || `${seed.name} este compatibil cu această cultură.`, missingData };
+      return { seed, score, reason: sentences.join(' ') || `${seed.name} is compatible with this crop.`, missingData };
     })
     .sort((a, b) => b.score - a.score || a.seed.name.localeCompare(b.seed.name));
 }
@@ -427,7 +428,7 @@ const CROP_ALIASES: Record<string, CropCode> = {
   rapita: 'RAPESEED', rapeseed: 'RAPESEED',
   soia: 'SOY', soy: 'SOY', soybean: 'SOY',
   lucerna: 'ALFALFA', alfalfa: 'ALFALFA',
-  ovaz: 'OAT', oat: 'OAT',
+  ovaz: 'OAT', oat: 'OAT', oats: 'OAT',
   cartof: 'POTATO', potato: 'POTATO',
   sfecla: 'BEET', 'sfecla de zahar': 'BEET', beet: 'BEET',
   legume: 'VEGETABLES', vegetables: 'VEGETABLES',
@@ -457,12 +458,12 @@ function numberOf(row: Record<string, string>, aliases: readonly string[]) {
 
 const levelOf = (row: Record<string, string>, aliases: readonly string[]) => LEVEL_ALIASES[normalized(cellOf(row, aliases))] ?? null;
 
-/** Transformă un rând din fișierul importat în produs de catalog. */
+/** Converts a row from the imported file into a catalog product. */
 export function seedFromRow(row: Record<string, string>): SeedEntry | string {
   const name = cellOf(row, ['name', 'nume', 'hibrid', 'soi', 'produs']);
-  if (!name) return 'Lipsește numele produsului.';
+  if (!name) return 'The product name is missing.';
   const crop = CROP_ALIASES[normalized(cellOf(row, ['crop', 'cultura']))];
-  if (!crop) return `${name}: cultura nu este recunoscută.`;
+  if (!crop) return `${name}: the crop is not recognized.`;
   const type = normalized(cellOf(row, ['type', 'tip']));
   return createSeedEntry({
     name,
@@ -474,7 +475,7 @@ export function seedFromRow(row: Record<string, string>): SeedEntry | string {
     expectedYieldMin: numberOf(row, ['expectedyieldmin', 'productiemin']),
     expectedYieldMax: numberOf(row, ['expectedyieldmax', 'productiemax']),
     waterRequirement: levelOf(row, ['waterrequirement', 'necesarapa']),
-    droughtTolerance: levelOf(row, ['droughttolerance', 'toleranta', 'tolerantaseceta']),
+    droughtTolerance: levelOf(row, ['droughttolerance', 'tolerance', 'toleranta', 'tolerantaseceta']),
     notes: cellOf(row, ['notes', 'observatii']),
   });
 }
@@ -482,9 +483,9 @@ export function seedFromRow(row: Record<string, string>): SeedEntry | string {
 export function tractorFromRow(row: Record<string, string>): TractorEntry | string {
   const brand = cellOf(row, ['brand', 'marca', 'producator']);
   const model = cellOf(row, ['model']);
-  if (!brand || !model) return 'Lipsește marca sau modelul.';
+  if (!brand || !model) return 'The brand or model is missing.';
   const horsePower = numberOf(row, ['horsepower', 'cp', 'putere', 'hp']);
-  if (!horsePower || horsePower <= 0) return `${brand} ${model}: puterea nu este validă.`;
+  if (!horsePower || horsePower <= 0) return `${brand} ${model}: the power is not valid.`;
   return createTractorEntry({
     brand,
     model,
@@ -498,7 +499,7 @@ export function tractorFromRow(row: Record<string, string>): TractorEntry | stri
   });
 }
 
-/** Citește un fișier CSV, cu separator virgulă sau punct și virgulă. */
+/** Reads a CSV file, with comma or semicolon separator. */
 export function parseCsv(text: string): Record<string, string>[] {
   const clean = text.replace(/^﻿/, '');
   const firstLine = clean.split(/\r?\n/, 1)[0] ?? '';
@@ -531,7 +532,7 @@ export function parseCsv(text: string): Record<string, string>[] {
   return tableToRows(rows);
 }
 
-/** Prima linie a tabelului conține numele coloanelor. */
+/** The first line of the table contains the column names. */
 export function tableToRows(table: readonly (readonly string[])[]): Record<string, string>[] {
   const [header, ...rows] = table;
   if (!header) return [];

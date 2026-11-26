@@ -16,7 +16,7 @@ describe('OpenWeatherMap', () => {
     weather: [{ id }],
   });
 
-  it('transformă pașii de 3 ore în ore locale, de la ora curentă', () => {
+  it('converts 3-hour steps into local hours, starting from the current hour', () => {
     const hours = expandOwmForecast([entry(12, 6)], 3 * 3600, now);
     expect(hours[0]!.time).toBe('2026-06-01T12:00');
     expect(hours[3]!.time).toBe('2026-06-01T15:00');
@@ -24,14 +24,14 @@ describe('OpenWeatherMap', () => {
     expect(hours[0]!.windKmh).toBe(18);
   });
 
-  it('păstrează numărul corect de ore până la ploaie', () => {
-    const alerts = evaluateWeatherAlerts('Sud-1', expandOwmForecast([entry(12, 6)], 0, now));
-    expect(alerts.find((alert) => alert.type === 'RAIN')?.message).toBe('Ploaie estimată în 3 ore pe parcela Sud-1.');
+  it('keeps the correct number of hours until rain', () => {
+    const alerts = evaluateWeatherAlerts('South-1', expandOwmForecast([entry(12, 6)], 0, now));
+    expect(alerts.find((alert) => alert.type === 'RAIN')?.message).toBe('Rain expected in 3 hours on parcel South-1.');
   });
 
-  it('recunoaște furtuna', () => {
+  it('recognizes the thunderstorm', () => {
     const hours = expandOwmForecast([entry(9, 0, 211)], 0, now);
-    expect(evaluateWeatherAlerts('Nord', hours).map((alert) => alert.type)).toContain('STORM');
+    expect(evaluateWeatherAlerts('North', hours).map((alert) => alert.type)).toContain('STORM');
   });
 });
 
@@ -40,7 +40,7 @@ describe('Sentinel', () => {
     bands: { B0: { stats: { mean, sampleCount: 100, noDataCount } } },
   });
 
-  it('ignoră zilele acoperite de nori sau fără date', () => {
+  it('ignores days covered by clouds or without data', () => {
     const result = parseStatistics({
       data: [
         { interval: { from: '2026-06-01T00:00:00Z' }, outputs: { ndvi: stats(0.7123, 10), ndre: stats(0.31, 10) } },
@@ -53,7 +53,7 @@ describe('Sentinel', () => {
 });
 
 describe('SoilGrids', () => {
-  it('returnează null pentru punctele fără date', () => {
+  it('returns null for points without data', () => {
     const layer = (name: string) => ({
       name,
       unit_measure: { d_factor: 10 },
@@ -64,7 +64,7 @@ describe('SoilGrids', () => {
 });
 
 describe('NASA POWER', () => {
-  it('agregă anii agricoli', () => {
+  it('aggregates agricultural years', () => {
     const years = summarizeClimateYears([
       { date: '2024-07-01', tMeanC: 25, tMaxC: 32, tMinC: 18, precipitationMm: 4, radiationMjM2: 25 },
       { date: '2024-12-01', tMeanC: 1, tMaxC: 5, tMinC: -3, precipitationMm: 2, radiationMjM2: 5 },

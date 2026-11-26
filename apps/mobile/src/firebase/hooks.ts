@@ -3,7 +3,7 @@ import { currentItems, subscribeLive } from './liveStore';
 import { subscribeOutbox } from './outbox';
 import type { CollectionName, FarmDoc, IrrigationDoc, MachineDoc, MachineWorkDoc, NotificationDoc, ParcelDoc, TaskDoc } from './types';
 
-/** Documentele fermei, actualizate în timp real și disponibile și fără conexiune. */
+/** The farm's documents, updated in real time and available without a connection. */
 export function useLiveCollection<T extends FarmDoc>(name: CollectionName): T[] {
   const [data, setData] = useState<T[]>(() => currentItems<T>(name));
   useEffect(() => {

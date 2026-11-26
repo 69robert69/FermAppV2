@@ -6,7 +6,7 @@ export const redis = env.REDIS_URL
   ? new Redis(env.REDIS_URL, { maxRetriesPerRequest: 2, lazyConnect: false })
   : null;
 
-redis?.on('error', (error) => logger.warn('Redis indisponibil', error.message));
+redis?.on('error', (error) => logger.warn('Redis unavailable', error.message));
 
 const MAX_MEMORY_ENTRIES = 5000;
 const memory = new Map<string, { value: string; expiresAt: number }>();
@@ -34,7 +34,7 @@ async function read(key: string): Promise<string | null> {
     try {
       return await redis.get(key);
     } catch (error) {
-      logger.warn('Citire Redis eșuată', (error as Error).message);
+      logger.warn('Redis read failed', (error as Error).message);
     }
   }
   return memoryGet(key);
@@ -46,13 +46,13 @@ async function write(key: string, value: string, ttlSeconds: number) {
       await redis.set(key, value, 'EX', ttlSeconds);
       return;
     } catch (error) {
-      logger.warn('Scriere Redis eșuată', (error as Error).message);
+      logger.warn('Redis write failed', (error as Error).message);
     }
   }
   memorySet(key, value, ttlSeconds);
 }
 
-/** Returnează valoarea din cache sau o calculează; apelurile simultane împart același rezultat. */
+/** Returns the cached value or computes it; simultaneous calls share the same result. */
 const inFlight = new Map<string, Promise<unknown>>();
 
 export async function cached<T>(key: string, ttlSeconds: number, load: () => Promise<T>): Promise<T> {
@@ -72,7 +72,7 @@ export async function cached<T>(key: string, ttlSeconds: number, load: () => Pro
   return promise;
 }
 
-/** Blocare scurtă, ca un job programat să ruleze pe o singură instanță. */
+/** Short lock, so a scheduled job runs on a single instance. */
 export async function acquireLock(key: string, ttlSeconds: number): Promise<boolean> {
   if (redis?.status === 'ready') {
     return (await redis.set(`lock:${key}`, '1', 'EX', ttlSeconds, 'NX')) === 'OK';

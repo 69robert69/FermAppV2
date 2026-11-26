@@ -2,7 +2,7 @@ import { computeGeoMetrics, type PolygonGeometry } from '@fermapp/domain';
 import { PrismaClient, type CropCode, type Prisma } from '@prisma/client';
 import bcrypt from 'bcryptjs';
 
-/** Date demonstrative pentru dezvoltare locală. Nu rulează în producție. */
+/** Demo data for local development. It does not run in production. */
 const prisma = new PrismaClient();
 
 const DEMO_EMAIL = 'demo@fermapp.local';
@@ -14,23 +14,23 @@ const rectangle = (lng: number, lat: number, width: number, height: number): Pol
 });
 
 const PARCELS: { name: string; code: string; geometry: PolygonGeometry; history: [number, CropCode][] }[] = [
-  { name: 'Nord 3', code: 'NV-003', geometry: rectangle(26.1, 44.8, 0.012, 0.008), history: [[2026, 'WHEAT'], [2025, 'CORN'], [2024, 'SUNFLOWER'], [2023, 'WHEAT'], [2022, 'SOY']] },
-  { name: 'Sud-1', code: 'SD-001', geometry: rectangle(26.12, 44.78, 0.01, 0.006), history: [[2026, 'CORN'], [2025, 'SOY'], [2024, 'WHEAT'], [2023, 'RAPESEED']] },
+  { name: 'North 3', code: 'NV-003', geometry: rectangle(26.1, 44.8, 0.012, 0.008), history: [[2026, 'WHEAT'], [2025, 'CORN'], [2024, 'SUNFLOWER'], [2023, 'WHEAT'], [2022, 'SOY']] },
+  { name: 'South-1', code: 'SD-001', geometry: rectangle(26.12, 44.78, 0.01, 0.006), history: [[2026, 'CORN'], [2025, 'SOY'], [2024, 'WHEAT'], [2023, 'RAPESEED']] },
   { name: 'Lunca Mare', code: 'LM-010', geometry: rectangle(26.08, 44.77, 0.016, 0.01), history: [[2025, 'ALFALFA'], [2024, 'ALFALFA'], [2023, 'ALFALFA']] },
 ];
 
 async function main() {
-  if (process.env.NODE_ENV === 'production') throw new Error('Datele demo nu se încarcă în producție.');
+  if (process.env.NODE_ENV === 'production') throw new Error('Demo data is not loaded in production.');
   if (await prisma.user.findUnique({ where: { email: DEMO_EMAIL } })) {
-    console.log('Datele demo există deja.');
+    console.log('Demo data already exists.');
     return;
   }
 
-  const farm = await prisma.farm.create({ data: { name: 'Ferma Demo', county: 'Ilfov' } });
+  const farm = await prisma.farm.create({ data: { name: 'Demo Farm', county: 'Ilfov' } });
   const admin = await prisma.user.create({
     data: {
       email: DEMO_EMAIL,
-      fullName: 'Administrator Demo',
+      fullName: 'Demo Administrator',
       passwordHash: await bcrypt.hash(DEMO_PASSWORD, 12),
       memberships: { create: { farmId: farm.id, role: 'ADMIN' } },
     },
@@ -66,14 +66,14 @@ async function main() {
     data: {
       farmId: farm.id,
       type: 'PEST_CHECK',
-      title: 'Verificare dăunători',
+      title: 'Pest check',
       priority: 'HIGH',
       dueDate: new Date(Date.now() + 2 * 86_400_000),
       assigneeId: admin.id,
     },
   });
 
-  console.log(`Cont demo: ${DEMO_EMAIL} / ${DEMO_PASSWORD}`);
+  console.log(`Demo account: ${DEMO_EMAIL} / ${DEMO_PASSWORD}`);
 }
 
 main()

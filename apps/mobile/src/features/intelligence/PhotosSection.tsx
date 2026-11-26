@@ -14,42 +14,45 @@ import { SheetInput } from './sections';
 
 const QUALITY = 0.7;
 
-/** Fotografia se încarcă împreună cu nota scrisă în formular. */
+/** The photo is uploaded together with the note written in the form. */
 export function usePhotoUpload(parcelId: string) {
   const client = useQueryClient();
   const [notes, setNotes] = useState('');
   const [uploading, setUploading] = useState(false);
 
-  async function upload(asset: ImagePicker.ImagePickerAsset) {
+  /** Resolves to true when the photo was saved. */
+  async function upload(asset: ImagePicker.ImagePickerAsset): Promise<boolean> {
     setUploading(true);
     try {
       await apiUpload(
         `/parcels/${parcelId}/photos`,
-        { uri: asset.uri, name: asset.fileName ?? 'fotografie.jpg', mimeType: asset.mimeType ?? 'image/jpeg' },
+        { uri: asset.uri, name: asset.fileName ?? 'photo.jpg', mimeType: asset.mimeType ?? 'image/jpeg' },
         notes.trim() ? { notes: notes.trim() } : undefined,
       );
       setNotes('');
       await client.invalidateQueries({ queryKey: intelligenceKey(parcelId) });
+      return true;
     } catch (error) {
-      Alert.alert('Fotografia nu a fost încărcată', errorMessage(error));
+      Alert.alert('The photo was not uploaded', errorMessage(error));
+      return false;
     } finally {
       setUploading(false);
     }
   }
 
-  async function takePhoto() {
+  async function takePhoto(): Promise<boolean> {
     const permission = await ImagePicker.requestCameraPermissionsAsync();
     if (!permission.granted) {
-      Alert.alert('Camera nu este disponibilă', 'Permite accesul la cameră din setările telefonului.');
-      return;
+      Alert.alert('The camera is not available', 'Allow camera access in the phone settings.');
+      return false;
     }
     const result = await ImagePicker.launchCameraAsync({ quality: QUALITY });
-    if (!result.canceled && result.assets[0]) await upload(result.assets[0]);
+    return !result.canceled && result.assets[0] ? upload(result.assets[0]) : false;
   }
 
-  async function pickPhoto() {
+  async function pickPhoto(): Promise<boolean> {
     const result = await ImagePicker.launchImageLibraryAsync({ mediaTypes: ['images'], quality: QUALITY });
-    if (!result.canceled && result.assets[0]) await upload(result.assets[0]);
+    return !result.canceled && result.assets[0] ? upload(result.assets[0]) : false;
   }
 
   return { notes, setNotes, uploading, takePhoto, pickPhoto };
@@ -69,14 +72,14 @@ export function PhotosSection({ data, photos }: { data: ParcelIntelligence; phot
 
   return (
     <>
-      <Section title="Fotografii">
+      <Section title="Photos">
         <Panel>
-          {data.photos.length === 0 ? <Txt variant="small">Nicio fotografie pentru această parcelă.</Txt> : null}
+          {data.photos.length === 0 ? <Txt variant="small">No photos for this parcel.</Txt> : null}
           <View style={styles.gallery}>
             {data.photos.map((photo) => (
               <View key={photo.id} style={styles.tile}>
                 <Image
-                  accessibilityLabel={photo.notes ?? `Fotografie din ${shortDate(photo.createdAt)}`}
+                  accessibilityLabel={photo.notes ?? `Photo from ${shortDate(photo.createdAt)}`}
                   source={
                     photo.imageUri
                       ? { uri: photo.imageUri }
@@ -91,19 +94,19 @@ export function PhotosSection({ data, photos }: { data: ParcelIntelligence; phot
               </View>
             ))}
           </View>
-          <SheetInput label="Notă pentru fotografie" value={photos.notes} onChangeText={photos.setNotes} multiline />
+          <SheetInput label="Photo note" value={photos.notes} onChangeText={photos.setNotes} multiline />
           <View style={{ flexDirection: 'row', gap: space.sm }}>
             <Button style={{ flex: 1 }} mode="contained" icon="camera-outline" loading={photos.uploading} disabled={photos.uploading} onPress={() => void photos.takePhoto()}>
-              Fotografiază
+              Take photo
             </Button>
             <Button style={{ flex: 1 }} mode="outlined" icon="image-outline" disabled={photos.uploading} onPress={() => void photos.pickPhoto()}>
-              Din galerie
+              From gallery
             </Button>
           </View>
         </Panel>
       </Section>
 
-      <Section title="Observații din teren">
+      <Section title="Field observations">
         <Panel>
           {data.observations.map((item) => (
             <View key={item.id} style={{ gap: 2 }}>
@@ -111,9 +114,9 @@ export function PhotosSection({ data, photos }: { data: ParcelIntelligence; phot
               <Txt variant="small">{`${item.author.fullName}, ${shortDate(item.createdAt)}`}</Txt>
             </View>
           ))}
-          <SheetInput label="Observație nouă" value={text} onChangeText={setText} multiline />
+          <SheetInput label="New observation" value={text} onChangeText={setText} multiline />
           <Button mode="contained" disabled={!text.trim() || addObservation.isPending} loading={addObservation.isPending} onPress={() => addObservation.mutate()}>
-            Salvează observația
+            Save observation
           </Button>
         </Panel>
       </Section>

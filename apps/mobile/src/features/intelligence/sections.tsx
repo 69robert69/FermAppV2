@@ -1,6 +1,6 @@
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { BottomSheetTextInput } from '@gorhom/bottom-sheet';
-import type { CropCode } from '@fermapp/domain';
+import { formatEuro, type CropCode } from '@fermapp/domain';
 import { useMutation } from '@tanstack/react-query';
 import { useState, type ReactNode } from 'react';
 import { ActivityIndicator, Pressable, StyleSheet, View } from 'react-native';
@@ -37,19 +37,19 @@ const CROP_ICONS: Record<CropCode, IconName> = {
 };
 
 const CROP_STATUS = {
-  NOT_SOWN: { label: 'Nesemănat', color: colors.straw },
-  GROWING: { label: 'În vegetație', color: colors.leaf },
-  READY: { label: 'Aproape de recoltare', color: colors.wheat },
-  HARVESTED: { label: 'Recoltat', color: colors.straw },
+  NOT_SOWN: { label: 'Not sown', color: colors.straw },
+  GROWING: { label: 'Growing', color: colors.leaf },
+  READY: { label: 'Near harvest', color: colors.wheat },
+  HARVESTED: { label: 'Harvested', color: colors.straw },
 } as const;
 
 const VERDICT_COLOR = { RECOMMENDED: colors.leaf, ACCEPTABLE: colors.amber, NOT_RECOMMENDED: colors.rust } as const;
 const LEVEL_COLOR = { LOW: colors.leaf, MEDIUM: colors.amber, HIGH: colors.rust } as const;
-const LEVEL_LABEL = { LOW: 'Scăzut', MEDIUM: 'Mediu', HIGH: 'Ridicat' } as const;
+const LEVEL_LABEL = { LOW: 'Low', MEDIUM: 'Medium', HIGH: 'High' } as const;
 const HEALTH_COLOR = { green: colors.leaf, yellow: colors.amber, red: colors.rust } as const;
-const HEALTH_LABEL = { green: 'Sănătos', yellow: 'Atenție', red: 'Critic' } as const;
+const HEALTH_LABEL = { green: 'Healthy', yellow: 'Warning', red: 'Critical' } as const;
 
-const dateText = (value: string | null | undefined) => (value ? toRoDate(new Date(value)) : 'Necompletată');
+const dateText = (value: string | null | undefined) => (value ? toRoDate(new Date(value)) : 'Not filled in');
 
 function Missing({ children }: { children: ReactNode }) {
   return <Txt variant="small">{children}</Txt>;
@@ -84,7 +84,7 @@ export function SheetInput({
   );
 }
 
-/** Cere asistentului o explicație pe baza datelor reale ale parcelei. */
+/** Asks the assistant for an explanation based on the parcel's real data. */
 function AiExplain({ parcelId, question }: { parcelId: string; question: string }) {
   const ask = useMutation({
     mutationFn: async () => {
@@ -96,7 +96,7 @@ function AiExplain({ parcelId, question }: { parcelId: string; question: string 
   return (
     <View style={{ gap: space.xs }}>
       <Button compact mode="text" icon="sprout-outline" loading={ask.isPending} disabled={ask.isPending} onPress={() => ask.mutate()} style={{ alignSelf: 'flex-start' }}>
-        Explică mai detaliat
+        Explain in more detail
       </Button>
       {ask.isError ? <Txt variant="small" color={colors.rust}>{errorMessage(ask.error)}</Txt> : null}
     </View>
@@ -110,12 +110,12 @@ export function HeaderSection({ data }: { data: ParcelIntelligence }) {
       <Txt variant="small">Parcel Intelligence</Txt>
       <Txt variant="display">{header.name}</Txt>
       <View style={styles.grid}>
-        <Stat value={number(header.areaHa, 2)} unit="ha" label="Suprafață" color={colors.wheat} />
-        <Stat value={header.code} label="Cod parcelă" />
+        <Stat value={number(header.areaHa, 2)} unit="ha" label="Area" color={colors.wheat} />
+        <Stat value={header.code} label="Parcel code" />
       </View>
-      <Row label="Județ" value={header.county ?? 'Necompletat'} />
-      <Row label="Localitate" value={header.locality ?? 'Necompletată'} />
-      <Row label="Coordonate GPS" value={`${header.lat.toFixed(5)}, ${header.lng.toFixed(5)}`} />
+      <Row label="County" value={header.county ?? 'Not filled in'} />
+      <Row label="Locality" value={header.locality ?? 'Not filled in'} />
+      <Row label="GPS coordinates" value={`${header.lat.toFixed(5)}, ${header.lng.toFixed(5)}`} />
     </View>
   );
 }
@@ -124,14 +124,14 @@ export function CropSection({ data }: { data: ParcelIntelligence }) {
   const { crop } = data;
   if (!crop) {
     return (
-      <Section title="Cultura curentă">
-        <Panel><Missing>Nu există o cultură înregistrată pentru acest an.</Missing></Panel>
+      <Section title="Current crop">
+        <Panel><Missing>There is no crop recorded for this year.</Missing></Panel>
       </Section>
     );
   }
   const status = CROP_STATUS[crop.status];
   return (
-    <Section title="Cultura curentă">
+    <Section title="Current crop">
       <Panel>
         <View style={styles.inline}>
           <MaterialCommunityIcons name={CROP_ICONS[crop.code]} size={30} color={status.color} />
@@ -142,9 +142,9 @@ export function CropSection({ data }: { data: ParcelIntelligence }) {
           <Txt variant="figure" color={status.color}>{`${crop.percent}%`}</Txt>
         </View>
         <ProgressTrack percent={crop.percent} color={status.color} />
-        <Row label="Semănat" value={dateText(crop.sowingDate)} />
-        <Row label="Recoltare estimată" value={dateText(crop.estimatedHarvestDate)} />
-        <Row label="Zi de vegetație" value={`${crop.vegetationDay} / ${crop.totalDays} zile`} />
+        <Row label="Sown" value={dateText(crop.sowingDate)} />
+        <Row label="Estimated harvest" value={dateText(crop.estimatedHarvestDate)} />
+        <Row label="Growing day" value={`${crop.vegetationDay} / ${crop.totalDays} days`} />
       </Panel>
     </Section>
   );
@@ -154,21 +154,21 @@ export function RotationSection({ data }: { data: ParcelIntelligence }) {
   const { rotation, header } = data;
   const color = VERDICT_COLOR[rotation.verdict];
   return (
-    <Section title="Rotația culturilor">
+    <Section title="Crop rotation">
       <Panel>
         <View style={styles.inline}>
           <CircularProgress percent={rotation.score} size={76} color={color} />
           <View style={{ flex: 1, gap: 2 }}>
             <Txt variant="subtitle" color={color}>{rotation.label}</Txt>
-            {rotation.mode === 'SUGGESTED' ? <Txt variant="small">Cea mai bună opțiune pentru acest an</Txt> : null}
+            {rotation.mode === 'SUGGESTED' ? <Txt variant="small">The best option for this year</Txt> : null}
             <Txt variant="small">{rotation.explanation}</Txt>
           </View>
         </View>
-        {rotation.history.length === 0 ? <Missing>Adaugă istoricul culturilor pentru un scor mai precis.</Missing> : null}
+        {rotation.history.length === 0 ? <Missing>Add the crop history for a more accurate score.</Missing> : null}
         {rotation.history.map((item) => (
           <Row key={item.year} label={String(item.year)} value={item.name} />
         ))}
-        <AiExplain parcelId={header.id} question="Explică scorul de rotație al acestei parcele și ce risc există." />
+        <AiExplain parcelId={header.id} question="Explain this parcel's rotation score and what risk exists." />
       </Panel>
     </Section>
   );
@@ -177,18 +177,18 @@ export function RotationSection({ data }: { data: ParcelIntelligence }) {
 export function IrrigationCoverageSection({ data }: { data: ParcelIntelligence }) {
   const { irrigation } = data;
   return (
-    <Section title="Irigații">
+    <Section title="Irrigation">
       <Panel>
         {irrigation.configured ? (
           <View style={styles.inline}>
             <CircularProgress percent={irrigation.coveragePct ?? 0} icon="water" />
             <View style={{ flex: 1, gap: space.sm }}>
-              <Stat value={number(irrigation.irrigatedHa ?? 0, 2)} unit="ha" label="Irigat" color={colors.water} />
-              <Stat value={number(irrigation.notIrrigatedHa ?? 0, 2)} unit="ha" label="Neirigat" />
+              <Stat value={number(irrigation.irrigatedHa ?? 0, 2)} unit="ha" label="Irrigated" color={colors.water} />
+              <Stat value={number(irrigation.notIrrigatedHa ?? 0, 2)} unit="ha" label="Not irrigated" />
             </View>
           </View>
         ) : (
-          <Missing>Completează suprafața irigată din editorul parcelei.</Missing>
+          <Missing>Fill in the irrigated area in the parcel editor.</Missing>
         )}
       </Panel>
     </Section>
@@ -203,12 +203,12 @@ function IrrigationCard({ run }: { run: ActiveIrrigation }) {
       <View style={styles.inline}>
         <MaterialCommunityIcons name="sprinkler-variant" size={24} color={colors.water} />
         <Txt variant="subtitle" style={{ flex: 1 }}>{run.label}</Txt>
-        <Txt color={paused ? colors.straw : colors.water}>{paused ? 'În pauză' : 'Pornit'}</Txt>
+        <Txt color={paused ? colors.straw : colors.water}>{paused ? 'Paused' : 'Running'}</Txt>
       </View>
       <ProgressTrack percent={progress.percent} color={paused ? colors.straw : colors.water} />
-      <Row label="Viteză" value={`${number(run.speedMPerH, 0)} m/h`} />
-      <Row label="Timp rămas" value={hoursMinutes(progress.remainingSeconds)} />
-      <Row label="ETA" value={progress.eta ? clock(progress.eta) : 'Oprit'} />
+      <Row label="Speed" value={`${number(run.speedMPerH, 0)} m/h`} />
+      <Row label="Time left" value={hoursMinutes(progress.remainingSeconds)} />
+      <Row label="ETA" value={progress.eta ? clock(progress.eta) : 'Stopped'} />
     </Panel>
   );
 }
@@ -216,7 +216,7 @@ function IrrigationCard({ run }: { run: ActiveIrrigation }) {
 export function ActiveIrrigationSection({ data }: { data: ParcelIntelligence }) {
   if (data.activeIrrigation.length === 0) return null;
   return (
-    <Section title="Sisteme de irigații active">
+    <Section title="Active irrigation systems">
       {data.activeIrrigation.map((run) => <IrrigationCard key={run.id} run={run} />)}
     </Section>
   );
@@ -228,16 +228,16 @@ function WorkCard({ work, onTrack }: { work: ActiveWork; onTrack: (work: ActiveW
     <Panel>
       <View style={styles.inline}>
         <MaterialCommunityIcons name="tractor-variant" size={24} color={colors.wheat} />
-        <Txt variant="subtitle" style={{ flex: 1 }}>{work.machine?.name ?? 'Fără utilaj'}</Txt>
+        <Txt variant="subtitle" style={{ flex: 1 }}>{work.machine?.name ?? 'No machine'}</Txt>
         <Txt variant="figure" color={colors.wheat}>{`${Math.floor(progress.percent)}%`}</Txt>
       </View>
       <ProgressTrack percent={progress.percent} />
       <Row label="Operator" value={work.operator.fullName} />
-      <Row label="Lucrare" value={WORK_TYPES[work.type]} />
-      <Row label="Lățime" value={`${number(work.workingWidthM)} m`} />
-      <Row label="Viteză" value={`${number(work.speedKmh)} km/h`} />
-      <Row label="ETA" value={work.status === 'PAUSED' ? 'În pauză' : hoursMinutes(progress.remainingSeconds)} />
-      <Button mode="outlined" icon="map-marker-radius-outline" onPress={() => onTrack(work)}>Vezi poziția live</Button>
+      <Row label="Operation" value={WORK_TYPES[work.type]} />
+      <Row label="Width" value={`${number(work.workingWidthM)} m`} />
+      <Row label="Speed" value={`${number(work.speedKmh)} km/h`} />
+      <Row label="ETA" value={work.status === 'PAUSED' ? 'Paused' : hoursMinutes(progress.remainingSeconds)} />
+      <Button mode="outlined" icon="map-marker-radius-outline" onPress={() => onTrack(work)}>See live position</Button>
     </Panel>
   );
 }
@@ -245,7 +245,7 @@ function WorkCard({ work, onTrack }: { work: ActiveWork; onTrack: (work: ActiveW
 export function ActiveWorkSection({ data, onTrack }: { data: ParcelIntelligence; onTrack: (work: ActiveWork) => void }) {
   if (data.activeWork.length === 0) return null;
   return (
-    <Section title="Lucrări active">
+    <Section title="Active operations">
       {data.activeWork.map((work) => <WorkCard key={work.id} work={work} onTrack={onTrack} />)}
     </Section>
   );
@@ -254,23 +254,23 @@ export function ActiveWorkSection({ data, onTrack }: { data: ParcelIntelligence;
 export function NextActionSection({ data }: { data: ParcelIntelligence }) {
   const { nextAction, header } = data;
   return (
-    <Section title="Următoarea acțiune recomandată">
+    <Section title="Next recommended action">
       <Panel style={{ borderLeftWidth: 4, borderLeftColor: LEVEL_COLOR[nextAction.priority] }}>
         <Txt variant="title">{nextAction.action}</Txt>
         <Txt color={colors.straw}>{nextAction.reason}</Txt>
-        <Row label="Prioritate" value={<Txt color={LEVEL_COLOR[nextAction.priority]}>{LEVEL_LABEL[nextAction.priority]}</Txt>} />
-        <Row label="Nivel de risc" value={<Txt color={LEVEL_COLOR[nextAction.riskLevel]}>{LEVEL_LABEL[nextAction.riskLevel]}</Txt>} />
-        <Row label="Nivel de încredere" value={`${nextAction.confidencePct}%`} />
-        <AiExplain parcelId={header.id} question={`Explică de ce se recomandă: ${nextAction.action}`} />
+        <Row label="Priority" value={<Txt color={LEVEL_COLOR[nextAction.priority]}>{LEVEL_LABEL[nextAction.priority]}</Txt>} />
+        <Row label="Risk level" value={<Txt color={LEVEL_COLOR[nextAction.riskLevel]}>{LEVEL_LABEL[nextAction.riskLevel]}</Txt>} />
+        <Row label="Confidence level" value={`${nextAction.confidencePct}%`} />
+        <AiExplain parcelId={header.id} question={`Explain why this is recommended: ${nextAction.action}`} />
       </Panel>
     </Section>
   );
 }
 
 const TASK_FLOW: Record<TaskStatus, { next: TaskStatus; label: string; status: string }> = {
-  TODO: { next: 'IN_PROGRESS', label: 'Începe', status: 'De făcut' },
-  IN_PROGRESS: { next: 'DONE', label: 'Finalizează', status: 'În lucru' },
-  DONE: { next: 'TODO', label: 'Redeschide', status: 'Finalizat' },
+  TODO: { next: 'IN_PROGRESS', label: 'Start', status: 'To do' },
+  IN_PROGRESS: { next: 'DONE', label: 'Complete', status: 'In progress' },
+  DONE: { next: 'TODO', label: 'Reopen', status: 'Done' },
 };
 
 export function TasksSection({ data }: { data: ParcelIntelligence }) {
@@ -282,18 +282,18 @@ export function TasksSection({ data }: { data: ParcelIntelligence }) {
     [intelligenceKey(data.header.id), ['tasks'], ['dashboard']],
   );
   return (
-    <Section title="Task-uri">
+    <Section title="Tasks">
       <Panel>
         <View style={styles.grid}>
-          <Stat value={String(summary.todo)} label="De făcut" />
-          <Stat value={String(summary.inProgress)} label="În lucru" color={colors.wheat} />
-          <Stat value={String(summary.done)} label="Finalizate" color={colors.leaf} />
+          <Stat value={String(summary.todo)} label="To do" />
+          <Stat value={String(summary.inProgress)} label="In progress" color={colors.wheat} />
+          <Stat value={String(summary.done)} label="Done" color={colors.leaf} />
         </View>
         {items.slice(0, 8).map((task) => (
           <View key={task.id} style={styles.inline}>
             <View style={{ flex: 1 }}>
               <Txt>{task.title || TASK_TYPES[task.type]}</Txt>
-              <Txt variant="small">{`${TASK_FLOW[task.status].status}, termen ${shortDate(task.dueDate)}`}</Txt>
+              <Txt variant="small">{`${TASK_FLOW[task.status].status}, due ${shortDate(task.dueDate)}`}</Txt>
             </View>
             <Pressable accessibilityRole="button" style={styles.textAction} onPress={() => move.mutate({ id: task.id, status: TASK_FLOW[task.status].next })}>
               <Txt color={colors.wheat}>{TASK_FLOW[task.status].label}</Txt>
@@ -319,14 +319,14 @@ export function WeatherSection({ data }: { data: ParcelIntelligence }) {
   const { weather } = data;
   if (!weather) {
     return (
-      <Section title="Meteo">
-        <Panel><Missing>Prognoza nu este disponibilă momentan.</Missing></Panel>
+      <Section title="Weather">
+        <Panel><Missing>The forecast is not available right now.</Missing></Panel>
       </Section>
     );
   }
   const { current, today } = weather;
   return (
-    <Section title="Meteo">
+    <Section title="Weather">
       {weather.alerts.map((alert) => (
         <View key={alert.code} style={styles.alert} accessibilityRole="alert">
           <MaterialCommunityIcons name={alert.code === 'WIND' ? 'weather-windy' : 'weather-pouring'} size={20} color={colors.wheatInk} />
@@ -336,20 +336,20 @@ export function WeatherSection({ data }: { data: ParcelIntelligence }) {
       <Panel>
         <Choice
           options={[
-            { value: 'today', label: 'Azi' },
-            { value: '7', label: '7 zile' },
-            { value: '14', label: '14 zile' },
+            { value: 'today', label: 'Today' },
+            { value: '7', label: '7 days' },
+            { value: '14', label: '14 days' },
           ]}
           value={range}
           onChange={setRange}
         />
         {range === 'today' && current ? (
           <View style={styles.grid}>
-            <Stat value={`${Math.round(current.temperatureC)}°`} label="Temperatură" />
-            <Stat value={`${Math.round(current.humidityPct)}%`} label="Umiditate" />
-            <Stat value={number(today?.precipitationMm ?? current.precipitationMm)} unit="mm" label="Precipitații azi" color={colors.water} />
-            <Stat value={String(Math.round(current.windKmh))} unit="km/h" label="Vânt" />
-            <Stat value={number(today?.et0Mm ?? 0)} unit="mm" label="Evapotranspirație" />
+            <Stat value={`${Math.round(current.temperatureC)}°`} label="Temperature" />
+            <Stat value={`${Math.round(current.humidityPct)}%`} label="Humidity" />
+            <Stat value={number(today?.precipitationMm ?? current.precipitationMm)} unit="mm" label="Rain today" color={colors.water} />
+            <Stat value={String(Math.round(current.windKmh))} unit="km/h" label="Wind" />
+            <Stat value={number(today?.et0Mm ?? 0)} unit="mm" label="Evapotranspiration" />
           </View>
         ) : null}
         {range === '7' ? weather.next7.map((day) => <ForecastRow key={day.date} day={day} />) : null}
@@ -371,27 +371,27 @@ function IndexBar({ label, value }: { label: string; value: number }) {
 export function SoilSection({ data }: { data: ParcelIntelligence }) {
   const { soil } = data;
   return (
-    <Section title="Analiza solului">
+    <Section title="Soil analysis">
       <Panel>
         {soil.status !== 'READY' ? (
-          <Missing>{soil.errorMessage ?? 'Profilul de sol este în curs de analiză.'}</Missing>
+          <Missing>{soil.errorMessage ?? 'The soil profile is being analysed.'}</Missing>
         ) : (
           <>
             <Txt variant="title">{soil.label}</Txt>
             <Row label="pH" value={soil.ph} />
-            <Row label="Argilă" value={`${soil.clayPct}%`} />
-            <Row label="Nisip" value={`${soil.sandPct}%`} />
-            <Row label="Praf" value={`${soil.siltPct}%`} />
-            <Row label="Materie organică" value={`${soil.organicMatterPct}%`} />
-            <Row label="Carbon organic" value={`${soil.organicCarbonGKg} g/kg`} />
+            <Row label="Clay" value={`${soil.clayPct}%`} />
+            <Row label="Sand" value={`${soil.sandPct}%`} />
+            <Row label="Silt" value={`${soil.siltPct}%`} />
+            <Row label="Organic matter" value={`${soil.organicMatterPct}%`} />
+            <Row label="Organic carbon" value={`${soil.organicCarbonGKg} g/kg`} />
             {soil.indices ? (
               <>
-                <IndexBar label="Scor sol" value={soil.indices.soilScore} />
-                <IndexBar label="Indice de fertilitate" value={soil.indices.fertilityIndex} />
-                <IndexBar label="Indice de retenție a apei" value={soil.indices.waterRetentionIndex} />
+                <IndexBar label="Soil score" value={soil.indices.soilScore} />
+                <IndexBar label="Fertility index" value={soil.indices.fertilityIndex} />
+                <IndexBar label="Water retention index" value={soil.indices.waterRetentionIndex} />
               </>
             ) : null}
-            <Txt variant="small">Valori orientative, estimate din hărțile SoilGrids.</Txt>
+            <Txt variant="small">Indicative values, estimated from SoilGrids maps.</Txt>
           </>
         )}
       </Panel>
@@ -402,9 +402,9 @@ export function SoilSection({ data }: { data: ParcelIntelligence }) {
 export function RecommendationsSection({ parcelId }: { parcelId: string }) {
   const query = useCropRecommendations(parcelId);
   return (
-    <Section title={query.data ? `Culturi recomandate pentru ${query.data.year}` : 'Culturi recomandate'}>
+    <Section title={query.data ? `Recommended crops for ${query.data.year}` : 'Recommended crops'}>
       <Panel>
-        {query.isLoading ? <ActivityIndicator color={colors.wheat} accessibilityLabel="Se calculează recomandările" /> : null}
+        {query.isLoading ? <ActivityIndicator color={colors.wheat} accessibilityLabel="Calculating recommendations" /> : null}
         {query.isError ? <Missing>{errorMessage(query.error)}</Missing> : null}
         {query.data?.recommendations.slice(0, 4).map((item) => (
           <View key={item.crop} style={{ gap: space.xs }}>
@@ -432,34 +432,34 @@ export function EconomicsSection({ data, canEdit }: { data: ParcelIntelligence; 
     [intelligenceKey(data.header.id)],
   );
   if (!economics) return null;
-  const lei = (value: number | null) => (value === null ? 'Date insuficiente' : `${number(value, 0)} lei`);
-  const pct = (value: number | null) => (value === null ? 'Date insuficiente' : `${number(value)}%`);
+  const euro = (value: number | null) => (value === null ? 'Insufficient data' : formatEuro(value, 0));
+  const pct = (value: number | null) => (value === null ? 'Insufficient data' : `${number(value)}%`);
   return (
-    <Section title={`Economie ${economics.year}`}>
+    <Section title={`Economics ${economics.year}`}>
       <Panel>
-        <Row label="Semințe" value={lei(economics.seedsCost)} />
-        <Row label="Îngrășăminte" value={lei(economics.fertilizerCost)} />
-        <Row label="Produse chimice" value={lei(economics.chemicalCost)} />
-        <Row label="Combustibil" value={lei(economics.fuelCost)} />
-        <Row label="Manoperă" value={lei(economics.laborCost)} />
-        <Row label="Irigații și altele" value={lei(economics.irrigationCost + economics.otherCost)} />
+        <Row label="Seeds" value={euro(economics.seedsCost)} />
+        <Row label="Fertilizers" value={euro(economics.fertilizerCost)} />
+        <Row label="Chemicals" value={euro(economics.chemicalCost)} />
+        <Row label="Fuel" value={euro(economics.fuelCost)} />
+        <Row label="Labour" value={euro(economics.laborCost)} />
+        <Row label="Irrigation and other" value={euro(economics.irrigationCost + economics.otherCost)} />
         <View style={styles.grid}>
-          <Stat value={number(economics.totalCost, 0)} unit="lei" label="Cost total" />
-          <Stat value={number(economics.costPerHa, 0)} unit="lei/ha" label="Cost pe hectar" />
+          <Stat value={formatEuro(economics.totalCost, 0)} label="Total cost" />
+          <Stat value={formatEuro(economics.costPerHa, 2)} unit="/ha" label="Cost per hectare" />
         </View>
-        <Row label="Venit estimat" value={lei(economics.expectedIncome)} />
-        <Row label="Profit estimat" value={<Txt color={(economics.expectedProfit ?? 0) >= 0 ? colors.leaf : colors.rust}>{lei(economics.expectedProfit)}</Txt>} />
-        <Row label="Marjă de profit" value={pct(economics.profitMarginPct)} />
+        <Row label="Estimated revenue" value={euro(economics.expectedIncome)} />
+        <Row label="Estimated profit" value={<Txt color={(economics.expectedProfit ?? 0) >= 0 ? colors.leaf : colors.rust}>{euro(economics.expectedProfit)}</Txt>} />
+        <Row label="Profit margin" value={pct(economics.profitMarginPct)} />
         <Row label="ROI" value={pct(economics.roiPct)} />
         {canEdit && economics.seasonId && economics.expectedIncome === null ? (
           <View style={{ gap: space.sm }}>
-            <Txt variant="small">Completează producția și prețul pentru a calcula profitul.</Txt>
+            <Txt variant="small">Fill in the yield and price to calculate the profit.</Txt>
             <View style={{ flexDirection: 'row', gap: space.sm }}>
-              <SheetInput label="Producție (t/ha)" value={yieldTHa} onChangeText={setYieldTHa} keyboardType="decimal-pad" />
-              <SheetInput label="Preț (lei/t)" value={price} onChangeText={setPrice} keyboardType="decimal-pad" />
+              <SheetInput label="Yield (t/ha)" value={yieldTHa} onChangeText={setYieldTHa} keyboardType="decimal-pad" />
+              <SheetInput label="Price (€/t)" value={price} onChangeText={setPrice} keyboardType="decimal-pad" />
             </View>
             <Button mode="contained" disabled={!isPositive(yieldTHa) || !isPositive(price) || save.isPending} loading={save.isPending} onPress={() => save.mutate()}>
-              Calculează profitul
+              Calculate profit
             </Button>
           </View>
         ) : null}
@@ -478,11 +478,11 @@ function SatelliteColumn({ title, point }: { title: string; point: SatellitePoin
           <Txt variant="figure" color={color}>{point.ndvi.toFixed(2)}</Txt>
           <Txt variant="small" color={color}>{HEALTH_LABEL[point.health.color]}</Txt>
           <Txt variant="small">{`NDRE ${point.ndre === null ? '-' : point.ndre.toFixed(2)}`}</Txt>
-          <Txt variant="small">{`Indice ${point.healthIndex}`}</Txt>
+          <Txt variant="small">{`Index ${point.healthIndex}`}</Txt>
           <Txt variant="small">{shortDate(point.date)}</Txt>
         </>
       ) : (
-        <Txt variant="small">Fără imagine</Txt>
+        <Txt variant="small">No image</Txt>
       )}
     </View>
   );
@@ -497,16 +497,16 @@ export function SatelliteSection({ data, canRefresh }: { data: ParcelIntelligenc
     [intelligenceKey(header.id), ['parcels']],
   );
   return (
-    <Section title="Monitorizare satelitară">
+    <Section title="Satellite monitoring">
       <Panel>
         <View style={{ flexDirection: 'row', gap: space.sm }}>
-          <SatelliteColumn title="Ultima imagine" point={satellite.latest} />
-          <SatelliteColumn title="Acum 7 zile" point={satellite.sevenDaysAgo} />
-          <SatelliteColumn title="Acum 30 zile" point={satellite.thirtyDaysAgo} />
+          <SatelliteColumn title="Latest image" point={satellite.latest} />
+          <SatelliteColumn title="7 days ago" point={satellite.sevenDaysAgo} />
+          <SatelliteColumn title="30 days ago" point={satellite.thirtyDaysAgo} />
         </View>
         {canRefresh ? (
           <Button mode="outlined" icon="satellite-variant" loading={refresh.isPending} disabled={refresh.isPending} onPress={() => refresh.mutate()}>
-            Descarcă imagini Sentinel-2
+            Download Sentinel-2 images
           </Button>
         ) : null}
       </Panel>

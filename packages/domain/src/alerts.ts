@@ -4,7 +4,7 @@ export type AlertType = 'RAIN' | 'STORM' | 'HAIL' | 'FROST' | 'HEAT' | 'WIND_SPR
 export type AlertSeverity = 'INFO' | 'WARNING' | 'SEVERE';
 
 export interface ForecastHour extends HourlyWeather {
-  /** Cod WMO, folosit pentru furtuni (95) și grindină (96, 99). */
+  /** WMO code, used for thunderstorms (95) and hail (96, 99). */
   weatherCode?: number | null;
 }
 
@@ -21,9 +21,9 @@ const SPRAY_WIND_LIMIT_KMH = 15;
 const FROST_C = 0;
 const HEAT_C = 35;
 
-const inHours = (n: number) => (n <= 1 ? 'într-o oră' : `în ${n} ore`);
+const inHours = (n: number) => (n <= 1 ? 'within the hour' : `in ${n} hours`);
 
-/** Generează cel mult o alertă pe tip, pentru primul moment relevant din orizont. */
+/** Generates at most one alert per type, for the first relevant moment in the horizon. */
 export function evaluateWeatherAlerts(
   parcelName: string,
   hours: readonly ForecastHour[],
@@ -38,8 +38,8 @@ export function evaluateWeatherAlerts(
     alerts.push({
       type: 'HAIL',
       severity: 'SEVERE',
-      title: 'Risc de grindină',
-      message: `Furtună cu grindină estimată ${inHours(hailIndex)} pe parcela ${parcelName}.`,
+      title: 'Hail risk',
+      message: `Hailstorm expected ${inHours(hailIndex)} on parcel ${parcelName}.`,
       startsAt: window[hailIndex]!.time,
     });
   }
@@ -49,8 +49,8 @@ export function evaluateWeatherAlerts(
     alerts.push({
       type: 'STORM',
       severity: 'SEVERE',
-      title: 'Furtună',
-      message: `Furtună estimată ${inHours(stormIndex)} pe parcela ${parcelName}.`,
+      title: 'Thunderstorm',
+      message: `Thunderstorm expected ${inHours(stormIndex)} on parcel ${parcelName}.`,
       startsAt: window[stormIndex]!.time,
     });
   }
@@ -60,8 +60,8 @@ export function evaluateWeatherAlerts(
     alerts.push({
       type: 'RAIN',
       severity: 'INFO',
-      title: 'Ploaie',
-      message: `Ploaie estimată ${inHours(rainIndex)} pe parcela ${parcelName}.`,
+      title: 'Rain',
+      message: `Rain expected ${inHours(rainIndex)} on parcel ${parcelName}.`,
       startsAt: window[rainIndex]!.time,
     });
   }
@@ -71,8 +71,8 @@ export function evaluateWeatherAlerts(
     alerts.push({
       type: 'FROST',
       severity: 'WARNING',
-      title: 'Îngheț',
-      message: `Îngheț estimat ${inHours(frostIndex)} pe parcela ${parcelName}: ${Math.round(window[frostIndex]!.temperatureC)} °C.`,
+      title: 'Frost',
+      message: `Frost expected ${inHours(frostIndex)} on parcel ${parcelName}: ${Math.round(window[frostIndex]!.temperatureC)} °C.`,
       startsAt: window[frostIndex]!.time,
     });
   }
@@ -82,8 +82,8 @@ export function evaluateWeatherAlerts(
     alerts.push({
       type: 'HEAT',
       severity: 'WARNING',
-      title: 'Temperaturi extreme',
-      message: `Caniculă estimată ${inHours(heatIndex)} pe parcela ${parcelName}: ${Math.round(window[heatIndex]!.temperatureC)} °C.`,
+      title: 'Extreme temperatures',
+      message: `Heatwave expected ${inHours(heatIndex)} on parcel ${parcelName}: ${Math.round(window[heatIndex]!.temperatureC)} °C.`,
       startsAt: window[heatIndex]!.time,
     });
   }
@@ -93,8 +93,8 @@ export function evaluateWeatherAlerts(
     alerts.push({
       type: 'WIND_SPRAYING',
       severity: 'WARNING',
-      title: 'Vânt puternic',
-      message: `Vânt ${Math.round(current.windKmh)} km/h. Erbicidarea nu este recomandată.`,
+      title: 'Strong wind',
+      message: `Wind ${Math.round(current.windKmh)} km/h. Herbicide spraying is not recommended.`,
       startsAt: current.time,
     });
   }

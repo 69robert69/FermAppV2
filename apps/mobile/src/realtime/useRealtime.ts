@@ -8,17 +8,17 @@ import { usesFirebase } from '../firebase/config';
 import type { ActiveWork, MachinePosition } from '../features/intelligence/api';
 import { mapOverviewKey, type MapParcelInfo } from '../features/map/api';
 import { WORK_TYPES } from '../lib/format';
+import { announceCompletion } from '../features/operations/store';
 import { useAuth } from '../store/auth';
-import { useToast } from '../store/toast';
 
-/** Ce ecrane se reîmprospătează la fiecare eveniment primit de la server. */
+/** Which screens refresh on each event received from the server. */
 const INVALIDATIONS: Record<string, QueryKey[]> = {
-  'work:updated': [['work'], ['dashboard'], ['intelligence'], mapOverviewKey],
+  'work:updated': [['work'], ['dashboard'], ['intelligence'], mapOverviewKey, ['economics']],
   'irrigation:updated': [['irrigation'], ['dashboard'], ['intelligence'], mapOverviewKey],
   'task:updated': [['tasks'], ['dashboard'], ['intelligence'], mapOverviewKey],
   'alert:new': [['alerts'], ['dashboard'], ['intelligence']],
   'notification:new': [['notifications']],
-  'parcel:updated': [['intelligence'], ['parcels'], mapOverviewKey],
+  'parcel:updated': [['intelligence'], ['parcels'], mapOverviewKey, ['economics']],
 };
 
 interface FinishedRun {
@@ -28,7 +28,7 @@ interface FinishedRun {
   type?: string;
 }
 
-/** Actualizează poziția utilajului pe hartă fără să reîncarce toate parcelele. */
+/** Updates the machine position on the map without reloading all parcels. */
 function placeMachine(position: MachinePosition & { workId: string }) {
   queryClient.setQueryData<MapParcelInfo[]>(mapOverviewKey, (items) =>
     items?.map((item) => ({
@@ -42,25 +42,22 @@ export function useRealtime() {
   const farmId = useAuth((state) => state.farm?.id);
 
   useEffect(() => {
-    // Pe Firebase, actualizările live vin direct din Firestore.
+    // On Firebase, live updates come directly from Firestore.
     if (!farmId || usesFirebase) return;
     const socket = io(API_ORIGIN, {
       transports: ['websocket'],
       auth: (callback) => callback({ token: useAuth.getState().accessToken }),
     });
 
-    // Serverul poate anunța aceeași finalizare de două ori.
-    const announced = new Set<string>();
+    // The server can announce the same completion twice, and the map may have announced it already.
     const announce = (run: FinishedRun, message: string) => {
-      if (run.status !== 'COMPLETED' || announced.has(run.id)) return;
-      announced.add(run.id);
-      useToast.getState().show(message);
+      if (run.status === 'COMPLETED') announceCompletion(run.id, message);
     };
     socket.on('work:updated', (work: FinishedRun) => {
-      announce(work, `${WORK_TYPES[work.type ?? ''] ?? 'Lucrarea'} pe parcela ${work.parcel?.name} s-a finalizat.`);
+      announce(work, `${WORK_TYPES[work.type ?? ''] ?? 'The operation'} of parcel ${work.parcel?.name} has been completed.`);
     });
     socket.on('irrigation:updated', (run: FinishedRun) => {
-      announce(run, `Irigarea pe parcela ${run.parcel?.name} s-a finalizat.`);
+      announce(run, `Irrigation on parcel ${run.parcel?.name} has completed.`);
     });
 
     for (const [event, keys] of Object.entries(INVALIDATIONS)) {

@@ -13,9 +13,9 @@ export interface CalendarEntry {
   done?: boolean;
 }
 
-const monthLabel = (date: string) => new Date(date).toLocaleDateString('ro-RO', { month: 'long', year: 'numeric' });
+const monthLabel = (date: string) => new Date(date).toLocaleDateString('en-GB', { month: 'long', year: 'numeric' });
 
-/** Activitățile grupate pe luni, în ordine cronologică. */
+/** Activities grouped by month, in chronological order. */
 export function CalendarList({ entries }: { entries: CalendarEntry[] }) {
   const sorted = [...entries].sort((a, b) => a.date.localeCompare(b.date));
   const months = new Map<string, CalendarEntry[]>();
@@ -37,7 +37,7 @@ export function CalendarList({ entries }: { entries: CalendarEntry[] }) {
                 <Txt color={entry.done ? colors.straw : colors.chaff}>{entry.title}</Txt>
                 {entry.subtitle ? <Txt variant="small">{entry.subtitle}</Txt> : null}
               </View>
-              {entry.done ? <MaterialCommunityIcons name="check-circle" size={20} color={colors.leaf} accessibilityLabel="Finalizat" /> : null}
+              {entry.done ? <MaterialCommunityIcons name="check-circle" size={20} color={colors.leaf} accessibilityLabel="Done" /> : null}
             </View>
           ))}
         </View>
@@ -70,31 +70,31 @@ export function PlanChecklist({ steps, doneKeys }: { steps: PlanStep[]; doneKeys
 export const stepsToCalendar = (steps: PlanStep[], doneKeys?: ReadonlySet<string>): CalendarEntry[] =>
   steps.map((step) => ({ id: step.key, date: step.date, title: step.title, done: doneKeys?.has(step.key) }));
 
-/** Necesarul de apă, schema de fertilizare și planul de monitorizare. */
+/** Water requirement, fertilization scheme and monitoring plan. */
 export function PlanResources({ plan }: { plan: ParcelPlanData }) {
   const { irrigation, fertilization, monitoring } = plan;
   return (
     <View style={{ gap: space.md }}>
       <Panel>
-        <Txt variant="subtitle">Necesar de irigare</Txt>
-        <Row label="Necesar pe sezon" value={`${number(irrigation.requiredMm, 0)} mm`} />
-        <Row label="Ploaie utilă estimată" value={irrigation.effectiveRainMm === null ? 'Date indisponibile' : `${number(irrigation.effectiveRainMm, 0)} mm`} />
-        <Row label="Deficit" value={irrigation.deficitMm === null ? 'Date indisponibile' : `${number(irrigation.deficitMm, 0)} mm`} />
-        <Row label="Cicluri recomandate" value={irrigation.deficitMm === null ? '-' : `${irrigation.passes} x ${irrigation.doseMm} mm`} />
-        <Row label="Perioadă critică" value={irrigation.criticalPeriod} />
+        <Txt variant="subtitle">Irrigation requirement</Txt>
+        <Row label="Seasonal requirement" value={`${number(irrigation.requiredMm, 0)} mm`} />
+        <Row label="Estimated effective rain" value={irrigation.effectiveRainMm === null ? 'Data unavailable' : `${number(irrigation.effectiveRainMm, 0)} mm`} />
+        <Row label="Deficit" value={irrigation.deficitMm === null ? 'Data unavailable' : `${number(irrigation.deficitMm, 0)} mm`} />
+        <Row label="Recommended cycles" value={irrigation.deficitMm === null ? '-' : `${irrigation.passes} x ${irrigation.doseMm} mm`} />
+        <Row label="Critical period" value={irrigation.criticalPeriod} />
       </Panel>
       <Panel>
-        <Txt variant="subtitle">Schemă de fertilizare</Txt>
+        <Txt variant="subtitle">Fertilization scheme</Txt>
         {fertilization.map((stage) => (
           <View key={stage.stage} style={{ gap: 2 }}>
             <Txt>{`${stage.stage}${stage.date ? `, ${shortDate(stage.date)}` : ''}`}</Txt>
             <Txt variant="small">{`N ${stage.nKgHa}, P₂O₅ ${stage.pKgHa}, K₂O ${stage.kKgHa} kg/ha`}</Txt>
           </View>
         ))}
-        <Txt variant="small">Doze orientative. Ajustează-le după analiza de sol.</Txt>
+        <Txt variant="small">Indicative doses. Adjust them according to the soil analysis.</Txt>
       </Panel>
       <Panel>
-        <Txt variant="subtitle">Plan de monitorizare</Txt>
+        <Txt variant="subtitle">Monitoring plan</Txt>
         {monitoring.map((item) => (
           <Row key={item.title} label={item.title} value={shortDate(item.date)} />
         ))}
@@ -107,20 +107,20 @@ export function PlanReport({ report }: { report: ParcelReport }) {
   return (
     <View style={{ gap: space.md }}>
       <Panel>
-        <Row label="Parcelă" value={report.parcelName} />
-        <Row label="Suprafață" value={`${number(report.areaHa, 2)} ha`} />
-        <Row label="Tip sol" value={report.soilType ?? 'Date indisponibile'} />
-        <Row label="Ultima cultură" value={report.lastCropName ?? 'Necunoscută'} />
-        <Row label="Cultură planificată" value={report.plannedCropName} />
-        <Row label="Scor compatibilitate" value={`${report.compatibilityScore}%`} />
-        <Row label="Cultură recomandată" value={`${report.recommendedCropName}, ${report.recommendedScore}%`} />
-        <Row label="Producție estimată" value={`${number(report.expectedYieldTHa)} t/ha`} />
+        <Row label="Parcel" value={report.parcelName} />
+        <Row label="Area" value={`${number(report.areaHa, 2)} ha`} />
+        <Row label="Soil type" value={report.soilType ?? 'Data unavailable'} />
+        <Row label="Last crop" value={report.lastCropName ?? 'Unknown'} />
+        <Row label="Planned crop" value={report.plannedCropName} />
+        <Row label="Compatibility score" value={`${report.compatibilityScore}%`} />
+        <Row label="Recommended crop" value={`${report.recommendedCropName}, ${report.recommendedScore}%`} />
+        <Row label="Estimated yield" value={`${number(report.expectedYieldTHa)} t/ha`} />
         {report.expectedProfitEurHa !== undefined ? (
-          <Row label="Profit estimat" value={`${number(report.expectedProfitEurHa, 0)} EUR/ha`} />
+          <Row label="Estimated profit" value={`${number(report.expectedProfitEurHa, 0)} EUR/ha`} />
         ) : null}
       </Panel>
       <Panel>
-        <Txt variant="subtitle">Riscuri principale</Txt>
+        <Txt variant="subtitle">Main risks</Txt>
         {report.risks.map((risk) => (
           <View key={risk} style={styles.risk}>
             <MaterialCommunityIcons name="alert-outline" size={18} color={colors.amber} />
@@ -129,14 +129,14 @@ export function PlanReport({ report }: { report: ParcelReport }) {
         ))}
       </Panel>
       <Panel>
-        <Txt variant="subtitle">Recomandare</Txt>
+        <Txt variant="subtitle">Recommendation</Txt>
         <Txt>{report.recommendation}</Txt>
       </Panel>
       <Txt variant="small">
         {report.priceEurPerT !== undefined
-          ? `Estimări orientative pentru cultură neirigată, calculate cu ${report.priceEurPerT} EUR/t și costuri de ${report.costEurHa} EUR/ha.`
-          : 'Estimări orientative pentru cultură neirigată.'}
-        {report.missingData.length ? ` Lipsesc datele despre: ${report.missingData.join(', ')}.` : ''}
+          ? `Indicative estimates for a non-irrigated crop, calculated with ${report.priceEurPerT} EUR/t and costs of ${report.costEurHa} EUR/ha.`
+          : 'Indicative estimates for a non-irrigated crop.'}
+        {report.missingData.length ? ` Missing data about: ${report.missingData.join(', ')}.` : ''}
       </Txt>
     </View>
   );

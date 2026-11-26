@@ -1,20 +1,20 @@
-# Deployment și scalare pentru 1.000+ ferme
+# Deployment and scaling for 1,000+ farms
 
-## Ipoteze de dimensionare
+## Sizing assumptions
 
-| Indicator | Valoare estimată |
+| Indicator | Estimated value |
 |---|--:|
-| Ferme | 1.000 |
-| Parcele | 30.000 (30 pe fermă) |
-| Utilizatori | 5.000 (5 pe fermă) |
-| Conexiuni Socket.IO la vârf | 1.500 |
-| Cereri API la vârf | 150-300 pe secundă |
-| Senzori | 2.000, cu o citire la 10 minute |
-| Citiri IoT pe an | Aproximativ 105 milioane de rânduri |
+| Farms | 1,000 |
+| Parcels | 30,000 (30 per farm) |
+| Users | 5,000 (5 per farm) |
+| Peak Socket.IO connections | 1,500 |
+| Peak API requests | 150-300 per second |
+| Sensors | 2,000, with one reading every 10 minutes |
+| IoT readings per year | About 105 million rows |
 
-Valorile trebuie confirmate prin test de încărcare înainte de lansare.
+These values must be confirmed by a load test before launch.
 
-## Arhitectura de producție
+## Production architecture
 
 ```text
 Cloudflare / WAF
@@ -23,82 +23,82 @@ Load balancer (TLS, WebSocket)
       │
 API × 3-6 (JOBS_ENABLED=false)      Worker × 2 (JOBS_ENABLED=true)
       │                                   │
-      ├────────── Redis gestionat ────────┤
+      ├────────── Managed Redis ──────────┤
       │                                   │
-PgBouncer ──► PostgreSQL primar ──► replică de citire
+PgBouncer ──► PostgreSQL primary ──► read replica
                     │
-              backup automat + PITR
+              automatic backup + PITR
 ```
 
-## Configurație recomandată de pornire
+## Recommended starting configuration
 
-| Componentă | Dimensiune | Observații |
+| Component | Size | Notes |
 |---|---|---|
-| API | 3 instanțe, 2 vCPU, 4 GB | Scalare automată la 60% CPU |
-| Worker | 2 instanțe, 2 vCPU, 4 GB | Blocările Redis evită rularea dublă |
-| PostgreSQL | 8 vCPU, 32 GB, SSD 500 GB | Cu replică în altă zonă |
-| PgBouncer | Mod transaction | Adaugă `pgbouncer=true` în `DATABASE_URL` |
-| Redis | 4 GB, cu replică | Cache, Socket.IO, blocări |
-| Stocare fișiere | S3 sau Supabase Storage | Pentru rapoarte și imagini arhivate |
+| API | 3 instances, 2 vCPU, 4 GB | Autoscaling at 60% CPU |
+| Worker | 2 instances, 2 vCPU, 4 GB | Redis locks prevent double runs |
+| PostgreSQL | 8 vCPU, 32 GB, 500 GB SSD | With a replica in another zone |
+| PgBouncer | Transaction mode | Add `pgbouncer=true` to `DATABASE_URL` |
+| Redis | 4 GB, with a replica | Cache, Socket.IO, locks |
+| File storage | S3 or Supabase Storage | For reports and archived images |
 
-Kubernetes devine util peste aproximativ 10 instanțe. Până atunci, un serviciu gestionat de containere (AWS ECS, Google Cloud Run sau Azure Container Apps) este mai simplu de operat. Cloud Run necesită configurarea sesiunilor pentru WebSocket.
+Kubernetes becomes useful above about 10 instances. Until then, a managed container service (AWS ECS, Google Cloud Run or Azure Container Apps) is simpler to operate. Cloud Run requires session affinity to be configured for WebSocket.
 
-## Pași de lansare
+## Launch steps
 
-1. Construiește imaginea: `docker build -f apps/api/Dockerfile -t fermapp-api .`
-2. Rulează migrările o singură dată: `npx prisma migrate deploy`.
-3. Pornește instanțele API cu `JOBS_ENABLED=false`.
-4. Pornește workerii cu `JOBS_ENABLED=true`.
-5. Verifică `/health`, apoi mută traficul treptat.
-6. Publică aplicația mobilă cu EAS Build și EAS Submit.
+1. Build the image: `docker build -f apps/api/Dockerfile -t fermapp-api .`
+2. Run the migrations once: `npx prisma migrate deploy`.
+3. Start the API instances with `JOBS_ENABLED=false`.
+4. Start the workers with `JOBS_ENABLED=true`.
+5. Check `/health`, then shift traffic gradually.
+6. Publish the mobile app with EAS Build and EAS Submit.
 
-Secretele se păstrează într-un manager de secrete, iar `JWT_ACCESS_SECRET` se rotește periodic.
+Secrets are kept in a secrets manager, and `JWT_ACCESS_SECRET` is rotated periodically.
 
-## Modificări necesare odată cu creșterea
+## Changes needed as usage grows
 
-| Prag | Modificare |
+| Threshold | Change |
 |---|---|
-| Înainte de lansare | Licențe comerciale pentru serviciile meteo și satelitare |
-| Înainte de lansare | Grupează parcelele apropiate pe o grilă de 0,05° pentru alerte |
-| Peste 100 de ferme | Trece joburile pe BullMQ, cu reîncercări și cozi separate |
-| Peste 500 de ferme | Partiționează `IotReading` pe luni sau migrează la TimescaleDB |
-| Peste 500 de ferme | Partiționează `Notification` și `WeatherAlert`, cu retenție de 12 luni |
-| Interogări spațiale | Adaugă PostGIS și index GiST pe geometrie |
-| Peste 2.000 de ferme | Citește rapoartele din replică și mută exporturile în joburi |
+| Before launch | Commercial licences for the weather and satellite services |
+| Before launch | Group nearby parcels on a 0.05° grid for alerts |
+| Above 100 farms | Move jobs to BullMQ, with retries and separate queues |
+| Above 500 farms | Partition `IotReading` by month or migrate to TimescaleDB |
+| Above 500 farms | Partition `Notification` and `WeatherAlert`, with 12-month retention |
+| Spatial queries | Add PostGIS and a GiST index on the geometry |
+| Above 2,000 farms | Read reports from the replica and move exports into jobs |
 
-## Serviciile externe la scară
+## External services at scale
 
-La 30.000 de parcele și o verificare la 30 de minute, apelurile fără grupare ar ajunge la 1,44 milioane pe zi. Cache-ul pe o grilă de aproximativ 1 km reduce acest număr doar parțial, deci gruparea pe o grilă mai mare este obligatorie.
+With 30,000 parcels and a check every 30 minutes, calls without grouping would reach 1.44 million per day. Caching on a grid of about 1 km reduces this number only partially, so grouping on a larger grid is mandatory.
 
-| Serviciu | Atenție |
+| Service | Caution |
 |---|---|
-| Open-Meteo | API-ul gratuit este pentru uz necomercial. Produsul comercial are nevoie de plan plătit |
-| OpenWeatherMap | Planul se alege după numărul de apeluri rezultat din grupare |
-| SoilGrids | Serviciu fără garanție de disponibilitate. Interogările se fac o dată pe parcelă, iar eșecurile se reiau automat |
-| NASA POWER | Rezultatele se păstrează 7 zile în cache |
-| Sentinel Hub / Copernicus | Consumul se măsoară în unități de procesare, deci descărcările trebuie programate pe fermă |
-| Claude API | Sunt necesare limite lunare pe fermă și monitorizarea tokenilor |
-| Expo Push | Se trimite în loturi de 100 de notificări |
+| Open-Meteo | The free API is for non-commercial use. A commercial product needs a paid plan |
+| OpenWeatherMap | The plan is chosen based on the number of calls resulting from grouping |
+| SoilGrids | Service with no availability guarantee. Queries run once per parcel, and failures are retried automatically |
+| NASA POWER | Results are cached for 7 days |
+| Sentinel Hub / Copernicus | Usage is measured in processing units, so downloads must be scheduled per farm |
+| Claude API | Monthly per-farm limits and token monitoring are required |
+| Expo Push | Sent in batches of 100 notifications |
 
-## Observabilitate
+## Observability
 
-- Loguri JSON centralizate în Grafana Loki, Datadog sau CloudWatch.
-- Metrici pentru latență, rata de erori, conexiuni socket și durata joburilor.
-- Sentry pentru erori pe server și în aplicația mobilă.
-- Alerte pentru erori 5xx, joburi întârziate, replică rămasă în urmă și spațiu pe disc.
+- Centralized JSON logs in Grafana Loki, Datadog or CloudWatch.
+- Metrics for latency, error rate, socket connections and job duration.
+- Sentry for errors on the server and in the mobile app.
+- Alerts for 5xx errors, delayed jobs, a lagging replica and disk space.
 
-## Continuitate
+## Continuity
 
-| Indicator | Țintă |
+| Indicator | Target |
 |---|---|
-| Disponibilitate | 99,9% |
-| Pierdere maximă de date (RPO) | 5 minute |
-| Timp de restaurare (RTO) | 1 oră |
-| Păstrare backup | 30 de zile, cu test lunar de restaurare |
+| Availability | 99.9% |
+| Maximum data loss (RPO) | 5 minutes |
+| Recovery time (RTO) | 1 hour |
+| Backup retention | 30 days, with a monthly restore test |
 
-## Securitate și conformitate
+## Security and compliance
 
-- TLS peste tot și baza de date într-o rețea privată.
-- Găzduire în UE pentru datele fermierilor și acorduri de prelucrare cu furnizorii.
-- Export și ștergere de date la cerere, conform GDPR.
-- Scanare automată a dependențelor și a imaginilor Docker în CI.
+- TLS everywhere and the database in a private network.
+- EU hosting for farmers' data and data processing agreements with vendors.
+- Data export and deletion on request, in line with GDPR.
+- Automatic scanning of dependencies and Docker images in CI.

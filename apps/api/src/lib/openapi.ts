@@ -18,9 +18,9 @@ function parameters(schema: ZodType | undefined, where: 'query' | 'path') {
 
 const ROLE_NAMES: Record<string, string> = {
   ADMIN: 'Administrator',
-  FARM_MANAGER: 'Manager Fermă',
-  OPERATOR: 'Operator Utilaj',
-  AGRONOMIST: 'Consultant Agronom',
+  FARM_MANAGER: 'Farm Manager',
+  OPERATOR: 'Machine Operator',
+  AGRONOMIST: 'Agronomist Consultant',
 };
 
 export function buildOpenApiDocument() {
@@ -31,7 +31,7 @@ export function buildOpenApiDocument() {
     const isPublic = route.roles === 'public';
     const access = isPublic
       ? 'Public'
-      : `Roluri: ${(route.roles as readonly string[]).map((role) => ROLE_NAMES[role]).join(', ')}`;
+      : `Roles: ${(route.roles as readonly string[]).map((role) => ROLE_NAMES[role]).join(', ')}`;
 
     const requestBody = route.file
       ? {
@@ -55,7 +55,7 @@ export function buildOpenApiDocument() {
       ...(requestBody ? { requestBody } : {}),
       responses: {
         [route.status]: {
-          description: 'Succes',
+          description: 'Success',
           ...(route.produces ? { content: { [route.produces]: { schema: { type: 'string', format: 'binary' } } } } : {}),
         },
         400: { $ref: '#/components/responses/Error' },
@@ -69,7 +69,7 @@ export function buildOpenApiDocument() {
     info: {
       title: 'FermApp API',
       version: '1.0.0',
-      description: 'API pentru managementul fermelor. Răspunsurile reușite au forma `{ "data": ... }`.',
+      description: 'Farm management API. Successful responses have the form `{ "data": ... }`.',
     },
     servers: [{ url: '/api/v1' }],
     tags: [...new Set(openApiRegistry.map((route) => route.tag))].map((name) => ({ name })),
@@ -78,7 +78,7 @@ export function buildOpenApiDocument() {
       securitySchemes: { bearerAuth: { type: 'http', scheme: 'bearer', bearerFormat: 'JWT' } },
       responses: {
         Error: {
-          description: 'Eroare',
+          description: 'Error',
           content: {
             'application/json': {
               schema: {

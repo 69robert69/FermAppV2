@@ -16,7 +16,7 @@ interface Props {
   busy?: boolean;
 }
 
-/** Operațiune activă: cronometru, procent realizat și ETA, actualizate în fiecare secundă. */
+/** Active operation: timer, percent done and ETA, updated every second. */
 export function RunCard({ run, title, subtitle, color = colors.wheat, canControl, onAction, busy }: Props) {
   const progress = useLiveProgress(run);
   const paused = run.status === 'PAUSED';
@@ -31,18 +31,18 @@ export function RunCard({ run, title, subtitle, color = colors.wheat, canControl
       </View>
       <ProgressTrack percent={progress.percent} color={paused ? colors.straw : color} />
       <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
-        <Txt variant="small">{`Scurs ${duration(progress.elapsedSeconds)}`}</Txt>
+        <Txt variant="small">{`Elapsed ${duration(progress.elapsedSeconds)}`}</Txt>
         <Txt variant="small">
-          {paused ? 'În pauză' : progress.eta ? `Se termină la ${clock(progress.eta)}` : ''}
+          {paused ? 'Paused' : progress.eta ? `Finishes at ${clock(progress.eta)}` : ''}
         </Txt>
       </View>
       {canControl && onAction ? (
         <View style={{ flexDirection: 'row', gap: space.sm }}>
           <Button mode="outlined" disabled={busy} style={{ flex: 1 }} onPress={() => onAction(paused ? 'resume' : 'pause')}>
-            {paused ? 'Reia' : 'Pauză'}
+            {paused ? 'Resume' : 'Pause'}
           </Button>
           <Button mode="contained" disabled={busy} style={{ flex: 1 }} onPress={() => onAction('complete')}>
-            Finalizează
+            Complete
           </Button>
         </View>
       ) : null}

@@ -1,4 +1,4 @@
-// Pregătește fișierele .env pentru rularea locală și afișează adresa calculatorului în rețea.
+// Prepares the .env files for local running and shows the computer's network address.
 import { randomBytes } from 'node:crypto';
 import { existsSync, readFileSync, writeFileSync } from 'node:fs';
 import { networkInterfaces } from 'node:os';
@@ -32,7 +32,7 @@ if (!existsSync(apiEnv)) {
 }
 
 const ip = findLanAddress();
-// Se actualizează doar adresa serverului, iar celelalte setări rămân neschimbate.
+// Only the server address is updated, and the other settings remain unchanged.
 const mobileEnv = path.join(root, 'apps/mobile/.env');
 const otherSettings = existsSync(mobileEnv)
   ? readFileSync(mobileEnv, 'utf8').split(/\r?\n/).filter((line) => line.trim() && !line.startsWith('EXPO_PUBLIC_API_URL='))

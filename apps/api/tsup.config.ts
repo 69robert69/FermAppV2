@@ -7,6 +7,6 @@ export default defineConfig({
   platform: 'node',
   sourcemap: true,
   clean: true,
-  // Domeniul este sursă TypeScript, deci se include în pachetul final.
+  // The domain package is TypeScript source, so it is bundled into the final build.
   noExternal: ['@fermapp/domain'],
 });

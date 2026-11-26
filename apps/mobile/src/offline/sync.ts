@@ -20,7 +20,7 @@ export async function refreshOutboxCounts() {
 
 let running: Promise<void> | null = null;
 
-/** Trimite operațiunile în ordine; se oprește la prima problemă de conexiune. */
+/** Sends operations in order; stops at the first connection problem. */
 export function flushOutbox(): Promise<void> {
   running ??= (async () => {
     if (!useAuth.getState().accessToken) return;
@@ -37,7 +37,7 @@ export function flushOutbox(): Promise<void> {
         sent += 1;
       } catch (error) {
         if (error instanceof ApiError && error.status > 0 && error.status < 500) {
-          // Serverul a refuzat definitiv operațiunea, deci rămâne vizibilă pentru utilizator.
+          // The server rejected the operation permanently, so it stays visible to the user.
           await failOperation(operation.id, error.message);
           continue;
         }

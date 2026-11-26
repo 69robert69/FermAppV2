@@ -20,28 +20,28 @@ const schema = readdirSync(migrations, { withFileTypes: true })
   .filter((entry) => entry.isDirectory())
   .map((entry) => entry.name)
   .sort()
-  .map((name) => `-- Migrare: ${name}\n${readFileSync(path.join(migrations, name, 'migration.sql'), 'utf8')}`)
+  .map((name) => `-- Migration: ${name}\n${readFileSync(path.join(migrations, name, 'migration.sql'), 'utf8')}`)
   .join('\n');
 writeFileSync(path.join(docs, 'schema.sql'), schema);
 
-const ROLE_SHORT: Record<string, string> = { ADMIN: 'Admin', FARM_MANAGER: 'Manager', OPERATOR: 'Operator', AGRONOMIST: 'Agronom' };
+const ROLE_SHORT: Record<string, string> = { ADMIN: 'Admin', FARM_MANAGER: 'Manager', OPERATOR: 'Operator', AGRONOMIST: 'Agronomist' };
 const tags = [...new Set(openApiRegistry.map((route) => route.tag))];
 const lines = [
-  '# Endpointuri API',
+  '# API endpoints',
   '',
-  `Fișier generat cu \`npm run docs:api\`. Baza este \`/api/v1\`. Sunt ${openApiRegistry.length} endpointuri.`,
-  'Documentația interactivă Swagger rulează la `/api/docs`.',
+  `File generated with \`npm run docs:api\`. The base path is \`/api/v1\`. There are ${openApiRegistry.length} endpoints.`,
+  'Interactive Swagger documentation runs at `/api/docs`.',
   '',
 ];
 for (const tag of tags) {
-  lines.push(`## ${tag}`, '', '| Metodă | Cale | Descriere | Acces |', '|---|---|---|---|');
+  lines.push(`## ${tag}`, '', '| Method | Path | Description | Access |', '|---|---|---|---|');
   for (const route of openApiRegistry.filter((item) => item.tag === tag)) {
     const access =
-      route.roles === 'public' ? 'Public' : route.roles.length === 4 ? 'Toate rolurile' : route.roles.map((role) => ROLE_SHORT[role]).join(', ');
+      route.roles === 'public' ? 'Public' : route.roles.length === 4 ? 'All roles' : route.roles.map((role) => ROLE_SHORT[role]).join(', ');
     lines.push(`| ${route.method.toUpperCase()} | \`${route.path}\` | ${route.summary} | ${access} |`);
   }
   lines.push('');
 }
-writeFileSync(path.join(docs, '02-endpointuri-api.md'), lines.join('\n'));
-console.log(`Documentație generată pentru ${openApiRegistry.length} endpointuri.`);
+writeFileSync(path.join(docs, '02-api-endpoints.md'), lines.join('\n'));
+console.log(`Documentation generated for ${openApiRegistry.length} endpoints.`);
 process.exit(0);

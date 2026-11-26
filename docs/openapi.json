@@ -3,7 +3,7 @@
   "info": {
     "title": "FermApp API",
     "version": "1.0.0",
-    "description": "API pentru managementul fermelor. Răspunsurile reușite au forma `{ \"data\": ... }`."
+    "description": "Farm management API. Successful responses have the form `{ \"data\": ... }`."
   },
   "servers": [
     {
@@ -12,19 +12,22 @@
   ],
   "tags": [
     {
-      "name": "Asistent AI"
+      "name": "AI Assistant"
     },
     {
-      "name": "Autentificare"
+      "name": "Authentication"
     },
     {
-      "name": "Costuri"
+      "name": "Costs"
     },
     {
-      "name": "Culturi și rotație"
+      "name": "Crops and rotation"
     },
     {
       "name": "Dashboard"
+    },
+    {
+      "name": "Economics"
     },
     {
       "name": "Parcel Intelligence"
@@ -33,40 +36,40 @@
       "name": "IoT"
     },
     {
-      "name": "Irigații"
+      "name": "Irrigation"
     },
     {
-      "name": "Utilaje"
+      "name": "Machines"
     },
     {
-      "name": "Hartă"
+      "name": "Map"
     },
     {
-      "name": "Notificări"
+      "name": "Notifications"
     },
     {
-      "name": "Parcele"
+      "name": "Parcels"
     },
     {
-      "name": "Plan tehnologic"
+      "name": "Technology plan"
     },
     {
-      "name": "Rapoarte"
+      "name": "Reports"
     },
     {
-      "name": "Satelit"
+      "name": "Satellite"
     },
     {
-      "name": "Sol"
+      "name": "Soil"
     },
     {
       "name": "To Do"
     },
     {
-      "name": "Echipă"
+      "name": "Team"
     },
     {
-      "name": "Meteo"
+      "name": "Weather"
     },
     {
       "name": "Work"
@@ -76,10 +79,10 @@
     "/ai/chat": {
       "post": {
         "tags": [
-          "Asistent AI"
+          "AI Assistant"
         ],
-        "summary": "Trimite o întrebare asistentului agronomic",
-        "description": "Roluri: Administrator, Manager Fermă, Operator Utilaj, Consultant Agronom",
+        "summary": "Send a question to the agronomy assistant",
+        "description": "Roles: Administrator, Farm Manager, Machine Operator, Agronomist Consultant",
         "security": [
           {
             "bearerAuth": []
@@ -119,7 +122,7 @@
         },
         "responses": {
           "200": {
-            "description": "Succes"
+            "description": "Success"
           },
           "400": {
             "$ref": "#/components/responses/Error"
@@ -136,10 +139,10 @@
     "/ai/conversations": {
       "get": {
         "tags": [
-          "Asistent AI"
+          "AI Assistant"
         ],
-        "summary": "Conversațiile utilizatorului",
-        "description": "Roluri: Administrator, Manager Fermă, Operator Utilaj, Consultant Agronom",
+        "summary": "The user’s conversations",
+        "description": "Roles: Administrator, Farm Manager, Machine Operator, Agronomist Consultant",
         "security": [
           {
             "bearerAuth": []
@@ -148,7 +151,7 @@
         "parameters": [],
         "responses": {
           "200": {
-            "description": "Succes"
+            "description": "Success"
           },
           "400": {
             "$ref": "#/components/responses/Error"
@@ -165,10 +168,10 @@
     "/ai/conversations/{id}": {
       "get": {
         "tags": [
-          "Asistent AI"
+          "AI Assistant"
         ],
-        "summary": "Mesajele unei conversații",
-        "description": "Roluri: Administrator, Manager Fermă, Operator Utilaj, Consultant Agronom",
+        "summary": "Messages of a conversation",
+        "description": "Roles: Administrator, Farm Manager, Machine Operator, Agronomist Consultant",
         "security": [
           {
             "bearerAuth": []
@@ -188,7 +191,7 @@
         ],
         "responses": {
           "200": {
-            "description": "Succes"
+            "description": "Success"
           },
           "400": {
             "$ref": "#/components/responses/Error"
@@ -205,9 +208,9 @@
     "/auth/register": {
       "post": {
         "tags": [
-          "Autentificare"
+          "Authentication"
         ],
-        "summary": "Creează un cont și o fermă nouă",
+        "summary": "Create an account and a new farm",
         "description": "Public",
         "security": [],
         "parameters": [],
@@ -256,7 +259,7 @@
         },
         "responses": {
           "201": {
-            "description": "Succes"
+            "description": "Success"
           },
           "400": {
             "$ref": "#/components/responses/Error"
@@ -267,9 +270,9 @@
     "/auth/login": {
       "post": {
         "tags": [
-          "Autentificare"
+          "Authentication"
         ],
-        "summary": "Autentificare cu email și parolă",
+        "summary": "Sign in with email and password",
         "description": "Public",
         "security": [],
         "parameters": [],
@@ -302,7 +305,7 @@
         },
         "responses": {
           "200": {
-            "description": "Succes"
+            "description": "Success"
           },
           "400": {
             "$ref": "#/components/responses/Error"
@@ -313,9 +316,9 @@
     "/auth/refresh": {
       "post": {
         "tags": [
-          "Autentificare"
+          "Authentication"
         ],
-        "summary": "Reînnoiește sesiunea și rotește tokenul de refresh",
+        "summary": "Renew the session and rotate the refresh token",
         "description": "Public",
         "security": [],
         "parameters": [],
@@ -342,7 +345,7 @@
         },
         "responses": {
           "200": {
-            "description": "Succes"
+            "description": "Success"
           },
           "400": {
             "$ref": "#/components/responses/Error"
@@ -353,10 +356,10 @@
     "/auth/logout": {
       "post": {
         "tags": [
-          "Autentificare"
+          "Authentication"
         ],
-        "summary": "Închide sesiunea curentă",
-        "description": "Roluri: Administrator, Manager Fermă, Operator Utilaj, Consultant Agronom",
+        "summary": "Close the current session",
+        "description": "Roles: Administrator, Farm Manager, Machine Operator, Agronomist Consultant",
         "security": [
           {
             "bearerAuth": []
@@ -386,7 +389,7 @@
         },
         "responses": {
           "204": {
-            "description": "Succes"
+            "description": "Success"
           },
           "400": {
             "$ref": "#/components/responses/Error"
@@ -403,10 +406,10 @@
     "/auth/me": {
       "get": {
         "tags": [
-          "Autentificare"
+          "Authentication"
         ],
-        "summary": "Profilul utilizatorului curent",
-        "description": "Roluri: Administrator, Manager Fermă, Operator Utilaj, Consultant Agronom",
+        "summary": "Current user profile",
+        "description": "Roles: Administrator, Farm Manager, Machine Operator, Agronomist Consultant",
         "security": [
           {
             "bearerAuth": []
@@ -415,7 +418,7 @@
         "parameters": [],
         "responses": {
           "200": {
-            "description": "Succes"
+            "description": "Success"
           },
           "400": {
             "$ref": "#/components/responses/Error"
@@ -432,10 +435,10 @@
     "/auth/switch-farm": {
       "post": {
         "tags": [
-          "Autentificare"
+          "Authentication"
         ],
-        "summary": "Schimbă ferma activă",
-        "description": "Roluri: Administrator, Manager Fermă, Operator Utilaj, Consultant Agronom",
+        "summary": "Switch the active farm",
+        "description": "Roles: Administrator, Farm Manager, Machine Operator, Agronomist Consultant",
         "security": [
           {
             "bearerAuth": []
@@ -465,7 +468,7 @@
         },
         "responses": {
           "200": {
-            "description": "Succes"
+            "description": "Success"
           },
           "400": {
             "$ref": "#/components/responses/Error"
@@ -482,10 +485,10 @@
     "/auth/push-token": {
       "post": {
         "tags": [
-          "Autentificare"
+          "Authentication"
         ],
-        "summary": "Înregistrează dispozitivul pentru notificări push",
-        "description": "Roluri: Administrator, Manager Fermă, Operator Utilaj, Consultant Agronom",
+        "summary": "Register the device for push notifications",
+        "description": "Roles: Administrator, Farm Manager, Machine Operator, Agronomist Consultant",
         "security": [
           {
             "bearerAuth": []
@@ -522,7 +525,7 @@
         },
         "responses": {
           "204": {
-            "description": "Succes"
+            "description": "Success"
           },
           "400": {
             "$ref": "#/components/responses/Error"
@@ -539,10 +542,10 @@
     "/costs": {
       "get": {
         "tags": [
-          "Costuri"
+          "Costs"
         ],
-        "summary": "Listează costurile",
-        "description": "Roluri: Administrator, Manager Fermă, Consultant Agronom",
+        "summary": "List costs",
+        "description": "Roles: Administrator, Farm Manager, Agronomist Consultant",
         "security": [
           {
             "bearerAuth": []
@@ -572,7 +575,7 @@
         ],
         "responses": {
           "200": {
-            "description": "Succes"
+            "description": "Success"
           },
           "400": {
             "$ref": "#/components/responses/Error"
@@ -587,10 +590,10 @@
       },
       "post": {
         "tags": [
-          "Costuri"
+          "Costs"
         ],
-        "summary": "Adaugă un cost",
-        "description": "Roluri: Administrator, Manager Fermă",
+        "summary": "Add a cost",
+        "description": "Roles: Administrator, Farm Manager",
         "security": [
           {
             "bearerAuth": []
@@ -633,10 +636,9 @@
                     "maximum": 100000000
                   },
                   "currency": {
-                    "default": "RON",
+                    "default": "EUR",
                     "type": "string",
-                    "minLength": 3,
-                    "maxLength": 3
+                    "const": "EUR"
                   },
                   "date": {},
                   "notes": {
@@ -663,7 +665,7 @@
         },
         "responses": {
           "201": {
-            "description": "Succes"
+            "description": "Success"
           },
           "400": {
             "$ref": "#/components/responses/Error"
@@ -680,10 +682,10 @@
     "/costs/{id}": {
       "patch": {
         "tags": [
-          "Costuri"
+          "Costs"
         ],
-        "summary": "Modifică un cost",
-        "description": "Roluri: Administrator, Manager Fermă",
+        "summary": "Update a cost",
+        "description": "Roles: Administrator, Farm Manager",
         "security": [
           {
             "bearerAuth": []
@@ -755,7 +757,7 @@
         },
         "responses": {
           "200": {
-            "description": "Succes"
+            "description": "Success"
           },
           "400": {
             "$ref": "#/components/responses/Error"
@@ -770,10 +772,10 @@
       },
       "delete": {
         "tags": [
-          "Costuri"
+          "Costs"
         ],
-        "summary": "Șterge un cost",
-        "description": "Roluri: Administrator, Manager Fermă",
+        "summary": "Delete a cost",
+        "description": "Roles: Administrator, Farm Manager",
         "security": [
           {
             "bearerAuth": []
@@ -793,7 +795,7 @@
         ],
         "responses": {
           "200": {
-            "description": "Succes"
+            "description": "Success"
           },
           "400": {
             "$ref": "#/components/responses/Error"
@@ -810,10 +812,10 @@
     "/parcels/{id}/costs/summary": {
       "get": {
         "tags": [
-          "Costuri"
+          "Costs"
         ],
-        "summary": "Cost pe hectar, cost total și profit estimat sau real",
-        "description": "Roluri: Administrator, Manager Fermă, Consultant Agronom",
+        "summary": "Cost per hectare, total cost and estimated or actual profit",
+        "description": "Roles: Administrator, Farm Manager, Agronomist Consultant",
         "security": [
           {
             "bearerAuth": []
@@ -843,7 +845,7 @@
         ],
         "responses": {
           "200": {
-            "description": "Succes"
+            "description": "Success"
           },
           "400": {
             "$ref": "#/components/responses/Error"
@@ -860,10 +862,10 @@
     "/crops": {
       "get": {
         "tags": [
-          "Culturi și rotație"
+          "Crops and rotation"
         ],
-        "summary": "Catalogul culturilor predefinite",
-        "description": "Roluri: Administrator, Manager Fermă, Operator Utilaj, Consultant Agronom",
+        "summary": "Catalog of predefined crops",
+        "description": "Roles: Administrator, Farm Manager, Machine Operator, Agronomist Consultant",
         "security": [
           {
             "bearerAuth": []
@@ -872,7 +874,7 @@
         "parameters": [],
         "responses": {
           "200": {
-            "description": "Succes"
+            "description": "Success"
           },
           "400": {
             "$ref": "#/components/responses/Error"
@@ -889,10 +891,10 @@
     "/parcels/{id}/seasons": {
       "get": {
         "tags": [
-          "Culturi și rotație"
+          "Crops and rotation"
         ],
-        "summary": "Istoricul culturilor pe ultimii 10 ani",
-        "description": "Roluri: Administrator, Manager Fermă, Operator Utilaj, Consultant Agronom",
+        "summary": "Crop history for the last 10 years",
+        "description": "Roles: Administrator, Farm Manager, Machine Operator, Agronomist Consultant",
         "security": [
           {
             "bearerAuth": []
@@ -912,7 +914,7 @@
         ],
         "responses": {
           "200": {
-            "description": "Succes"
+            "description": "Success"
           },
           "400": {
             "$ref": "#/components/responses/Error"
@@ -927,10 +929,10 @@
       },
       "post": {
         "tags": [
-          "Culturi și rotație"
+          "Crops and rotation"
         ],
-        "summary": "Adaugă o cultură în istoricul parcelei",
-        "description": "Roluri: Administrator, Manager Fermă, Consultant Agronom",
+        "summary": "Add a crop to the parcel history",
+        "description": "Roles: Administrator, Farm Manager, Agronomist Consultant",
         "security": [
           {
             "bearerAuth": []
@@ -1083,7 +1085,7 @@
         },
         "responses": {
           "201": {
-            "description": "Succes"
+            "description": "Success"
           },
           "400": {
             "$ref": "#/components/responses/Error"
@@ -1100,10 +1102,10 @@
     "/seasons/{id}": {
       "patch": {
         "tags": [
-          "Culturi și rotație"
+          "Crops and rotation"
         ],
-        "summary": "Modifică o înregistrare de cultură",
-        "description": "Roluri: Administrator, Manager Fermă, Consultant Agronom",
+        "summary": "Update a crop record",
+        "description": "Roles: Administrator, Farm Manager, Agronomist Consultant",
         "security": [
           {
             "bearerAuth": []
@@ -1252,7 +1254,7 @@
         },
         "responses": {
           "200": {
-            "description": "Succes"
+            "description": "Success"
           },
           "400": {
             "$ref": "#/components/responses/Error"
@@ -1267,10 +1269,10 @@
       },
       "delete": {
         "tags": [
-          "Culturi și rotație"
+          "Crops and rotation"
         ],
-        "summary": "Șterge o înregistrare de cultură",
-        "description": "Roluri: Administrator, Manager Fermă, Consultant Agronom",
+        "summary": "Delete a crop record",
+        "description": "Roles: Administrator, Farm Manager, Agronomist Consultant",
         "security": [
           {
             "bearerAuth": []
@@ -1290,7 +1292,7 @@
         ],
         "responses": {
           "200": {
-            "description": "Succes"
+            "description": "Success"
           },
           "400": {
             "$ref": "#/components/responses/Error"
@@ -1307,10 +1309,10 @@
     "/parcels/{id}/rotation/evaluate": {
       "post": {
         "tags": [
-          "Culturi și rotație"
+          "Crops and rotation"
         ],
-        "summary": "Evaluează cultura propusă",
-        "description": "Roluri: Administrator, Manager Fermă, Operator Utilaj, Consultant Agronom",
+        "summary": "Evaluate the proposed crop",
+        "description": "Roles: Administrator, Farm Manager, Machine Operator, Agronomist Consultant",
         "security": [
           {
             "bearerAuth": []
@@ -1368,7 +1370,7 @@
         },
         "responses": {
           "200": {
-            "description": "Succes"
+            "description": "Success"
           },
           "400": {
             "$ref": "#/components/responses/Error"
@@ -1385,10 +1387,10 @@
     "/parcels/{id}/rotation/options": {
       "get": {
         "tags": [
-          "Culturi și rotație"
+          "Crops and rotation"
         ],
-        "summary": "Ordonează toate culturile după scorul de rotație",
-        "description": "Roluri: Administrator, Manager Fermă, Operator Utilaj, Consultant Agronom",
+        "summary": "Rank all crops by rotation score",
+        "description": "Roles: Administrator, Farm Manager, Machine Operator, Agronomist Consultant",
         "security": [
           {
             "bearerAuth": []
@@ -1418,7 +1420,7 @@
         ],
         "responses": {
           "200": {
-            "description": "Succes"
+            "description": "Success"
           },
           "400": {
             "$ref": "#/components/responses/Error"
@@ -1435,10 +1437,10 @@
     "/parcels/{id}/recommendations": {
       "get": {
         "tags": [
-          "Culturi și rotație"
+          "Crops and rotation"
         ],
-        "summary": "Recomandă culturi după sol, climă și rotație",
-        "description": "Roluri: Administrator, Manager Fermă, Operator Utilaj, Consultant Agronom",
+        "summary": "Recommend crops by soil, climate and rotation",
+        "description": "Roles: Administrator, Farm Manager, Machine Operator, Agronomist Consultant",
         "security": [
           {
             "bearerAuth": []
@@ -1468,7 +1470,7 @@
         ],
         "responses": {
           "200": {
-            "description": "Succes"
+            "description": "Success"
           },
           "400": {
             "$ref": "#/components/responses/Error"
@@ -1485,10 +1487,10 @@
     "/parcels/{id}/climate": {
       "get": {
         "tags": [
-          "Culturi și rotație"
+          "Crops and rotation"
         ],
-        "summary": "Compară anii agricoli pe baza datelor NASA POWER",
-        "description": "Roluri: Administrator, Manager Fermă, Operator Utilaj, Consultant Agronom",
+        "summary": "Compare agricultural years based on NASA POWER data",
+        "description": "Roles: Administrator, Farm Manager, Machine Operator, Agronomist Consultant",
         "security": [
           {
             "bearerAuth": []
@@ -1519,7 +1521,7 @@
         ],
         "responses": {
           "200": {
-            "description": "Succes"
+            "description": "Success"
           },
           "400": {
             "$ref": "#/components/responses/Error"
@@ -1536,10 +1538,10 @@
     "/parcels/{id}/development": {
       "get": {
         "tags": [
-          "Culturi și rotație"
+          "Crops and rotation"
         ],
-        "summary": "Estimează dezvoltarea culturii curente prin grade-zile (GDD)",
-        "description": "Roluri: Administrator, Manager Fermă, Operator Utilaj, Consultant Agronom",
+        "summary": "Estimate the development of the current crop using growing degree-days (GDD)",
+        "description": "Roles: Administrator, Farm Manager, Machine Operator, Agronomist Consultant",
         "security": [
           {
             "bearerAuth": []
@@ -1569,7 +1571,7 @@
         ],
         "responses": {
           "200": {
-            "description": "Succes"
+            "description": "Success"
           },
           "400": {
             "$ref": "#/components/responses/Error"
@@ -1588,8 +1590,8 @@
         "tags": [
           "Dashboard"
         ],
-        "summary": "Indicatorii principali ai fermei",
-        "description": "Roluri: Administrator, Manager Fermă, Operator Utilaj, Consultant Agronom",
+        "summary": "Main farm indicators",
+        "description": "Roles: Administrator, Farm Manager, Machine Operator, Agronomist Consultant",
         "security": [
           {
             "bearerAuth": []
@@ -1598,7 +1600,7 @@
         "parameters": [],
         "responses": {
           "200": {
-            "description": "Succes"
+            "description": "Success"
           },
           "400": {
             "$ref": "#/components/responses/Error"
@@ -1617,8 +1619,8 @@
         "tags": [
           "Dashboard"
         ],
-        "summary": "Modificările de după ultima sincronizare offline",
-        "description": "Roluri: Administrator, Manager Fermă, Operator Utilaj, Consultant Agronom",
+        "summary": "Changes since the last offline sync",
+        "description": "Roles: Administrator, Farm Manager, Machine Operator, Agronomist Consultant",
         "security": [
           {
             "bearerAuth": []
@@ -1634,7 +1636,670 @@
         ],
         "responses": {
           "200": {
-            "description": "Succes"
+            "description": "Success"
+          },
+          "400": {
+            "$ref": "#/components/responses/Error"
+          },
+          "401": {
+            "$ref": "#/components/responses/Error"
+          },
+          "403": {
+            "$ref": "#/components/responses/Error"
+          }
+        }
+      }
+    },
+    "/economics/settings": {
+      "get": {
+        "tags": [
+          "Economics"
+        ],
+        "summary": "Fuel price, labour rates and machine ownership costs",
+        "description": "Roles: Administrator, Farm Manager, Agronomist Consultant",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "Success"
+          },
+          "400": {
+            "$ref": "#/components/responses/Error"
+          },
+          "401": {
+            "$ref": "#/components/responses/Error"
+          },
+          "403": {
+            "$ref": "#/components/responses/Error"
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "Economics"
+        ],
+        "summary": "Save the economic settings of the farm",
+        "description": "Roles: Administrator, Farm Manager",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$schema": "https://json-schema.org/draft/2020-12/schema",
+                "type": "object",
+                "properties": {
+                  "fuelPricePerL": {
+                    "type": "number",
+                    "minimum": 0,
+                    "maximum": 20
+                  },
+                  "defaultLaborRate": {
+                    "type": "number",
+                    "minimum": 0,
+                    "maximum": 500
+                  },
+                  "labor": {
+                    "type": "object",
+                    "propertyNames": {
+                      "type": "string",
+                      "maxLength": 64
+                    },
+                    "additionalProperties": {
+                      "type": "object",
+                      "properties": {
+                        "monthlySalary": {
+                          "anyOf": [
+                            {
+                              "type": "number",
+                              "minimum": 0,
+                              "maximum": 100000000
+                            },
+                            {
+                              "type": "null"
+                            }
+                          ]
+                        },
+                        "hourlyRate": {
+                          "anyOf": [
+                            {
+                              "type": "number",
+                              "minimum": 0,
+                              "maximum": 500
+                            },
+                            {
+                              "type": "null"
+                            }
+                          ]
+                        }
+                      }
+                    }
+                  },
+                  "machines": {
+                    "type": "object",
+                    "propertyNames": {
+                      "type": "string",
+                      "maxLength": 64
+                    },
+                    "additionalProperties": {
+                      "type": "object",
+                      "properties": {
+                        "purchasePrice": {
+                          "type": "number",
+                          "minimum": 0,
+                          "maximum": 100000000
+                        },
+                        "residualPct": {
+                          "type": "number",
+                          "minimum": 0,
+                          "maximum": 100
+                        },
+                        "depreciationYears": {
+                          "type": "number",
+                          "minimum": 0.5,
+                          "maximum": 50
+                        },
+                        "annualHours": {
+                          "type": "number",
+                          "minimum": 1,
+                          "maximum": 8760
+                        },
+                        "serviceCostPerYear": {
+                          "type": "number",
+                          "minimum": 0,
+                          "maximum": 100000000
+                        },
+                        "maintenanceCostPerYear": {
+                          "type": "number",
+                          "minimum": 0,
+                          "maximum": 100000000
+                        }
+                      },
+                      "required": [
+                        "purchasePrice",
+                        "depreciationYears",
+                        "annualHours"
+                      ]
+                    }
+                  }
+                },
+                "required": [
+                  "fuelPricePerL",
+                  "defaultLaborRate",
+                  "labor",
+                  "machines"
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Success"
+          },
+          "400": {
+            "$ref": "#/components/responses/Error"
+          },
+          "401": {
+            "$ref": "#/components/responses/Error"
+          },
+          "403": {
+            "$ref": "#/components/responses/Error"
+          }
+        }
+      }
+    },
+    "/economics/sheets": {
+      "get": {
+        "tags": [
+          "Economics"
+        ],
+        "summary": "The economic sheets of every parcel in a season",
+        "description": "Roles: Administrator, Farm Manager, Agronomist Consultant",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "year",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "minimum": 2000,
+              "maximum": 2100
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success"
+          },
+          "400": {
+            "$ref": "#/components/responses/Error"
+          },
+          "401": {
+            "$ref": "#/components/responses/Error"
+          },
+          "403": {
+            "$ref": "#/components/responses/Error"
+          }
+        }
+      }
+    },
+    "/economics/sheets/{parcelId}/{year}": {
+      "get": {
+        "tags": [
+          "Economics"
+        ],
+        "summary": "The economic sheet of a parcel in a season",
+        "description": "Roles: Administrator, Farm Manager, Agronomist Consultant",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "parcelId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+            }
+          },
+          {
+            "name": "year",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "minimum": 2000,
+              "maximum": 2100
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success"
+          },
+          "400": {
+            "$ref": "#/components/responses/Error"
+          },
+          "401": {
+            "$ref": "#/components/responses/Error"
+          },
+          "403": {
+            "$ref": "#/components/responses/Error"
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "Economics"
+        ],
+        "summary": "Save the seed, fertiliser, crop protection, other costs and revenue of a parcel",
+        "description": "Roles: Administrator, Farm Manager, Agronomist Consultant",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "parcelId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+            }
+          },
+          {
+            "name": "year",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "minimum": 2000,
+              "maximum": 2100
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$schema": "https://json-schema.org/draft/2020-12/schema",
+                "type": "object",
+                "properties": {
+                  "seeds": {
+                    "maxItems": 50,
+                    "type": "array",
+                    "items": {
+                      "type": "object",
+                      "properties": {
+                        "id": {
+                          "type": "string",
+                          "minLength": 1,
+                          "maxLength": 64
+                        },
+                        "supplier": {
+                          "type": "string",
+                          "maxLength": 120
+                        },
+                        "hybrid": {
+                          "type": "string",
+                          "maxLength": 120
+                        },
+                        "category": {
+                          "anyOf": [
+                            {
+                              "type": "string",
+                              "maxLength": 40
+                            },
+                            {
+                              "type": "null"
+                            }
+                          ]
+                        },
+                        "unit": {
+                          "type": "string",
+                          "enum": [
+                            "SEEDS",
+                            "KG"
+                          ]
+                        },
+                        "bagSize": {
+                          "type": "number",
+                          "exclusiveMinimum": 0,
+                          "maximum": 10000000
+                        },
+                        "ratePerHa": {
+                          "type": "number",
+                          "minimum": 0,
+                          "maximum": 10000000
+                        },
+                        "pricePerBag": {
+                          "type": "number",
+                          "minimum": 0,
+                          "maximum": 100000000
+                        },
+                        "bagsUsed": {
+                          "anyOf": [
+                            {
+                              "type": "number",
+                              "minimum": 0,
+                              "maximum": 1000000
+                            },
+                            {
+                              "type": "null"
+                            }
+                          ]
+                        }
+                      },
+                      "required": [
+                        "id",
+                        "supplier",
+                        "hybrid",
+                        "unit",
+                        "bagSize",
+                        "ratePerHa",
+                        "pricePerBag"
+                      ]
+                    }
+                  },
+                  "fertilizers": {
+                    "maxItems": 50,
+                    "type": "array",
+                    "items": {
+                      "type": "object",
+                      "properties": {
+                        "id": {
+                          "type": "string",
+                          "minLength": 1,
+                          "maxLength": 64
+                        },
+                        "product": {
+                          "type": "string",
+                          "maxLength": 120
+                        },
+                        "ratePerHaKg": {
+                          "type": "number",
+                          "minimum": 0,
+                          "maximum": 10000
+                        },
+                        "pricePerT": {
+                          "type": "number",
+                          "minimum": 0,
+                          "maximum": 100000000
+                        },
+                        "applications": {
+                          "type": "integer",
+                          "minimum": 1,
+                          "maximum": 20
+                        },
+                        "n": {
+                          "anyOf": [
+                            {
+                              "type": "number",
+                              "minimum": 0,
+                              "maximum": 100
+                            },
+                            {
+                              "type": "null"
+                            }
+                          ]
+                        },
+                        "p": {
+                          "anyOf": [
+                            {
+                              "type": "number",
+                              "minimum": 0,
+                              "maximum": 100
+                            },
+                            {
+                              "type": "null"
+                            }
+                          ]
+                        },
+                        "k": {
+                          "anyOf": [
+                            {
+                              "type": "number",
+                              "minimum": 0,
+                              "maximum": 100
+                            },
+                            {
+                              "type": "null"
+                            }
+                          ]
+                        }
+                      },
+                      "required": [
+                        "id",
+                        "product",
+                        "ratePerHaKg",
+                        "pricePerT"
+                      ]
+                    }
+                  },
+                  "chemicals": {
+                    "maxItems": 50,
+                    "type": "array",
+                    "items": {
+                      "type": "object",
+                      "properties": {
+                        "id": {
+                          "type": "string",
+                          "minLength": 1,
+                          "maxLength": 64
+                        },
+                        "product": {
+                          "type": "string",
+                          "maxLength": 120
+                        },
+                        "kind": {
+                          "type": "string",
+                          "enum": [
+                            "HERBICIDE",
+                            "FUNGICIDE",
+                            "INSECTICIDE",
+                            "GROWTH_REGULATOR"
+                          ]
+                        },
+                        "dosePerHa": {
+                          "type": "number",
+                          "minimum": 0,
+                          "maximum": 1000
+                        },
+                        "unit": {
+                          "type": "string",
+                          "enum": [
+                            "L",
+                            "KG"
+                          ]
+                        },
+                        "pricePerUnit": {
+                          "type": "number",
+                          "minimum": 0,
+                          "maximum": 100000000
+                        },
+                        "applications": {
+                          "type": "integer",
+                          "minimum": 1,
+                          "maximum": 20
+                        }
+                      },
+                      "required": [
+                        "id",
+                        "product",
+                        "kind",
+                        "dosePerHa",
+                        "unit",
+                        "pricePerUnit"
+                      ]
+                    }
+                  },
+                  "misc": {
+                    "maxItems": 50,
+                    "type": "array",
+                    "items": {
+                      "type": "object",
+                      "properties": {
+                        "id": {
+                          "type": "string",
+                          "minLength": 1,
+                          "maxLength": 64
+                        },
+                        "label": {
+                          "type": "string",
+                          "maxLength": 120
+                        },
+                        "amount": {
+                          "type": "number",
+                          "minimum": 0,
+                          "maximum": 100000000
+                        },
+                        "basis": {
+                          "type": "string",
+                          "enum": [
+                            "PER_HA",
+                            "TOTAL"
+                          ]
+                        }
+                      },
+                      "required": [
+                        "id",
+                        "label",
+                        "amount",
+                        "basis"
+                      ]
+                    }
+                  },
+                  "revenue": {
+                    "type": "object",
+                    "properties": {
+                      "expectedYieldTHa": {
+                        "anyOf": [
+                          {
+                            "type": "number",
+                            "minimum": 0,
+                            "maximum": 200
+                          },
+                          {
+                            "type": "null"
+                          }
+                        ]
+                      },
+                      "actualYieldTHa": {
+                        "anyOf": [
+                          {
+                            "type": "number",
+                            "minimum": 0,
+                            "maximum": 200
+                          },
+                          {
+                            "type": "null"
+                          }
+                        ]
+                      },
+                      "pricePerT": {
+                        "anyOf": [
+                          {
+                            "type": "number",
+                            "minimum": 0,
+                            "maximum": 100000000
+                          },
+                          {
+                            "type": "null"
+                          }
+                        ]
+                      },
+                      "actualPricePerT": {
+                        "anyOf": [
+                          {
+                            "type": "number",
+                            "minimum": 0,
+                            "maximum": 100000000
+                          },
+                          {
+                            "type": "null"
+                          }
+                        ]
+                      }
+                    }
+                  }
+                },
+                "required": [
+                  "seeds",
+                  "fertilizers",
+                  "chemicals",
+                  "misc",
+                  "revenue"
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Success"
+          },
+          "400": {
+            "$ref": "#/components/responses/Error"
+          },
+          "401": {
+            "$ref": "#/components/responses/Error"
+          },
+          "403": {
+            "$ref": "#/components/responses/Error"
+          }
+        }
+      }
+    },
+    "/economics/farm": {
+      "get": {
+        "tags": [
+          "Economics"
+        ],
+        "summary": "Real cost per hectare and profit of every parcel, by crop and by technology",
+        "description": "Roles: Administrator, Farm Manager, Agronomist Consultant",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "year",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "minimum": 2000,
+              "maximum": 2100
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success"
           },
           "400": {
             "$ref": "#/components/responses/Error"
@@ -1653,8 +2318,8 @@
         "tags": [
           "Parcel Intelligence"
         ],
-        "summary": "Toate datele panoului Parcel Intelligence",
-        "description": "Roluri: Administrator, Manager Fermă, Operator Utilaj, Consultant Agronom",
+        "summary": "All data for the Parcel Intelligence panel",
+        "description": "Roles: Administrator, Farm Manager, Machine Operator, Agronomist Consultant",
         "security": [
           {
             "bearerAuth": []
@@ -1674,7 +2339,7 @@
         ],
         "responses": {
           "200": {
-            "description": "Succes"
+            "description": "Success"
           },
           "400": {
             "$ref": "#/components/responses/Error"
@@ -1693,8 +2358,8 @@
         "tags": [
           "Parcel Intelligence"
         ],
-        "summary": "Vremea de azi, prognoza pe 7 și 14 zile și alertele de stropire",
-        "description": "Roluri: Administrator, Manager Fermă, Operator Utilaj, Consultant Agronom",
+        "summary": "Today’s weather, 7- and 14-day forecast and spraying alerts",
+        "description": "Roles: Administrator, Farm Manager, Machine Operator, Agronomist Consultant",
         "security": [
           {
             "bearerAuth": []
@@ -1714,7 +2379,7 @@
         ],
         "responses": {
           "200": {
-            "description": "Succes"
+            "description": "Success"
           },
           "400": {
             "$ref": "#/components/responses/Error"
@@ -1733,8 +2398,8 @@
         "tags": [
           "Parcel Intelligence"
         ],
-        "summary": "Scorul de rotație și istoricul culturilor",
-        "description": "Roluri: Administrator, Manager Fermă, Operator Utilaj, Consultant Agronom",
+        "summary": "Rotation score and crop history",
+        "description": "Roles: Administrator, Farm Manager, Machine Operator, Agronomist Consultant",
         "security": [
           {
             "bearerAuth": []
@@ -1754,7 +2419,7 @@
         ],
         "responses": {
           "200": {
-            "description": "Succes"
+            "description": "Success"
           },
           "400": {
             "$ref": "#/components/responses/Error"
@@ -1773,8 +2438,8 @@
         "tags": [
           "Parcel Intelligence"
         ],
-        "summary": "Costuri, venit estimat, profit, marjă și ROI",
-        "description": "Roluri: Administrator, Manager Fermă, Consultant Agronom",
+        "summary": "Costs, estimated revenue, profit, margin and ROI",
+        "description": "Roles: Administrator, Farm Manager, Agronomist Consultant",
         "security": [
           {
             "bearerAuth": []
@@ -1804,7 +2469,7 @@
         ],
         "responses": {
           "200": {
-            "description": "Succes"
+            "description": "Success"
           },
           "400": {
             "$ref": "#/components/responses/Error"
@@ -1823,8 +2488,8 @@
         "tags": [
           "Parcel Intelligence"
         ],
-        "summary": "Înregistrează un venit realizat",
-        "description": "Roluri: Administrator, Manager Fermă",
+        "summary": "Record realized revenue",
+        "description": "Roles: Administrator, Farm Manager",
         "security": [
           {
             "bearerAuth": []
@@ -1876,7 +2541,7 @@
         },
         "responses": {
           "201": {
-            "description": "Succes"
+            "description": "Success"
           },
           "400": {
             "$ref": "#/components/responses/Error"
@@ -1895,8 +2560,8 @@
         "tags": [
           "Parcel Intelligence"
         ],
-        "summary": "NDVI, NDRE și starea vegetației: acum, acum 7 și 30 de zile",
-        "description": "Roluri: Administrator, Manager Fermă, Operator Utilaj, Consultant Agronom",
+        "summary": "NDVI, NDRE and vegetation status: now, 7 and 30 days ago",
+        "description": "Roles: Administrator, Farm Manager, Machine Operator, Agronomist Consultant",
         "security": [
           {
             "bearerAuth": []
@@ -1916,7 +2581,7 @@
         ],
         "responses": {
           "200": {
-            "description": "Succes"
+            "description": "Success"
           },
           "400": {
             "$ref": "#/components/responses/Error"
@@ -1935,8 +2600,8 @@
         "tags": [
           "Parcel Intelligence"
         ],
-        "summary": "Task-urile parcelei și sumarul pe status",
-        "description": "Roluri: Administrator, Manager Fermă, Operator Utilaj, Consultant Agronom",
+        "summary": "Parcel tasks and status summary",
+        "description": "Roles: Administrator, Farm Manager, Machine Operator, Agronomist Consultant",
         "security": [
           {
             "bearerAuth": []
@@ -1956,7 +2621,7 @@
         ],
         "responses": {
           "200": {
-            "description": "Succes"
+            "description": "Success"
           },
           "400": {
             "$ref": "#/components/responses/Error"
@@ -1975,8 +2640,8 @@
         "tags": [
           "Parcel Intelligence"
         ],
-        "summary": "Observațiile din teren",
-        "description": "Roluri: Administrator, Manager Fermă, Operator Utilaj, Consultant Agronom",
+        "summary": "Field observations",
+        "description": "Roles: Administrator, Farm Manager, Machine Operator, Agronomist Consultant",
         "security": [
           {
             "bearerAuth": []
@@ -1996,7 +2661,7 @@
         ],
         "responses": {
           "200": {
-            "description": "Succes"
+            "description": "Success"
           },
           "400": {
             "$ref": "#/components/responses/Error"
@@ -2013,8 +2678,8 @@
         "tags": [
           "Parcel Intelligence"
         ],
-        "summary": "Adaugă o observație din teren",
-        "description": "Roluri: Administrator, Manager Fermă, Operator Utilaj, Consultant Agronom",
+        "summary": "Add a field observation",
+        "description": "Roles: Administrator, Farm Manager, Machine Operator, Agronomist Consultant",
         "security": [
           {
             "bearerAuth": []
@@ -2065,7 +2730,7 @@
         },
         "responses": {
           "201": {
-            "description": "Succes"
+            "description": "Success"
           },
           "400": {
             "$ref": "#/components/responses/Error"
@@ -2084,8 +2749,8 @@
         "tags": [
           "Parcel Intelligence"
         ],
-        "summary": "Galeria foto a parcelei",
-        "description": "Roluri: Administrator, Manager Fermă, Operator Utilaj, Consultant Agronom",
+        "summary": "Parcel photo gallery",
+        "description": "Roles: Administrator, Farm Manager, Machine Operator, Agronomist Consultant",
         "security": [
           {
             "bearerAuth": []
@@ -2105,7 +2770,7 @@
         ],
         "responses": {
           "200": {
-            "description": "Succes"
+            "description": "Success"
           },
           "400": {
             "$ref": "#/components/responses/Error"
@@ -2122,8 +2787,8 @@
         "tags": [
           "Parcel Intelligence"
         ],
-        "summary": "Încarcă o fotografie cu note",
-        "description": "Roluri: Administrator, Manager Fermă, Operator Utilaj, Consultant Agronom",
+        "summary": "Upload a photo with notes",
+        "description": "Roles: Administrator, Farm Manager, Machine Operator, Agronomist Consultant",
         "security": [
           {
             "bearerAuth": []
@@ -2162,7 +2827,7 @@
         },
         "responses": {
           "201": {
-            "description": "Succes"
+            "description": "Success"
           },
           "400": {
             "$ref": "#/components/responses/Error"
@@ -2181,8 +2846,8 @@
         "tags": [
           "Parcel Intelligence"
         ],
-        "summary": "Conținutul fotografiei",
-        "description": "Roluri: Administrator, Manager Fermă, Operator Utilaj, Consultant Agronom",
+        "summary": "Photo content",
+        "description": "Roles: Administrator, Farm Manager, Machine Operator, Agronomist Consultant",
         "security": [
           {
             "bearerAuth": []
@@ -2212,7 +2877,7 @@
         ],
         "responses": {
           "200": {
-            "description": "Succes",
+            "description": "Success",
             "content": {
               "image/jpeg": {
                 "schema": {
@@ -2239,8 +2904,8 @@
         "tags": [
           "Parcel Intelligence"
         ],
-        "summary": "Șterge o fotografie",
-        "description": "Roluri: Administrator, Manager Fermă, Operator Utilaj, Consultant Agronom",
+        "summary": "Delete a photo",
+        "description": "Roles: Administrator, Farm Manager, Machine Operator, Agronomist Consultant",
         "security": [
           {
             "bearerAuth": []
@@ -2270,7 +2935,7 @@
         ],
         "responses": {
           "200": {
-            "description": "Succes"
+            "description": "Success"
           },
           "400": {
             "$ref": "#/components/responses/Error"
@@ -2289,8 +2954,8 @@
         "tags": [
           "Parcel Intelligence"
         ],
-        "summary": "Raport PDF pentru parcelă",
-        "description": "Roluri: Administrator, Manager Fermă, Operator Utilaj, Consultant Agronom",
+        "summary": "PDF report for the parcel",
+        "description": "Roles: Administrator, Farm Manager, Machine Operator, Agronomist Consultant",
         "security": [
           {
             "bearerAuth": []
@@ -2310,7 +2975,7 @@
         ],
         "responses": {
           "200": {
-            "description": "Succes",
+            "description": "Success",
             "content": {
               "application/pdf": {
                 "schema": {
@@ -2337,8 +3002,8 @@
         "tags": [
           "IoT"
         ],
-        "summary": "Listează dispozitivele IoT",
-        "description": "Roluri: Administrator, Manager Fermă, Operator Utilaj, Consultant Agronom",
+        "summary": "List IoT devices",
+        "description": "Roles: Administrator, Farm Manager, Machine Operator, Agronomist Consultant",
         "security": [
           {
             "bearerAuth": []
@@ -2347,7 +3012,7 @@
         "parameters": [],
         "responses": {
           "200": {
-            "description": "Succes"
+            "description": "Success"
           },
           "400": {
             "$ref": "#/components/responses/Error"
@@ -2364,8 +3029,8 @@
         "tags": [
           "IoT"
         ],
-        "summary": "Înregistrează un dispozitiv. Cheia se afișează o singură dată.",
-        "description": "Roluri: Administrator, Manager Fermă",
+        "summary": "Register a device. The key is shown only once.",
+        "description": "Roles: Administrator, Farm Manager",
         "security": [
           {
             "bearerAuth": []
@@ -2432,7 +3097,7 @@
         },
         "responses": {
           "201": {
-            "description": "Succes"
+            "description": "Success"
           },
           "400": {
             "$ref": "#/components/responses/Error"
@@ -2451,8 +3116,8 @@
         "tags": [
           "IoT"
         ],
-        "summary": "Șterge un dispozitiv și citirile lui",
-        "description": "Roluri: Administrator, Manager Fermă",
+        "summary": "Delete a device and its readings",
+        "description": "Roles: Administrator, Farm Manager",
         "security": [
           {
             "bearerAuth": []
@@ -2472,7 +3137,7 @@
         ],
         "responses": {
           "200": {
-            "description": "Succes"
+            "description": "Success"
           },
           "400": {
             "$ref": "#/components/responses/Error"
@@ -2491,8 +3156,8 @@
         "tags": [
           "IoT"
         ],
-        "summary": "Ultimele citiri ale unui dispozitiv",
-        "description": "Roluri: Administrator, Manager Fermă, Operator Utilaj, Consultant Agronom",
+        "summary": "Latest readings of a device",
+        "description": "Roles: Administrator, Farm Manager, Machine Operator, Agronomist Consultant",
         "security": [
           {
             "bearerAuth": []
@@ -2532,7 +3197,7 @@
         ],
         "responses": {
           "200": {
-            "description": "Succes"
+            "description": "Success"
           },
           "400": {
             "$ref": "#/components/responses/Error"
@@ -2551,7 +3216,7 @@
         "tags": [
           "IoT"
         ],
-        "summary": "Primește citiri de la senzori, cu antetul X-Device-Key",
+        "summary": "Receive sensor readings, with the X-Device-Key header",
         "description": "Public",
         "security": [],
         "parameters": [],
@@ -2600,7 +3265,7 @@
         },
         "responses": {
           "202": {
-            "description": "Succes"
+            "description": "Success"
           },
           "400": {
             "$ref": "#/components/responses/Error"
@@ -2611,10 +3276,10 @@
     "/irrigation/estimate": {
       "post": {
         "tags": [
-          "Irigații"
+          "Irrigation"
         ],
-        "summary": "Calculează durata și ETA irigării",
-        "description": "Roluri: Administrator, Manager Fermă, Operator Utilaj, Consultant Agronom",
+        "summary": "Calculate irrigation duration and ETA",
+        "description": "Roles: Administrator, Farm Manager, Machine Operator, Agronomist Consultant",
         "security": [
           {
             "bearerAuth": []
@@ -2650,7 +3315,7 @@
         },
         "responses": {
           "200": {
-            "description": "Succes"
+            "description": "Success"
           },
           "400": {
             "$ref": "#/components/responses/Error"
@@ -2667,10 +3332,10 @@
     "/irrigation": {
       "get": {
         "tags": [
-          "Irigații"
+          "Irrigation"
         ],
-        "summary": "Listează irigările",
-        "description": "Roluri: Administrator, Manager Fermă, Operator Utilaj, Consultant Agronom",
+        "summary": "List irrigations",
+        "description": "Roles: Administrator, Farm Manager, Machine Operator, Agronomist Consultant",
         "security": [
           {
             "bearerAuth": []
@@ -2704,7 +3369,7 @@
         ],
         "responses": {
           "200": {
-            "description": "Succes"
+            "description": "Success"
           },
           "400": {
             "$ref": "#/components/responses/Error"
@@ -2719,10 +3384,10 @@
       },
       "post": {
         "tags": [
-          "Irigații"
+          "Irrigation"
         ],
-        "summary": "Pornește o irigare",
-        "description": "Roluri: Administrator, Manager Fermă, Operator Utilaj",
+        "summary": "Start an irrigation",
+        "description": "Roles: Administrator, Farm Manager, Machine Operator",
         "security": [
           {
             "bearerAuth": []
@@ -2785,7 +3450,7 @@
         },
         "responses": {
           "201": {
-            "description": "Succes"
+            "description": "Success"
           },
           "400": {
             "$ref": "#/components/responses/Error"
@@ -2802,10 +3467,10 @@
     "/irrigation/{id}": {
       "get": {
         "tags": [
-          "Irigații"
+          "Irrigation"
         ],
-        "summary": "Detaliile și progresul irigării",
-        "description": "Roluri: Administrator, Manager Fermă, Operator Utilaj, Consultant Agronom",
+        "summary": "Irrigation details and progress",
+        "description": "Roles: Administrator, Farm Manager, Machine Operator, Agronomist Consultant",
         "security": [
           {
             "bearerAuth": []
@@ -2825,7 +3490,7 @@
         ],
         "responses": {
           "200": {
-            "description": "Succes"
+            "description": "Success"
           },
           "400": {
             "$ref": "#/components/responses/Error"
@@ -2842,10 +3507,10 @@
     "/irrigation/{id}/pause": {
       "post": {
         "tags": [
-          "Irigații"
+          "Irrigation"
         ],
-        "summary": "Pune irigarea pe pauză",
-        "description": "Roluri: Administrator, Manager Fermă, Operator Utilaj",
+        "summary": "Pause the irrigation",
+        "description": "Roles: Administrator, Farm Manager, Machine Operator",
         "security": [
           {
             "bearerAuth": []
@@ -2865,7 +3530,7 @@
         ],
         "responses": {
           "200": {
-            "description": "Succes"
+            "description": "Success"
           },
           "400": {
             "$ref": "#/components/responses/Error"
@@ -2882,10 +3547,10 @@
     "/irrigation/{id}/resume": {
       "post": {
         "tags": [
-          "Irigații"
+          "Irrigation"
         ],
-        "summary": "Reia irigarea",
-        "description": "Roluri: Administrator, Manager Fermă, Operator Utilaj",
+        "summary": "Resume the irrigation",
+        "description": "Roles: Administrator, Farm Manager, Machine Operator",
         "security": [
           {
             "bearerAuth": []
@@ -2905,7 +3570,7 @@
         ],
         "responses": {
           "200": {
-            "description": "Succes"
+            "description": "Success"
           },
           "400": {
             "$ref": "#/components/responses/Error"
@@ -2922,10 +3587,10 @@
     "/irrigation/{id}/complete": {
       "post": {
         "tags": [
-          "Irigații"
+          "Irrigation"
         ],
-        "summary": "Finalizează irigarea",
-        "description": "Roluri: Administrator, Manager Fermă, Operator Utilaj",
+        "summary": "Complete the irrigation",
+        "description": "Roles: Administrator, Farm Manager, Machine Operator",
         "security": [
           {
             "bearerAuth": []
@@ -2945,7 +3610,7 @@
         ],
         "responses": {
           "200": {
-            "description": "Succes"
+            "description": "Success"
           },
           "400": {
             "$ref": "#/components/responses/Error"
@@ -2962,10 +3627,10 @@
     "/irrigation/{id}/cancel": {
       "post": {
         "tags": [
-          "Irigații"
+          "Irrigation"
         ],
-        "summary": "Anulează irigarea",
-        "description": "Roluri: Administrator, Manager Fermă, Operator Utilaj",
+        "summary": "Cancel the irrigation",
+        "description": "Roles: Administrator, Farm Manager, Machine Operator",
         "security": [
           {
             "bearerAuth": []
@@ -2985,7 +3650,7 @@
         ],
         "responses": {
           "200": {
-            "description": "Succes"
+            "description": "Success"
           },
           "400": {
             "$ref": "#/components/responses/Error"
@@ -3002,10 +3667,10 @@
     "/parcels/{id}/water": {
       "get": {
         "tags": [
-          "Irigații"
+          "Irrigation"
         ],
-        "summary": "Necesarul de apă, precipitațiile primite și deficitul",
-        "description": "Roluri: Administrator, Manager Fermă, Operator Utilaj, Consultant Agronom",
+        "summary": "Water requirement, rainfall received and deficit",
+        "description": "Roles: Administrator, Farm Manager, Machine Operator, Agronomist Consultant",
         "security": [
           {
             "bearerAuth": []
@@ -3035,7 +3700,7 @@
         ],
         "responses": {
           "200": {
-            "description": "Succes"
+            "description": "Success"
           },
           "400": {
             "$ref": "#/components/responses/Error"
@@ -3052,10 +3717,10 @@
     "/machines": {
       "get": {
         "tags": [
-          "Utilaje"
+          "Machines"
         ],
-        "summary": "Listează utilajele",
-        "description": "Roluri: Administrator, Manager Fermă, Operator Utilaj, Consultant Agronom",
+        "summary": "List machines",
+        "description": "Roles: Administrator, Farm Manager, Machine Operator, Agronomist Consultant",
         "security": [
           {
             "bearerAuth": []
@@ -3064,7 +3729,7 @@
         "parameters": [],
         "responses": {
           "200": {
-            "description": "Succes"
+            "description": "Success"
           },
           "400": {
             "$ref": "#/components/responses/Error"
@@ -3079,10 +3744,10 @@
       },
       "post": {
         "tags": [
-          "Utilaje"
+          "Machines"
         ],
-        "summary": "Adaugă un utilaj",
-        "description": "Roluri: Administrator, Manager Fermă",
+        "summary": "Add a machine",
+        "description": "Roles: Administrator, Farm Manager",
         "security": [
           {
             "bearerAuth": []
@@ -3172,6 +3837,19 @@
                         "type": "null"
                       }
                     ]
+                  },
+                  "tillageSystems": {
+                    "maxItems": 4,
+                    "type": "array",
+                    "items": {
+                      "type": "string",
+                      "enum": [
+                        "CONVENTIONAL",
+                        "MINIMUM_TILL",
+                        "STRIP_TILL",
+                        "NO_TILL"
+                      ]
+                    }
                   }
                 },
                 "required": [
@@ -3184,7 +3862,7 @@
         },
         "responses": {
           "201": {
-            "description": "Succes"
+            "description": "Success"
           },
           "400": {
             "$ref": "#/components/responses/Error"
@@ -3201,10 +3879,10 @@
     "/machines/{id}": {
       "patch": {
         "tags": [
-          "Utilaje"
+          "Machines"
         ],
-        "summary": "Modifică un utilaj",
-        "description": "Roluri: Administrator, Manager Fermă",
+        "summary": "Update a machine",
+        "description": "Roles: Administrator, Farm Manager",
         "security": [
           {
             "bearerAuth": []
@@ -3305,6 +3983,19 @@
                         "type": "null"
                       }
                     ]
+                  },
+                  "tillageSystems": {
+                    "maxItems": 4,
+                    "type": "array",
+                    "items": {
+                      "type": "string",
+                      "enum": [
+                        "CONVENTIONAL",
+                        "MINIMUM_TILL",
+                        "STRIP_TILL",
+                        "NO_TILL"
+                      ]
+                    }
                   }
                 }
               }
@@ -3313,7 +4004,7 @@
         },
         "responses": {
           "200": {
-            "description": "Succes"
+            "description": "Success"
           },
           "400": {
             "$ref": "#/components/responses/Error"
@@ -3328,10 +4019,10 @@
       },
       "delete": {
         "tags": [
-          "Utilaje"
+          "Machines"
         ],
-        "summary": "Arhivează un utilaj",
-        "description": "Roluri: Administrator, Manager Fermă",
+        "summary": "Archive a machine",
+        "description": "Roles: Administrator, Farm Manager",
         "security": [
           {
             "bearerAuth": []
@@ -3351,7 +4042,7 @@
         ],
         "responses": {
           "200": {
-            "description": "Succes"
+            "description": "Success"
           },
           "400": {
             "$ref": "#/components/responses/Error"
@@ -3368,10 +4059,10 @@
     "/map/overview": {
       "get": {
         "tags": [
-          "Hartă"
+          "Map"
         ],
-        "summary": "Situația live a tuturor parcelelor, pentru afișarea pe hartă",
-        "description": "Roluri: Administrator, Manager Fermă, Operator Utilaj, Consultant Agronom",
+        "summary": "Live status of all parcels, for display on the map",
+        "description": "Roles: Administrator, Farm Manager, Machine Operator, Agronomist Consultant",
         "security": [
           {
             "bearerAuth": []
@@ -3380,7 +4071,7 @@
         "parameters": [],
         "responses": {
           "200": {
-            "description": "Succes"
+            "description": "Success"
           },
           "400": {
             "$ref": "#/components/responses/Error"
@@ -3397,10 +4088,10 @@
     "/notifications": {
       "get": {
         "tags": [
-          "Notificări"
+          "Notifications"
         ],
-        "summary": "Ultimele notificări ale utilizatorului",
-        "description": "Roluri: Administrator, Manager Fermă, Operator Utilaj, Consultant Agronom",
+        "summary": "Latest notifications of the user",
+        "description": "Roles: Administrator, Farm Manager, Machine Operator, Agronomist Consultant",
         "security": [
           {
             "bearerAuth": []
@@ -3421,7 +4112,7 @@
         ],
         "responses": {
           "200": {
-            "description": "Succes"
+            "description": "Success"
           },
           "400": {
             "$ref": "#/components/responses/Error"
@@ -3438,10 +4129,10 @@
     "/notifications/{id}/read": {
       "post": {
         "tags": [
-          "Notificări"
+          "Notifications"
         ],
-        "summary": "Marchează notificarea drept citită",
-        "description": "Roluri: Administrator, Manager Fermă, Operator Utilaj, Consultant Agronom",
+        "summary": "Mark the notification as read",
+        "description": "Roles: Administrator, Farm Manager, Machine Operator, Agronomist Consultant",
         "security": [
           {
             "bearerAuth": []
@@ -3461,7 +4152,7 @@
         ],
         "responses": {
           "204": {
-            "description": "Succes"
+            "description": "Success"
           },
           "400": {
             "$ref": "#/components/responses/Error"
@@ -3478,10 +4169,10 @@
     "/parcels": {
       "get": {
         "tags": [
-          "Parcele"
+          "Parcels"
         ],
-        "summary": "Listează parcelele fermei",
-        "description": "Roluri: Administrator, Manager Fermă, Operator Utilaj, Consultant Agronom",
+        "summary": "List the farm’s parcels",
+        "description": "Roles: Administrator, Farm Manager, Machine Operator, Agronomist Consultant",
         "security": [
           {
             "bearerAuth": []
@@ -3513,7 +4204,7 @@
         ],
         "responses": {
           "200": {
-            "description": "Succes"
+            "description": "Success"
           },
           "400": {
             "$ref": "#/components/responses/Error"
@@ -3528,10 +4219,10 @@
       },
       "post": {
         "tags": [
-          "Parcele"
+          "Parcels"
         ],
-        "summary": "Creează o parcelă și pornește analiza solului",
-        "description": "Roluri: Administrator, Manager Fermă",
+        "summary": "Create a parcel and start the soil analysis",
+        "description": "Roles: Administrator, Farm Manager",
         "security": [
           {
             "bearerAuth": []
@@ -3620,6 +4311,22 @@
                         "type": "null"
                       }
                     ]
+                  },
+                  "tillageSystem": {
+                    "anyOf": [
+                      {
+                        "type": "string",
+                        "enum": [
+                          "CONVENTIONAL",
+                          "MINIMUM_TILL",
+                          "STRIP_TILL",
+                          "NO_TILL"
+                        ]
+                      },
+                      {
+                        "type": "null"
+                      }
+                    ]
                   }
                 },
                 "required": [
@@ -3632,7 +4339,7 @@
         },
         "responses": {
           "201": {
-            "description": "Succes"
+            "description": "Success"
           },
           "400": {
             "$ref": "#/components/responses/Error"
@@ -3649,10 +4356,10 @@
     "/parcels/import": {
       "post": {
         "tags": [
-          "Parcele"
+          "Parcels"
         ],
-        "summary": "Importă parcele din GeoJSON, KML, KMZ, SHP sau APIA LPIS",
-        "description": "Roluri: Administrator, Manager Fermă",
+        "summary": "Import parcels from GeoJSON, KML, KMZ, SHP or APIA LPIS",
+        "description": "Roles: Administrator, Farm Manager",
         "security": [
           {
             "bearerAuth": []
@@ -3709,7 +4416,7 @@
         },
         "responses": {
           "201": {
-            "description": "Succes"
+            "description": "Success"
           },
           "400": {
             "$ref": "#/components/responses/Error"
@@ -3726,10 +4433,10 @@
     "/parcels/export": {
       "get": {
         "tags": [
-          "Parcele"
+          "Parcels"
         ],
-        "summary": "Exportă parcelele active",
-        "description": "Roluri: Administrator, Manager Fermă, Operator Utilaj, Consultant Agronom",
+        "summary": "Export active parcels",
+        "description": "Roles: Administrator, Farm Manager, Machine Operator, Agronomist Consultant",
         "security": [
           {
             "bearerAuth": []
@@ -3754,7 +4461,7 @@
         ],
         "responses": {
           "200": {
-            "description": "Succes",
+            "description": "Success",
             "content": {
               "application/octet-stream": {
                 "schema": {
@@ -3779,10 +4486,10 @@
     "/parcels/{id}": {
       "get": {
         "tags": [
-          "Parcele"
+          "Parcels"
         ],
-        "summary": "Detaliile unei parcele",
-        "description": "Roluri: Administrator, Manager Fermă, Operator Utilaj, Consultant Agronom",
+        "summary": "Parcel details",
+        "description": "Roles: Administrator, Farm Manager, Machine Operator, Agronomist Consultant",
         "security": [
           {
             "bearerAuth": []
@@ -3802,7 +4509,7 @@
         ],
         "responses": {
           "200": {
-            "description": "Succes"
+            "description": "Success"
           },
           "400": {
             "$ref": "#/components/responses/Error"
@@ -3817,10 +4524,10 @@
       },
       "patch": {
         "tags": [
-          "Parcele"
+          "Parcels"
         ],
-        "summary": "Modifică datele sau conturul parcelei",
-        "description": "Roluri: Administrator, Manager Fermă",
+        "summary": "Update the parcel data or outline",
+        "description": "Roles: Administrator, Farm Manager",
         "security": [
           {
             "bearerAuth": []
@@ -3949,7 +4656,78 @@
         },
         "responses": {
           "200": {
-            "description": "Succes"
+            "description": "Success"
+          },
+          "400": {
+            "$ref": "#/components/responses/Error"
+          },
+          "401": {
+            "$ref": "#/components/responses/Error"
+          },
+          "403": {
+            "$ref": "#/components/responses/Error"
+          }
+        }
+      }
+    },
+    "/parcels/{id}/tillage": {
+      "post": {
+        "tags": [
+          "Parcels"
+        ],
+        "summary": "Set the tillage technology of a year; the current one follows the history",
+        "description": "Roles: Administrator, Farm Manager",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$schema": "https://json-schema.org/draft/2020-12/schema",
+                "type": "object",
+                "properties": {
+                  "system": {
+                    "type": "string",
+                    "enum": [
+                      "CONVENTIONAL",
+                      "MINIMUM_TILL",
+                      "STRIP_TILL",
+                      "NO_TILL"
+                    ]
+                  },
+                  "year": {
+                    "default": 2026,
+                    "type": "integer",
+                    "minimum": 1990,
+                    "maximum": 2100
+                  }
+                },
+                "required": [
+                  "system"
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Success"
           },
           "400": {
             "$ref": "#/components/responses/Error"
@@ -3966,10 +4744,10 @@
     "/parcels/{id}/archive": {
       "post": {
         "tags": [
-          "Parcele"
+          "Parcels"
         ],
-        "summary": "Arhivează parcela",
-        "description": "Roluri: Administrator, Manager Fermă",
+        "summary": "Archive the parcel",
+        "description": "Roles: Administrator, Farm Manager",
         "security": [
           {
             "bearerAuth": []
@@ -3989,7 +4767,7 @@
         ],
         "responses": {
           "200": {
-            "description": "Succes"
+            "description": "Success"
           },
           "400": {
             "$ref": "#/components/responses/Error"
@@ -4006,10 +4784,10 @@
     "/parcels/{id}/restore": {
       "post": {
         "tags": [
-          "Parcele"
+          "Parcels"
         ],
-        "summary": "Restaurează parcela din arhivă",
-        "description": "Roluri: Administrator, Manager Fermă",
+        "summary": "Restore the parcel from the archive",
+        "description": "Roles: Administrator, Farm Manager",
         "security": [
           {
             "bearerAuth": []
@@ -4029,7 +4807,7 @@
         ],
         "responses": {
           "200": {
-            "description": "Succes"
+            "description": "Success"
           },
           "400": {
             "$ref": "#/components/responses/Error"
@@ -4046,10 +4824,10 @@
     "/parcels/wizard/analyze": {
       "post": {
         "tags": [
-          "Plan tehnologic"
+          "Technology plan"
         ],
-        "summary": "Analizează parcela și generează planul fără să salveze nimic",
-        "description": "Roluri: Administrator, Manager Fermă, Consultant Agronom",
+        "summary": "Analyse the parcel and generate the plan without saving anything",
+        "description": "Roles: Administrator, Farm Manager, Agronomist Consultant",
         "security": [
           {
             "bearerAuth": []
@@ -4169,7 +4947,7 @@
         },
         "responses": {
           "200": {
-            "description": "Succes"
+            "description": "Success"
           },
           "400": {
             "$ref": "#/components/responses/Error"
@@ -4186,10 +4964,10 @@
     "/parcels/wizard/complete": {
       "post": {
         "tags": [
-          "Plan tehnologic"
+          "Technology plan"
         ],
-        "summary": "Salvează parcela, culturile, planul tehnologic și task-urile",
-        "description": "Roluri: Administrator, Manager Fermă, Consultant Agronom",
+        "summary": "Save the parcel, crops, technology plan and tasks",
+        "description": "Roles: Administrator, Farm Manager, Agronomist Consultant",
         "security": [
           {
             "bearerAuth": []
@@ -4330,6 +5108,22 @@
                             "type": "null"
                           }
                         ]
+                      },
+                      "tillageSystem": {
+                        "anyOf": [
+                          {
+                            "type": "string",
+                            "enum": [
+                              "CONVENTIONAL",
+                              "MINIMUM_TILL",
+                              "STRIP_TILL",
+                              "NO_TILL"
+                            ]
+                          },
+                          {
+                            "type": "null"
+                          }
+                        ]
                       }
                     },
                     "required": [
@@ -4348,7 +5142,7 @@
         },
         "responses": {
           "201": {
-            "description": "Succes"
+            "description": "Success"
           },
           "400": {
             "$ref": "#/components/responses/Error"
@@ -4365,10 +5159,10 @@
     "/parcels/{id}/plan": {
       "get": {
         "tags": [
-          "Plan tehnologic"
+          "Technology plan"
         ],
-        "summary": "Planul activ și rapoartele salvate ale parcelei",
-        "description": "Roluri: Administrator, Manager Fermă, Operator Utilaj, Consultant Agronom",
+        "summary": "The active plan and saved reports of the parcel",
+        "description": "Roles: Administrator, Farm Manager, Machine Operator, Agronomist Consultant",
         "security": [
           {
             "bearerAuth": []
@@ -4388,7 +5182,7 @@
         ],
         "responses": {
           "200": {
-            "description": "Succes"
+            "description": "Success"
           },
           "400": {
             "$ref": "#/components/responses/Error"
@@ -4405,10 +5199,10 @@
     "/reports/{type}": {
       "get": {
         "tags": [
-          "Rapoarte"
+          "Reports"
         ],
-        "summary": "Generează un raport în JSON, PDF sau Excel",
-        "description": "Roluri: Administrator, Manager Fermă, Operator Utilaj, Consultant Agronom",
+        "summary": "Generate a report in JSON, PDF or Excel",
+        "description": "Roles: Administrator, Farm Manager, Machine Operator, Agronomist Consultant",
         "security": [
           {
             "bearerAuth": []
@@ -4422,9 +5216,14 @@
             "schema": {
               "type": "string",
               "enum": [
-                "work",
-                "fuel",
                 "costs",
+                "profitability",
+                "farm",
+                "parcels",
+                "work",
+                "machines",
+                "crops",
+                "fuel",
                 "yields",
                 "rotation",
                 "irrigation"
@@ -4442,6 +5241,18 @@
                 "json",
                 "pdf",
                 "xlsx"
+              ]
+            }
+          },
+          {
+            "name": "orientation",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "enum": [
+                "portrait",
+                "landscape"
               ]
             }
           },
@@ -4470,7 +5281,7 @@
         ],
         "responses": {
           "200": {
-            "description": "Succes",
+            "description": "Success",
             "content": {
               "application/pdf": {
                 "schema": {
@@ -4495,10 +5306,10 @@
     "/parcels/{id}/satellite": {
       "get": {
         "tags": [
-          "Satelit"
+          "Satellite"
         ],
-        "summary": "Istoricul NDVI, NDRE și Health Index",
-        "description": "Roluri: Administrator, Manager Fermă, Operator Utilaj, Consultant Agronom",
+        "summary": "NDVI, NDRE and Health Index history",
+        "description": "Roles: Administrator, Farm Manager, Machine Operator, Agronomist Consultant",
         "security": [
           {
             "bearerAuth": []
@@ -4529,7 +5340,7 @@
         ],
         "responses": {
           "200": {
-            "description": "Succes"
+            "description": "Success"
           },
           "400": {
             "$ref": "#/components/responses/Error"
@@ -4546,10 +5357,10 @@
     "/parcels/{id}/satellite/refresh": {
       "post": {
         "tags": [
-          "Satelit"
+          "Satellite"
         ],
-        "summary": "Descarcă observațiile Sentinel-2 pentru perioada indicată",
-        "description": "Roluri: Administrator, Manager Fermă, Consultant Agronom",
+        "summary": "Download Sentinel-2 observations for the given period",
+        "description": "Roles: Administrator, Farm Manager, Agronomist Consultant",
         "security": [
           {
             "bearerAuth": []
@@ -4588,7 +5399,7 @@
         },
         "responses": {
           "200": {
-            "description": "Succes"
+            "description": "Success"
           },
           "400": {
             "$ref": "#/components/responses/Error"
@@ -4605,10 +5416,10 @@
     "/parcels/{id}/satellite/compare": {
       "get": {
         "tags": [
-          "Satelit"
+          "Satellite"
         ],
-        "summary": "Compară două date de observație",
-        "description": "Roluri: Administrator, Manager Fermă, Operator Utilaj, Consultant Agronom",
+        "summary": "Compare two observation dates",
+        "description": "Roles: Administrator, Farm Manager, Machine Operator, Agronomist Consultant",
         "security": [
           {
             "bearerAuth": []
@@ -4646,7 +5457,7 @@
         ],
         "responses": {
           "200": {
-            "description": "Succes"
+            "description": "Success"
           },
           "400": {
             "$ref": "#/components/responses/Error"
@@ -4663,10 +5474,10 @@
     "/parcels/{id}/satellite/image": {
       "get": {
         "tags": [
-          "Satelit"
+          "Satellite"
         ],
-        "summary": "Imaginea colorată a indicelui pentru o dată",
-        "description": "Roluri: Administrator, Manager Fermă, Operator Utilaj, Consultant Agronom",
+        "summary": "Coloured index image for a date",
+        "description": "Roles: Administrator, Farm Manager, Machine Operator, Agronomist Consultant",
         "security": [
           {
             "bearerAuth": []
@@ -4708,7 +5519,7 @@
         ],
         "responses": {
           "200": {
-            "description": "Succes",
+            "description": "Success",
             "content": {
               "image/png": {
                 "schema": {
@@ -4733,10 +5544,10 @@
     "/parcels/{id}/soil": {
       "get": {
         "tags": [
-          "Sol"
+          "Soil"
         ],
-        "summary": "Profilul de sol al parcelei",
-        "description": "Roluri: Administrator, Manager Fermă, Operator Utilaj, Consultant Agronom",
+        "summary": "Soil profile of the parcel",
+        "description": "Roles: Administrator, Farm Manager, Machine Operator, Agronomist Consultant",
         "security": [
           {
             "bearerAuth": []
@@ -4756,7 +5567,7 @@
         ],
         "responses": {
           "200": {
-            "description": "Succes"
+            "description": "Success"
           },
           "400": {
             "$ref": "#/components/responses/Error"
@@ -4773,10 +5584,10 @@
     "/parcels/{id}/soil/refresh": {
       "post": {
         "tags": [
-          "Sol"
+          "Soil"
         ],
-        "summary": "Reinterogează SoilGrids",
-        "description": "Roluri: Administrator, Manager Fermă, Consultant Agronom",
+        "summary": "Query SoilGrids again",
+        "description": "Roles: Administrator, Farm Manager, Agronomist Consultant",
         "security": [
           {
             "bearerAuth": []
@@ -4796,7 +5607,7 @@
         ],
         "responses": {
           "200": {
-            "description": "Succes"
+            "description": "Success"
           },
           "400": {
             "$ref": "#/components/responses/Error"
@@ -4815,8 +5626,8 @@
         "tags": [
           "To Do"
         ],
-        "summary": "Task-urile predefinite",
-        "description": "Roluri: Administrator, Manager Fermă, Operator Utilaj, Consultant Agronom",
+        "summary": "Predefined tasks",
+        "description": "Roles: Administrator, Farm Manager, Machine Operator, Agronomist Consultant",
         "security": [
           {
             "bearerAuth": []
@@ -4825,7 +5636,7 @@
         "parameters": [],
         "responses": {
           "200": {
-            "description": "Succes"
+            "description": "Success"
           },
           "400": {
             "$ref": "#/components/responses/Error"
@@ -4844,8 +5655,8 @@
         "tags": [
           "To Do"
         ],
-        "summary": "Listează task-urile",
-        "description": "Roluri: Administrator, Manager Fermă, Operator Utilaj, Consultant Agronom",
+        "summary": "List tasks",
+        "description": "Roles: Administrator, Farm Manager, Machine Operator, Agronomist Consultant",
         "security": [
           {
             "bearerAuth": []
@@ -4891,7 +5702,7 @@
         ],
         "responses": {
           "200": {
-            "description": "Succes"
+            "description": "Success"
           },
           "400": {
             "$ref": "#/components/responses/Error"
@@ -4908,8 +5719,8 @@
         "tags": [
           "To Do"
         ],
-        "summary": "Creează un task",
-        "description": "Roluri: Administrator, Manager Fermă, Consultant Agronom",
+        "summary": "Create a task",
+        "description": "Roles: Administrator, Farm Manager, Agronomist Consultant",
         "security": [
           {
             "bearerAuth": []
@@ -5005,7 +5816,7 @@
         },
         "responses": {
           "201": {
-            "description": "Succes"
+            "description": "Success"
           },
           "400": {
             "$ref": "#/components/responses/Error"
@@ -5024,8 +5835,8 @@
         "tags": [
           "To Do"
         ],
-        "summary": "Modifică un task",
-        "description": "Roluri: Administrator, Manager Fermă, Consultant Agronom",
+        "summary": "Update a task",
+        "description": "Roles: Administrator, Farm Manager, Agronomist Consultant",
         "security": [
           {
             "bearerAuth": []
@@ -5127,7 +5938,7 @@
         },
         "responses": {
           "200": {
-            "description": "Succes"
+            "description": "Success"
           },
           "400": {
             "$ref": "#/components/responses/Error"
@@ -5144,8 +5955,8 @@
         "tags": [
           "To Do"
         ],
-        "summary": "Șterge un task",
-        "description": "Roluri: Administrator, Manager Fermă, Consultant Agronom",
+        "summary": "Delete a task",
+        "description": "Roles: Administrator, Farm Manager, Agronomist Consultant",
         "security": [
           {
             "bearerAuth": []
@@ -5165,7 +5976,7 @@
         ],
         "responses": {
           "200": {
-            "description": "Succes"
+            "description": "Success"
           },
           "400": {
             "$ref": "#/components/responses/Error"
@@ -5184,8 +5995,8 @@
         "tags": [
           "To Do"
         ],
-        "summary": "Schimbă statusul. Operatorii pot schimba doar task-urile proprii.",
-        "description": "Roluri: Administrator, Manager Fermă, Operator Utilaj, Consultant Agronom",
+        "summary": "Change the status. Operators can only change their own tasks.",
+        "description": "Roles: Administrator, Farm Manager, Machine Operator, Agronomist Consultant",
         "security": [
           {
             "bearerAuth": []
@@ -5229,7 +6040,7 @@
         },
         "responses": {
           "200": {
-            "description": "Succes"
+            "description": "Success"
           },
           "400": {
             "$ref": "#/components/responses/Error"
@@ -5246,10 +6057,10 @@
     "/team": {
       "get": {
         "tags": [
-          "Echipă"
+          "Team"
         ],
-        "summary": "Listează membrii fermei",
-        "description": "Roluri: Administrator, Manager Fermă, Operator Utilaj, Consultant Agronom",
+        "summary": "List farm members",
+        "description": "Roles: Administrator, Farm Manager, Machine Operator, Agronomist Consultant",
         "security": [
           {
             "bearerAuth": []
@@ -5258,7 +6069,7 @@
         "parameters": [],
         "responses": {
           "200": {
-            "description": "Succes"
+            "description": "Success"
           },
           "400": {
             "$ref": "#/components/responses/Error"
@@ -5273,10 +6084,10 @@
       },
       "post": {
         "tags": [
-          "Echipă"
+          "Team"
         ],
-        "summary": "Adaugă un membru. Parola este necesară doar pentru conturile noi.",
-        "description": "Roluri: Administrator",
+        "summary": "Add a member. A password is required only for new accounts.",
+        "description": "Roles: Administrator",
         "security": [
           {
             "bearerAuth": []
@@ -5327,7 +6138,7 @@
         },
         "responses": {
           "201": {
-            "description": "Succes"
+            "description": "Success"
           },
           "400": {
             "$ref": "#/components/responses/Error"
@@ -5344,10 +6155,10 @@
     "/team/{userId}": {
       "patch": {
         "tags": [
-          "Echipă"
+          "Team"
         ],
-        "summary": "Schimbă rolul unui membru",
-        "description": "Roluri: Administrator",
+        "summary": "Change a member’s role",
+        "description": "Roles: Administrator",
         "security": [
           {
             "bearerAuth": []
@@ -5392,7 +6203,7 @@
         },
         "responses": {
           "200": {
-            "description": "Succes"
+            "description": "Success"
           },
           "400": {
             "$ref": "#/components/responses/Error"
@@ -5407,10 +6218,10 @@
       },
       "delete": {
         "tags": [
-          "Echipă"
+          "Team"
         ],
-        "summary": "Elimină un membru din fermă",
-        "description": "Roluri: Administrator",
+        "summary": "Remove a member from the farm",
+        "description": "Roles: Administrator",
         "security": [
           {
             "bearerAuth": []
@@ -5430,7 +6241,7 @@
         ],
         "responses": {
           "200": {
-            "description": "Succes"
+            "description": "Success"
           },
           "400": {
             "$ref": "#/components/responses/Error"
@@ -5447,10 +6258,10 @@
     "/parcels/{id}/weather/forecast": {
       "get": {
         "tags": [
-          "Meteo"
+          "Weather"
         ],
-        "summary": "Prognoză pentru 24 de ore, 7 sau 14 zile",
-        "description": "Roluri: Administrator, Manager Fermă, Operator Utilaj, Consultant Agronom",
+        "summary": "Forecast for 24 hours, 7 or 14 days",
+        "description": "Roles: Administrator, Farm Manager, Machine Operator, Agronomist Consultant",
         "security": [
           {
             "bearerAuth": []
@@ -5484,7 +6295,7 @@
         ],
         "responses": {
           "200": {
-            "description": "Succes"
+            "description": "Success"
           },
           "400": {
             "$ref": "#/components/responses/Error"
@@ -5501,10 +6312,10 @@
     "/parcels/{id}/weather/history": {
       "get": {
         "tags": [
-          "Meteo"
+          "Weather"
         ],
-        "summary": "Istoric meteo pentru 30 de zile sau 12 luni",
-        "description": "Roluri: Administrator, Manager Fermă, Operator Utilaj, Consultant Agronom",
+        "summary": "Weather history for 30 days or 12 months",
+        "description": "Roles: Administrator, Farm Manager, Machine Operator, Agronomist Consultant",
         "security": [
           {
             "bearerAuth": []
@@ -5537,7 +6348,7 @@
         ],
         "responses": {
           "200": {
-            "description": "Succes"
+            "description": "Success"
           },
           "400": {
             "$ref": "#/components/responses/Error"
@@ -5554,10 +6365,10 @@
     "/parcels/{id}/weather/windows": {
       "get": {
         "tags": [
-          "Meteo"
+          "Weather"
         ],
-        "summary": "Ferestre optime pentru lucrări, pe următoarele 7 zile",
-        "description": "Roluri: Administrator, Manager Fermă, Operator Utilaj, Consultant Agronom",
+        "summary": "Optimal windows for field work over the next 7 days",
+        "description": "Roles: Administrator, Farm Manager, Machine Operator, Agronomist Consultant",
         "security": [
           {
             "bearerAuth": []
@@ -5577,7 +6388,7 @@
         ],
         "responses": {
           "200": {
-            "description": "Succes"
+            "description": "Success"
           },
           "400": {
             "$ref": "#/components/responses/Error"
@@ -5594,10 +6405,10 @@
     "/alerts": {
       "get": {
         "tags": [
-          "Meteo"
+          "Weather"
         ],
-        "summary": "Alertele meteo ale fermei",
-        "description": "Roluri: Administrator, Manager Fermă, Operator Utilaj, Consultant Agronom",
+        "summary": "Farm weather alerts",
+        "description": "Roles: Administrator, Farm Manager, Machine Operator, Agronomist Consultant",
         "security": [
           {
             "bearerAuth": []
@@ -5628,7 +6439,7 @@
         ],
         "responses": {
           "200": {
-            "description": "Succes"
+            "description": "Success"
           },
           "400": {
             "$ref": "#/components/responses/Error"
@@ -5645,10 +6456,10 @@
     "/parcels/{id}/alerts/check": {
       "post": {
         "tags": [
-          "Meteo"
+          "Weather"
         ],
-        "summary": "Verifică acum alertele meteo pentru parcelă",
-        "description": "Roluri: Administrator, Manager Fermă, Operator Utilaj, Consultant Agronom",
+        "summary": "Check weather alerts for the parcel now",
+        "description": "Roles: Administrator, Farm Manager, Machine Operator, Agronomist Consultant",
         "security": [
           {
             "bearerAuth": []
@@ -5668,7 +6479,7 @@
         ],
         "responses": {
           "200": {
-            "description": "Succes"
+            "description": "Success"
           },
           "400": {
             "$ref": "#/components/responses/Error"
@@ -5687,8 +6498,8 @@
         "tags": [
           "Work"
         ],
-        "summary": "Calculează capacitatea, durata și ETA",
-        "description": "Roluri: Administrator, Manager Fermă, Operator Utilaj, Consultant Agronom",
+        "summary": "Calculate capacity, duration and ETA",
+        "description": "Roles: Administrator, Farm Manager, Machine Operator, Agronomist Consultant",
         "security": [
           {
             "bearerAuth": []
@@ -5736,7 +6547,7 @@
         },
         "responses": {
           "200": {
-            "description": "Succes"
+            "description": "Success"
           },
           "400": {
             "$ref": "#/components/responses/Error"
@@ -5755,8 +6566,8 @@
         "tags": [
           "Work"
         ],
-        "summary": "Listează lucrările",
-        "description": "Roluri: Administrator, Manager Fermă, Operator Utilaj, Consultant Agronom",
+        "summary": "List operations",
+        "description": "Roles: Administrator, Farm Manager, Machine Operator, Agronomist Consultant",
         "security": [
           {
             "bearerAuth": []
@@ -5801,7 +6612,7 @@
         ],
         "responses": {
           "200": {
-            "description": "Succes"
+            "description": "Success"
           },
           "400": {
             "$ref": "#/components/responses/Error"
@@ -5818,8 +6629,8 @@
         "tags": [
           "Work"
         ],
-        "summary": "Pornește o lucrare",
-        "description": "Roluri: Administrator, Manager Fermă, Operator Utilaj",
+        "summary": "Start an operation",
+        "description": "Roles: Administrator, Farm Manager, Machine Operator",
         "security": [
           {
             "bearerAuth": []
@@ -5901,7 +6712,7 @@
         },
         "responses": {
           "201": {
-            "description": "Succes"
+            "description": "Success"
           },
           "400": {
             "$ref": "#/components/responses/Error"
@@ -5920,8 +6731,8 @@
         "tags": [
           "Work"
         ],
-        "summary": "Detaliile și progresul unei lucrări",
-        "description": "Roluri: Administrator, Manager Fermă, Operator Utilaj, Consultant Agronom",
+        "summary": "Details and progress of an operation",
+        "description": "Roles: Administrator, Farm Manager, Machine Operator, Agronomist Consultant",
         "security": [
           {
             "bearerAuth": []
@@ -5941,7 +6752,7 @@
         ],
         "responses": {
           "200": {
-            "description": "Succes"
+            "description": "Success"
           },
           "400": {
             "$ref": "#/components/responses/Error"
@@ -5960,8 +6771,8 @@
         "tags": [
           "Work"
         ],
-        "summary": "Trimite poziția GPS a utilajului",
-        "description": "Roluri: Administrator, Manager Fermă, Operator Utilaj",
+        "summary": "Send the machine’s GPS position",
+        "description": "Roles: Administrator, Farm Manager, Machine Operator",
         "security": [
           {
             "bearerAuth": []
@@ -6044,7 +6855,7 @@
         },
         "responses": {
           "204": {
-            "description": "Succes"
+            "description": "Success"
           },
           "400": {
             "$ref": "#/components/responses/Error"
@@ -6061,8 +6872,8 @@
         "tags": [
           "Work"
         ],
-        "summary": "Ultima poziție GPS a utilajului",
-        "description": "Roluri: Administrator, Manager Fermă, Operator Utilaj, Consultant Agronom",
+        "summary": "Latest GPS position of the machine",
+        "description": "Roles: Administrator, Farm Manager, Machine Operator, Agronomist Consultant",
         "security": [
           {
             "bearerAuth": []
@@ -6082,7 +6893,7 @@
         ],
         "responses": {
           "200": {
-            "description": "Succes"
+            "description": "Success"
           },
           "400": {
             "$ref": "#/components/responses/Error"
@@ -6101,8 +6912,8 @@
         "tags": [
           "Work"
         ],
-        "summary": "Pune lucrarea pe pauză",
-        "description": "Roluri: Administrator, Manager Fermă, Operator Utilaj",
+        "summary": "Pause the operation",
+        "description": "Roles: Administrator, Farm Manager, Machine Operator",
         "security": [
           {
             "bearerAuth": []
@@ -6122,7 +6933,7 @@
         ],
         "responses": {
           "200": {
-            "description": "Succes"
+            "description": "Success"
           },
           "400": {
             "$ref": "#/components/responses/Error"
@@ -6141,8 +6952,8 @@
         "tags": [
           "Work"
         ],
-        "summary": "Reia lucrarea",
-        "description": "Roluri: Administrator, Manager Fermă, Operator Utilaj",
+        "summary": "Resume the operation",
+        "description": "Roles: Administrator, Farm Manager, Machine Operator",
         "security": [
           {
             "bearerAuth": []
@@ -6162,7 +6973,7 @@
         ],
         "responses": {
           "200": {
-            "description": "Succes"
+            "description": "Success"
           },
           "400": {
             "$ref": "#/components/responses/Error"
@@ -6181,8 +6992,8 @@
         "tags": [
           "Work"
         ],
-        "summary": "Finalizează lucrarea",
-        "description": "Roluri: Administrator, Manager Fermă, Operator Utilaj",
+        "summary": "Complete the operation",
+        "description": "Roles: Administrator, Farm Manager, Machine Operator",
         "security": [
           {
             "bearerAuth": []
@@ -6202,7 +7013,7 @@
         ],
         "responses": {
           "200": {
-            "description": "Succes"
+            "description": "Success"
           },
           "400": {
             "$ref": "#/components/responses/Error"
@@ -6221,8 +7032,8 @@
         "tags": [
           "Work"
         ],
-        "summary": "Anulează lucrarea",
-        "description": "Roluri: Administrator, Manager Fermă, Operator Utilaj",
+        "summary": "Cancel the operation",
+        "description": "Roles: Administrator, Farm Manager, Machine Operator",
         "security": [
           {
             "bearerAuth": []
@@ -6242,7 +7053,7 @@
         ],
         "responses": {
           "200": {
-            "description": "Succes"
+            "description": "Success"
           },
           "400": {
             "$ref": "#/components/responses/Error"
@@ -6267,7 +7078,7 @@
     },
     "responses": {
       "Error": {
-        "description": "Eroare",
+        "description": "Error",
         "content": {
           "application/json": {
             "schema": {

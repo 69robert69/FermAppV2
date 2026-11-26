@@ -1,6 +1,6 @@
 const REQUEST_TIMEOUT_MS = 45_000;
 
-/** Cerere către un serviciu public, cu limită de timp. */
+/** Request to a public service, with a timeout. */
 export async function fetchJson<T>(url: string, timeoutMs = REQUEST_TIMEOUT_MS) {
   const controller = new AbortController();
   const timer = setTimeout(() => controller.abort(), timeoutMs);

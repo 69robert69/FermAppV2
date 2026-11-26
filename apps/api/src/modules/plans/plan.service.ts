@@ -27,7 +27,7 @@ export interface SiteData {
   climate: PlanClimate | null;
 }
 
-/** Datele de sol și climă ale locației. O sursă indisponibilă nu oprește planificarea. */
+/** Soil and climate data for the location. An unavailable source does not stop planning. */
 export async function loadSiteData(lat: number, lng: number, parcelId?: string): Promise<SiteData> {
   const profile = parcelId ? await prisma.soilProfile.findUnique({ where: { parcelId } }) : null;
   const saved: PlanSoil | null =
@@ -39,22 +39,22 @@ export async function loadSiteData(lat: number, lng: number, parcelId?: string):
     saved ??
       cached(`plan-soil:${lat.toFixed(4)}:${lng.toFixed(4)}`, SOIL_CACHE_SECONDS, async () => {
         const values = await fetchSoilGrids(lat, lng);
-        if (!values) throw new Error('SoilGrids nu are date pentru această locație.');
+        if (!values) throw new Error('SoilGrids has no data for this location.');
         const soilClass = classifySoil(values);
         return { ph: values.ph, texture: soilClass.texture, label: soilClass.label };
       }).catch((error) => {
-        logger.warn('Sol indisponibil pentru plan', (error as Error).message);
+        logger.warn('Soil unavailable for plan', (error as Error).message);
         return null;
       }),
     getClimateNormals(lat, lng).catch((error) => {
-      logger.warn('Climă indisponibilă pentru plan', (error as Error).message);
+      logger.warn('Climate unavailable for plan', (error as Error).message);
       return null;
     }),
   ]);
   return { soil, climate };
 }
 
-/** Istoricul parcelei, completat cu ultima cultură declarată în wizard. */
+/** The parcel history, completed with the last crop declared in the wizard. */
 export function historyWithLastCrop(history: CropHistoryEntry[], lastCrop: LastCrop, now = new Date()) {
   if (lastCrop === OTHER_CROP) return history;
   const year = nextSeasonYear(now) - 1;
@@ -62,7 +62,7 @@ export function historyWithLastCrop(history: CropHistoryEntry[], lastCrop: LastC
 }
 
 export const lastCropLabel = (lastCrop: LastCrop, name?: string | null) =>
-  lastCrop === OTHER_CROP ? name?.trim() || 'Altă cultură' : CROPS[lastCrop].name;
+  lastCrop === OTHER_CROP ? name?.trim() || 'Other crop' : CROPS[lastCrop].name;
 
 export async function parcelCropHistory(parcelId: string, beforeYear?: number): Promise<CropHistoryEntry[]> {
   return prisma.cropSeason.findMany({
@@ -74,7 +74,7 @@ export async function parcelCropHistory(parcelId: string, beforeYear?: number): 
 
 type Tx = Prisma.TransactionClient;
 
-/** Înlocuiește planul anului și task-urile lui nepornite. Lucrul început sau finalizat se păstrează. */
+/** Replaces the year's plan and its not-started tasks. Work that was started or completed is kept. */
 export async function savePlan(tx: Tx, input: { farmId: string; parcelId: string; plan: ParcelPlanData; trigger: 'WIZARD' | 'CROP_CHANGED' }) {
   const { farmId, parcelId, plan, trigger } = input;
 
@@ -107,7 +107,7 @@ export async function savePlan(tx: Tx, input: { farmId: string; parcelId: string
         planStepKey: step.key,
         type: step.taskType as TaskType,
         title: `${step.title}: ${plan.cropName}`,
-        description: `Generat automat din planul tehnologic ${plan.year}.`,
+        description: `Generated automatically from the ${plan.year} technology plan.`,
         priority: step.priority,
         dueDate: new Date(step.date),
       })),
@@ -134,8 +134,8 @@ export function announcePlan(farmId: string, parcelId: string) {
 }
 
 /**
- * Recalculează tot ce depinde de cultură: rotație, calendar, apă, fertilizare, monitorizare,
- * task-uri și recomandări. Anii încheiați rămân neschimbați.
+ * Recalculates everything that depends on the crop: rotation, calendar, water, fertilization, monitoring,
+ * tasks and recommendations. Completed years remain unchanged.
  */
 export async function regeneratePlan(farmId: string, parcelId: string, year: number, cropChanged: boolean, now = new Date()) {
   if (year < now.getUTCFullYear()) return null;
@@ -162,7 +162,7 @@ export async function regeneratePlan(farmId: string, parcelId: string, year: num
     const result = await savePlan(tx, { farmId, parcelId, plan, trigger: 'CROP_CHANGED' });
     await tx.cropSeason.update({
       where: { id: season.id },
-      // Valorile introduse de utilizator rămân, cât timp cultura este aceeași.
+      // Values entered by the user remain, as long as the crop is the same.
       data: {
         expectedHarvestDate: cropChanged || !season.expectedHarvestDate ? new Date(plan.harvestDate) : undefined,
         expectedYieldTHa: cropChanged || season.expectedYieldTHa === null ? plan.report.expectedYieldTHa : undefined,
@@ -174,17 +174,17 @@ export async function regeneratePlan(farmId: string, parcelId: string, year: num
   return saved;
 }
 
-/** O salvare de cultură reușește și când recalcularea planului eșuează. */
+/** Saving a crop succeeds even when recalculating the plan fails. */
 export async function regeneratePlanSafely(farmId: string, parcelId: string, year: number, cropChanged = false) {
   try {
     await regeneratePlan(farmId, parcelId, year, cropChanged);
   } catch (error) {
-    logger.error('Recalcularea planului a eșuat', error);
+    logger.error('Plan recalculation failed', error);
   }
   emitToFarm(farmId, 'parcel:updated', { parcelId });
 }
 
-/** La ștergerea culturii dispar și task-urile ei nepornite. */
+/** Deleting the crop also removes its not-started tasks. */
 export async function removePlan(farmId: string, parcelId: string, year: number) {
   await prisma.$transaction([
     prisma.task.deleteMany({ where: { parcelId, status: 'TODO', plan: { parcelId, year } } }),
@@ -193,7 +193,7 @@ export async function removePlan(farmId: string, parcelId: string, year: number)
   announcePlan(farmId, parcelId);
 }
 
-/** Datele financiare nu se trimit operatorilor. */
+/** Financial data is not sent to operators. */
 export function planForRole(data: ParcelPlanData, role: string): ParcelPlanData {
   if (role !== 'OPERATOR') return data;
   const { expectedProfitEurHa: _profit, priceEurPerT: _price, costEurHa: _cost, ...report } = data.report;

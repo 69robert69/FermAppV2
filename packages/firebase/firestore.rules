@@ -43,7 +43,7 @@ service cloud.firestore {
 
     match /farms/{farmId} {
       allow read: if inFarm(farmId) || (request.auth != null && resource.data.ownerId == request.auth.uid);
-      // Un cont nou își poate crea o singură fermă, înainte să aibă profil.
+      // A new account can create a single farm, before it has a profile.
       allow create: if request.auth != null
         && !hasProfile()
         && request.resource.data.ownerId == request.auth.uid;
@@ -81,7 +81,7 @@ service cloud.firestore {
         && request.auth.uid == uid
         && request.resource.data.uid == uid
         && ((request.resource.data.role == 'ADMIN' && ownsFarm(request.resource.data.farmId)) || invited());
-      // Rolul și ferma se schimbă doar de către administrator.
+      // The role and farm are changed only by the administrator.
       allow update: if (request.auth != null && request.auth.uid == uid && changesOnly(['name', 'updatedAt']))
         || (hasRole(['ADMIN'])
           && resource.data.farmId == me().farmId
@@ -94,7 +94,7 @@ service cloud.firestore {
     match /parcels/{id} {
       allow read: if canRead();
       allow create: if canCreate(managers()) && request.resource.data.ownerId == request.auth.uid;
-      // Agronomul actualizează doar cultura planificată și scorul de rotație.
+      // The agronomist updates only the planned crop and the rotation score.
       allow update: if (canUpdate(managers()) && request.resource.data.ownerId == resource.data.ownerId)
         || (canUpdate(['AGRONOMIST']) && changesOnly(['currentCrop', 'plannedCrop', 'rotationScore', 'updatedAt']));
       allow delete: if canDelete(['ADMIN']);
@@ -138,7 +138,7 @@ service cloud.firestore {
     match /tasks/{id} {
       allow read: if canRead();
       allow create: if canCreate(planners());
-      // Operatorul schimbă doar statusul task-urilor atribuite lui.
+      // Operators change only the status of tasks assigned to them.
       allow update: if canUpdate(planners())
         || (canUpdate(['OPERATOR'])
           && resource.data.responsibleUser == request.auth.uid
@@ -170,12 +170,24 @@ service cloud.firestore {
       allow update: if canUpdate(field());
     }
 
-    // Datele financiare nu sunt vizibile pentru operatori.
+    // Financial data is not visible to operators.
     match /expenses/{id} {
       allow read: if hasRole(planners()) && canRead();
       allow create: if canCreate(planners());
       allow update: if canUpdate(planners());
       allow delete: if canDelete(planners());
+    }
+    // Economic settings (managers), season sheets (planners) and the one-time currency marker.
+    match /economics/{id} {
+      // The currency migration first checks whether its farm's marker exists; a missing
+      // document has no farmId, so that one read is allowed by its id.
+      allow read: if (hasRole(planners()) && canRead())
+        || (resource == null && hasRole(managers()) && id == me().farmId + '__currency');
+      allow create: if (request.resource.data.kind == 'sheet' && canCreate(planners()))
+        || (request.resource.data.kind in ['settings', 'currency'] && canCreate(managers()));
+      allow update: if (resource.data.kind == 'sheet' && canUpdate(planners()))
+        || (resource.data.kind == 'settings' && canUpdate(managers()));
+      allow delete: if canDelete(managers());
     }
     match /reports/{id} {
       allow read: if hasRole(planners()) && canRead();
@@ -184,7 +196,7 @@ service cloud.firestore {
       allow delete: if canDelete(planners());
     }
 
-    // Catalogul este al fiecărei ferme și se modifică doar de administrator.
+    // The catalog belongs to each farm and is changed only by the administrator.
     match /seedCatalog/{id} {
       allow read: if canRead();
       allow create: if canCreate(['ADMIN']);

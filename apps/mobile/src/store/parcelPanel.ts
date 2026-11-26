@@ -8,7 +8,7 @@ export interface TrackedWork {
 
 interface ParcelPanelState {
   selectedParcelId: string | null;
-  /** Crește la fiecare atingere, ca aceeași parcelă să poată fi redeschisă imediat. */
+  /** Increments on every tap, so the same parcel can be reopened immediately. */
   selectionToken: number;
   tracked: TrackedWork | null;
   select: (parcelId: string) => void;

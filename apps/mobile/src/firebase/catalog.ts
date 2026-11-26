@@ -45,7 +45,7 @@ function catalogWrites(farmId: string, collection: CollectionName, entries: read
   }));
 }
 
-/** Încarcă o singură dată produsele de pornire în catalogul fermei. */
+/** Loads the starter products into the farm catalog only once. */
 export async function ensureCatalogSeeded(profile: UserProfile) {
   if (profile.role !== 'ADMIN') return;
   const farm = await getDoc(doc(firestore, 'farms', profile.farmId)).catch(() => null);
@@ -58,7 +58,7 @@ export async function ensureCatalogSeeded(profile: UserProfile) {
   await queueWrites([...writes, { kind: 'update', collection: 'farms', docId: profile.farmId, data: { catalogSeededAt: new Date().toISOString() } }]);
 }
 
-/** Până la prima sincronizare se afișează produsele incluse în aplicație. */
+/** Until the first sync, the products bundled with the app are shown. */
 async function withBuiltIn<T extends FarmDoc>(name: CollectionName, builtIn: readonly { id: string }[]): Promise<T[]> {
   const items = await liveItems<T>(name);
   if (items.length > 0) return items;
@@ -94,7 +94,7 @@ async function readXlsxTable(bytes: Uint8Array): Promise<string[][]> {
   const stringsFile = zip.file('xl/sharedStrings.xml');
   const shared = stringsFile ? Array.from(parse(await stringsFile.async('string')).getElementsByTagName('si')).map(textOf) : [];
   const sheetFile = zip.file('xl/worksheets/sheet1.xml');
-  if (!sheetFile) throw new ApiError(400, 'BAD_FILE', 'Fișierul Excel nu conține o foaie de calcul.');
+  if (!sheetFile) throw new ApiError(400, 'BAD_FILE', 'The Excel file does not contain a worksheet.');
   const columnIndex = (ref: string) => [...ref.replace(/\d+/g, '')].reduce((total, letter) => total * 26 + letter.charCodeAt(0) - 64, 0) - 1;
   return Array.from(parse(await sheetFile.async('string')).getElementsByTagName('row')).map((row) => {
     const cells: string[] = [];
@@ -107,20 +107,20 @@ async function readXlsxTable(bytes: Uint8Array): Promise<string[][]> {
   });
 }
 
-/** Rândurile dintr-un fișier CSV sau Excel. */
+/** The rows from a CSV or Excel file. */
 export async function readCatalogFile(bytes: Uint8Array): Promise<Record<string, string>[]> {
   const isZip = bytes[0] === 0x50 && bytes[1] === 0x4b;
   if (!isZip) return parseCsv(new TextDecoder('utf-8').decode(bytes));
   const table = await readXlsxTable(bytes);
-  // Rapoartele exportate au un titlu deasupra tabelului.
+  // Exported reports have a title above the table.
   const headerIndex = table.findIndex((row) => row.filter((cell) => cell.trim()).length >= 2);
   return tableToRows(headerIndex > 0 ? table.slice(headerIndex) : table);
 }
 
-/** Adaugă în catalog produsele valide și raportează rândurile respinse. */
+/** Adds the valid products to the catalog and reports the rejected rows. */
 export async function importCatalog(kind: 'seeds' | 'tractors', fileUri: string) {
   const rows = await readCatalogFile(await new File(fileUri).bytes());
-  if (rows.length === 0) throw new ApiError(400, 'BAD_FILE', 'Fișierul nu conține rânduri de importat.');
+  if (rows.length === 0) throw new ApiError(400, 'BAD_FILE', 'The file contains no rows to import.');
   const parsed: (SeedEntry | TractorEntry | string)[] = rows.map((row) => (kind === 'seeds' ? seedFromRow(row) : tractorFromRow(row)));
   const entries = parsed.filter((item): item is SeedEntry | TractorEntry => typeof item !== 'string');
   const problems = parsed.filter((item): item is string => typeof item === 'string');
@@ -129,7 +129,7 @@ export async function importCatalog(kind: 'seeds' | 'tractors', fileUri: string)
   return { imported: entries.length, problems };
 }
 
-/** Compatibilitatea produselor unei culturi cu parcela. */
+/** Compatibility of a crop's products with the parcel. */
 export async function seedRanking(parcel: Pick<ParcelDoc, 'id' | 'centerLat' | 'centerLng' | 'irrigatedAreaHa'>, crop: CropCode, year: number) {
   const [seeds, seasons, site] = await Promise.all([
     catalogSeeds(),
@@ -150,7 +150,7 @@ export async function seedRanking(parcel: Pick<ParcelDoc, 'id' | 'centerLat' | '
   });
 }
 
-/** Tractoarele fermei sau, dacă nu există, modelele din catalog. */
+/** The farm's tractors or, if there are none, the catalog models. */
 export async function tractorOptions(): Promise<TractorOption[]> {
   const machines = (await liveItems<MachineDoc>('machines')).filter((machine) => machine.type === 'TRACTOR' && machine.powerHp);
   const owned = machines.map((machine) => ({
@@ -183,7 +183,7 @@ export async function machineRecommendation(areaHa: number, operation: WorkOpera
   });
 }
 
-/** Lucrarea pentru care se face recomandarea, pe baza următorului task din plan. */
+/** The operation the recommendation is for, based on the next task in the plan. */
 export const OPERATION_BY_TASK: Record<string, WorkOperation> = {
   SOIL_PREP: 'DISCING',
   SOWING: 'SOWING',

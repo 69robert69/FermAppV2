@@ -14,6 +14,12 @@ import { errorMessage } from '../../lib/hooks';
 import { canManage, canOperate, canPlan, useAuth } from '../../store/auth';
 import { CatalogSection } from '../catalog/CatalogSection';
 import { PlanSection } from '../plan/PlanSection';
+import { EconomicSummarySection } from '../economics/EconomicSummarySection';
+import { FieldStatusSection } from '../fieldStatus';
+import { OperationHistorySection } from '../operations/OperationHistorySection';
+import { TillageSection, useParcelById } from '../tillage';
+import { SatelliteSummarySection } from '../satellite/SatelliteSummarySection';
+import { usesFirebase } from '../../firebase/config';
 import { colors, fonts, space } from '../../theme';
 import { useParcelIntelligence, type ActiveWork, type ParcelIntelligence } from './api';
 import { PhotosSection, usePhotoUpload } from './PhotosSection';
@@ -21,7 +27,6 @@ import {
   ActiveIrrigationSection,
   ActiveWorkSection,
   CropSection,
-  EconomicsSection,
   HeaderSection,
   IrrigationCoverageSection,
   NextActionSection,
@@ -40,6 +45,7 @@ export interface PanelActions {
   onFullHistory: (parcelId: string, name: string) => void;
   onTrackWork: (work: ActiveWork) => void;
   onConfigurePlan: (parcelId: string) => void;
+  onOpenSatellite: (parcelId: string, name: string) => void;
 }
 
 interface Props extends PanelActions {
@@ -65,6 +71,7 @@ function PanelContent({ data, actions, dismiss }: { data: ParcelIntelligence; ac
   const role = useAuth((state) => state.role);
   const parcelId = data.header.id;
   const photos = usePhotoUpload(parcelId);
+  const parcel = useParcelById(parcelId);
   const scroll = useRef<ComponentRef<typeof BottomSheetScrollView>>(null);
   const notesY = useRef(0);
   const [reporting, setReporting] = useState(false);
@@ -77,10 +84,10 @@ function PanelContent({ data, actions, dismiss }: { data: ParcelIntelligence; ac
   async function generateReport() {
     setReporting(true);
     try {
-      const uri = await apiDownload(`/parcels/${parcelId}/report`, `parcela-${data.header.code}.pdf`);
+      const uri = await apiDownload(`/parcels/${parcelId}/report`, `parcel-${data.header.code}.pdf`);
       await Sharing.shareAsync(uri);
     } catch (error) {
-      Alert.alert('Raportul nu a fost generat', errorMessage(error));
+      Alert.alert('The report was not generated', errorMessage(error));
     } finally {
       setReporting(false);
     }
@@ -96,30 +103,40 @@ function PanelContent({ data, actions, dismiss }: { data: ParcelIntelligence; ac
       <HeaderSection data={data} />
 
       <View style={styles.quickGrid}>
-        {canOperate(role) ? <QuickAction icon="tractor-variant" label="Pornește lucrare" onPress={() => leave(() => actions.onStartWork(parcelId))} /> : null}
-        {canOperate(role) ? <QuickAction icon="water-outline" label="Pornește irigare" onPress={() => leave(() => actions.onStartIrrigation(parcelId))} /> : null}
-        {canPlan(role) ? <QuickAction icon="checkbox-marked-circle-plus-outline" label="Adaugă task" onPress={() => leave(() => actions.onAddTask(parcelId))} /> : null}
-        <QuickAction icon="note-plus-outline" label="Adaugă observație" onPress={() => scroll.current?.scrollTo({ y: notesY.current, animated: true })} />
-        <QuickAction icon="camera-plus-outline" label="Încarcă foto" busy={photos.uploading} onPress={() => void photos.pickPhoto()} />
-        <QuickAction icon="file-chart-outline" label="Generează raport" busy={reporting} onPress={() => void generateReport()} />
-        <QuickAction icon="history" label="Istoric complet" onPress={() => leave(() => actions.onFullHistory(parcelId, data.header.name))} />
-        <QuickAction icon="navigation-variant-outline" label="Navighează" onPress={navigateToParcel} />
+        {canOperate(role) ? <QuickAction icon="tractor-variant" label="Start operation" onPress={() => leave(() => actions.onStartWork(parcelId))} /> : null}
+        {canOperate(role) ? <QuickAction icon="water-outline" label="Start irrigation" onPress={() => leave(() => actions.onStartIrrigation(parcelId))} /> : null}
+        {canPlan(role) ? <QuickAction icon="checkbox-marked-circle-plus-outline" label="Add task" onPress={() => leave(() => actions.onAddTask(parcelId))} /> : null}
+        <QuickAction icon="note-plus-outline" label="Add observation" onPress={() => scroll.current?.scrollTo({ y: notesY.current, animated: true })} />
+        <QuickAction icon="camera-plus-outline" label="Upload photo" busy={photos.uploading} onPress={() => void photos.pickPhoto()} />
+        <QuickAction icon="file-chart-outline" label="Generate report" busy={reporting} onPress={() => void generateReport()} />
+        {usesFirebase ? <QuickAction icon="satellite-variant" label="Satellite" onPress={() => leave(() => actions.onOpenSatellite(parcelId, data.header.name))} /> : null}
+        <QuickAction icon="history" label="Full history" onPress={() => leave(() => actions.onFullHistory(parcelId, data.header.name))} />
+        <QuickAction icon="navigation-variant-outline" label="Navigate" onPress={navigateToParcel} />
       </View>
 
+      <FieldStatusSection parcelId={parcelId} />
       <CropSection data={data} />
+      {parcel ? <TillageSection parcel={parcel} canEdit={canManage(role)} crop={data.crop?.code} /> : null}
       <NextActionSection data={data} />
       <CatalogSection data={data} canEdit={canPlan(role)} />
       <PlanSection data={data} canEdit={canPlan(role)} onConfigure={() => leave(() => actions.onConfigurePlan(parcelId))} />
       <ActiveWorkSection data={data} onTrack={(work) => leave(() => actions.onTrackWork(work))} />
       <ActiveIrrigationSection data={data} />
+      <OperationHistorySection parcelId={parcelId} />
       <RotationSection data={data} />
       <IrrigationCoverageSection data={data} />
       <TasksSection data={data} />
       <WeatherSection data={data} />
       <SoilSection data={data} />
       <RecommendationsSection parcelId={parcelId} />
-      <EconomicsSection data={data} canEdit={canPlan(role) || canManage(role)} />
-      <SatelliteSection data={data} canRefresh={canPlan(role)} />
+      {canPlan(role) || canManage(role) ? (
+        <EconomicSummarySection parcelId={parcelId} onOpen={() => leave(() => actions.onFullHistory(parcelId, data.header.name))} />
+      ) : null}
+      {usesFirebase ? (
+        <SatelliteSummarySection parcelId={parcelId} onOpen={() => leave(() => actions.onOpenSatellite(parcelId, data.header.name))} />
+      ) : (
+        <SatelliteSection data={data} canRefresh={canPlan(role)} />
+      )}
       <View onLayout={(event) => { notesY.current = event.nativeEvent.layout.y; }} style={{ gap: space.lg }}>
         <PhotosSection data={data} photos={photos} />
       </View>
@@ -130,6 +147,7 @@ function PanelContent({ data, actions, dismiss }: { data: ParcelIntelligence; ac
 export function ParcelIntelligencePanel({ parcelId, selectionToken, onDismiss, ...actions }: Props) {
   const sheet = useRef<BottomSheetModal>(null);
   const closing = useRef(false);
+  const presented = useRef(false);
   const reopenAfterClose = useRef(false);
   const { width } = useWindowDimensions();
   const query = useParcelIntelligence(parcelId);
@@ -137,11 +155,14 @@ export function ParcelIntelligencePanel({ parcelId, selectionToken, onDismiss, .
   useEffect(() => {
     if (!parcelId) {
       reopenAfterClose.current = false;
-      sheet.current?.dismiss();
+      // Dismissing a sheet that has already closed leaves the library in a dismissing
+      // state, so it is called only while the panel is actually shown.
+      if (presented.current) sheet.current?.dismiss();
     } else if (closing.current) {
-      // O parcelă atinsă cât timp panoul se închide se deschide imediat după închidere.
+      // A parcel tapped while the panel is closing opens right after it closes.
       reopenAfterClose.current = true;
     } else {
+      presented.current = true;
       sheet.current?.present();
     }
   }, [parcelId, selectionToken]);
@@ -157,11 +178,16 @@ export function ParcelIntelligencePanel({ parcelId, selectionToken, onDismiss, .
       sheet.current?.present();
       return;
     }
+    presented.current = false;
     onDismiss();
   }, [onDismiss]);
 
+  // Taps pass through to the map above the panel: another parcel opens directly,
+  // and empty map closes the panel. A blocking backdrop swallowed the first tap.
   const backdrop = useCallback(
-    (props: BottomSheetBackdropProps) => <BottomSheetBackdrop {...props} appearsOnIndex={0} disappearsOnIndex={-1} opacity={0.15} />,
+    (props: BottomSheetBackdropProps) => (
+      <BottomSheetBackdrop {...props} appearsOnIndex={0} disappearsOnIndex={-1} opacity={0.15} enableTouchThrough pressBehavior="none" />
+    ),
     [],
   );
   const sideMargin = useMemo(() => (width >= TABLET_WIDTH ? (width - TABLET_SHEET) / 2 : 0), [width]);
@@ -187,7 +213,7 @@ export function ParcelIntelligencePanel({ parcelId, selectionToken, onDismiss, .
           {(data) => <PanelContent data={data} actions={actions} dismiss={() => sheet.current?.dismiss()} />}
         </QueryState>
       ) : (
-        <Empty icon="vector-polygon" title="Alege o parcelă de pe hartă" />
+        <Empty icon="vector-polygon" title="Choose a parcel on the map" />
       )}
     </BottomSheetModal>
   );

@@ -54,7 +54,7 @@ services:
       redis:
         condition: service_started
 
-  # Broker MQTT pentru senzori: docker compose --profile iot up
+  # MQTT broker for sensors: docker compose --profile iot up
   mosquitto:
     profiles: ['iot']
     image: eclipse-mosquitto:2

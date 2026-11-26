@@ -1,209 +1,221 @@
-# Endpointuri API
+# API endpoints
 
-Fișier generat cu `npm run docs:api`. Baza este `/api/v1`. Sunt 105 endpointuri.
-Documentația interactivă Swagger rulează la `/api/docs`.
+File generated with `npm run docs:api`. The base path is `/api/v1`. There are 112 endpoints.
+Interactive Swagger documentation runs at `/api/docs`.
 
-## Asistent AI
+## AI Assistant
 
-| Metodă | Cale | Descriere | Acces |
+| Method | Path | Description | Access |
 |---|---|---|---|
-| POST | `/ai/chat` | Trimite o întrebare asistentului agronomic | Toate rolurile |
-| GET | `/ai/conversations` | Conversațiile utilizatorului | Toate rolurile |
-| GET | `/ai/conversations/:id` | Mesajele unei conversații | Toate rolurile |
+| POST | `/ai/chat` | Send a question to the agronomy assistant | All roles |
+| GET | `/ai/conversations` | The user’s conversations | All roles |
+| GET | `/ai/conversations/:id` | Messages of a conversation | All roles |
 
-## Autentificare
+## Authentication
 
-| Metodă | Cale | Descriere | Acces |
+| Method | Path | Description | Access |
 |---|---|---|---|
-| POST | `/auth/register` | Creează un cont și o fermă nouă | Public |
-| POST | `/auth/login` | Autentificare cu email și parolă | Public |
-| POST | `/auth/refresh` | Reînnoiește sesiunea și rotește tokenul de refresh | Public |
-| POST | `/auth/logout` | Închide sesiunea curentă | Toate rolurile |
-| GET | `/auth/me` | Profilul utilizatorului curent | Toate rolurile |
-| POST | `/auth/switch-farm` | Schimbă ferma activă | Toate rolurile |
-| POST | `/auth/push-token` | Înregistrează dispozitivul pentru notificări push | Toate rolurile |
+| POST | `/auth/register` | Create an account and a new farm | Public |
+| POST | `/auth/login` | Sign in with email and password | Public |
+| POST | `/auth/refresh` | Renew the session and rotate the refresh token | Public |
+| POST | `/auth/logout` | Close the current session | All roles |
+| GET | `/auth/me` | Current user profile | All roles |
+| POST | `/auth/switch-farm` | Switch the active farm | All roles |
+| POST | `/auth/push-token` | Register the device for push notifications | All roles |
 
-## Costuri
+## Costs
 
-| Metodă | Cale | Descriere | Acces |
+| Method | Path | Description | Access |
 |---|---|---|---|
-| GET | `/costs` | Listează costurile | Admin, Manager, Agronom |
-| POST | `/costs` | Adaugă un cost | Admin, Manager |
-| PATCH | `/costs/:id` | Modifică un cost | Admin, Manager |
-| DELETE | `/costs/:id` | Șterge un cost | Admin, Manager |
-| GET | `/parcels/:id/costs/summary` | Cost pe hectar, cost total și profit estimat sau real | Admin, Manager, Agronom |
+| GET | `/costs` | List costs | Admin, Manager, Agronomist |
+| POST | `/costs` | Add a cost | Admin, Manager |
+| PATCH | `/costs/:id` | Update a cost | Admin, Manager |
+| DELETE | `/costs/:id` | Delete a cost | Admin, Manager |
+| GET | `/parcels/:id/costs/summary` | Cost per hectare, total cost and estimated or actual profit | Admin, Manager, Agronomist |
 
-## Culturi și rotație
+## Crops and rotation
 
-| Metodă | Cale | Descriere | Acces |
+| Method | Path | Description | Access |
 |---|---|---|---|
-| GET | `/crops` | Catalogul culturilor predefinite | Toate rolurile |
-| GET | `/parcels/:id/seasons` | Istoricul culturilor pe ultimii 10 ani | Toate rolurile |
-| POST | `/parcels/:id/seasons` | Adaugă o cultură în istoricul parcelei | Admin, Manager, Agronom |
-| PATCH | `/seasons/:id` | Modifică o înregistrare de cultură | Admin, Manager, Agronom |
-| DELETE | `/seasons/:id` | Șterge o înregistrare de cultură | Admin, Manager, Agronom |
-| POST | `/parcels/:id/rotation/evaluate` | Evaluează cultura propusă | Toate rolurile |
-| GET | `/parcels/:id/rotation/options` | Ordonează toate culturile după scorul de rotație | Toate rolurile |
-| GET | `/parcels/:id/recommendations` | Recomandă culturi după sol, climă și rotație | Toate rolurile |
-| GET | `/parcels/:id/climate` | Compară anii agricoli pe baza datelor NASA POWER | Toate rolurile |
-| GET | `/parcels/:id/development` | Estimează dezvoltarea culturii curente prin grade-zile (GDD) | Toate rolurile |
+| GET | `/crops` | Catalog of predefined crops | All roles |
+| GET | `/parcels/:id/seasons` | Crop history for the last 10 years | All roles |
+| POST | `/parcels/:id/seasons` | Add a crop to the parcel history | Admin, Manager, Agronomist |
+| PATCH | `/seasons/:id` | Update a crop record | Admin, Manager, Agronomist |
+| DELETE | `/seasons/:id` | Delete a crop record | Admin, Manager, Agronomist |
+| POST | `/parcels/:id/rotation/evaluate` | Evaluate the proposed crop | All roles |
+| GET | `/parcels/:id/rotation/options` | Rank all crops by rotation score | All roles |
+| GET | `/parcels/:id/recommendations` | Recommend crops by soil, climate and rotation | All roles |
+| GET | `/parcels/:id/climate` | Compare agricultural years based on NASA POWER data | All roles |
+| GET | `/parcels/:id/development` | Estimate the development of the current crop using growing degree-days (GDD) | All roles |
 
 ## Dashboard
 
-| Metodă | Cale | Descriere | Acces |
+| Method | Path | Description | Access |
 |---|---|---|---|
-| GET | `/dashboard` | Indicatorii principali ai fermei | Toate rolurile |
-| GET | `/sync/changes` | Modificările de după ultima sincronizare offline | Toate rolurile |
+| GET | `/dashboard` | Main farm indicators | All roles |
+| GET | `/sync/changes` | Changes since the last offline sync | All roles |
+
+## Economics
+
+| Method | Path | Description | Access |
+|---|---|---|---|
+| GET | `/economics/settings` | Fuel price, labour rates and machine ownership costs | Admin, Manager, Agronomist |
+| POST | `/economics/settings` | Save the economic settings of the farm | Admin, Manager |
+| GET | `/economics/sheets` | The economic sheets of every parcel in a season | Admin, Manager, Agronomist |
+| GET | `/economics/sheets/:parcelId/:year` | The economic sheet of a parcel in a season | Admin, Manager, Agronomist |
+| POST | `/economics/sheets/:parcelId/:year` | Save the seed, fertiliser, crop protection, other costs and revenue of a parcel | Admin, Manager, Agronomist |
+| GET | `/economics/farm` | Real cost per hectare and profit of every parcel, by crop and by technology | Admin, Manager, Agronomist |
 
 ## Parcel Intelligence
 
-| Metodă | Cale | Descriere | Acces |
+| Method | Path | Description | Access |
 |---|---|---|---|
-| GET | `/parcels/:id/intelligence` | Toate datele panoului Parcel Intelligence | Toate rolurile |
-| GET | `/parcels/:id/weather` | Vremea de azi, prognoza pe 7 și 14 zile și alertele de stropire | Toate rolurile |
-| GET | `/parcels/:id/rotation-score` | Scorul de rotație și istoricul culturilor | Toate rolurile |
-| GET | `/parcels/:id/economics` | Costuri, venit estimat, profit, marjă și ROI | Admin, Manager, Agronom |
-| POST | `/parcels/:id/incomes` | Înregistrează un venit realizat | Admin, Manager |
-| GET | `/parcels/:id/ndvi` | NDVI, NDRE și starea vegetației: acum, acum 7 și 30 de zile | Toate rolurile |
-| GET | `/parcels/:id/tasks` | Task-urile parcelei și sumarul pe status | Toate rolurile |
-| GET | `/parcels/:id/observations` | Observațiile din teren | Toate rolurile |
-| POST | `/parcels/:id/observations` | Adaugă o observație din teren | Toate rolurile |
-| GET | `/parcels/:id/photos` | Galeria foto a parcelei | Toate rolurile |
-| POST | `/parcels/:id/photos` | Încarcă o fotografie cu note | Toate rolurile |
-| GET | `/parcels/:id/photos/:photoId/file` | Conținutul fotografiei | Toate rolurile |
-| DELETE | `/parcels/:id/photos/:photoId` | Șterge o fotografie | Toate rolurile |
-| GET | `/parcels/:id/report` | Raport PDF pentru parcelă | Toate rolurile |
+| GET | `/parcels/:id/intelligence` | All data for the Parcel Intelligence panel | All roles |
+| GET | `/parcels/:id/weather` | Today’s weather, 7- and 14-day forecast and spraying alerts | All roles |
+| GET | `/parcels/:id/rotation-score` | Rotation score and crop history | All roles |
+| GET | `/parcels/:id/economics` | Costs, estimated revenue, profit, margin and ROI | Admin, Manager, Agronomist |
+| POST | `/parcels/:id/incomes` | Record realized revenue | Admin, Manager |
+| GET | `/parcels/:id/ndvi` | NDVI, NDRE and vegetation status: now, 7 and 30 days ago | All roles |
+| GET | `/parcels/:id/tasks` | Parcel tasks and status summary | All roles |
+| GET | `/parcels/:id/observations` | Field observations | All roles |
+| POST | `/parcels/:id/observations` | Add a field observation | All roles |
+| GET | `/parcels/:id/photos` | Parcel photo gallery | All roles |
+| POST | `/parcels/:id/photos` | Upload a photo with notes | All roles |
+| GET | `/parcels/:id/photos/:photoId/file` | Photo content | All roles |
+| DELETE | `/parcels/:id/photos/:photoId` | Delete a photo | All roles |
+| GET | `/parcels/:id/report` | PDF report for the parcel | All roles |
 
 ## IoT
 
-| Metodă | Cale | Descriere | Acces |
+| Method | Path | Description | Access |
 |---|---|---|---|
-| GET | `/iot/devices` | Listează dispozitivele IoT | Toate rolurile |
-| POST | `/iot/devices` | Înregistrează un dispozitiv. Cheia se afișează o singură dată. | Admin, Manager |
-| DELETE | `/iot/devices/:id` | Șterge un dispozitiv și citirile lui | Admin, Manager |
-| GET | `/iot/devices/:id/readings` | Ultimele citiri ale unui dispozitiv | Toate rolurile |
-| POST | `/iot/ingest` | Primește citiri de la senzori, cu antetul X-Device-Key | Public |
+| GET | `/iot/devices` | List IoT devices | All roles |
+| POST | `/iot/devices` | Register a device. The key is shown only once. | Admin, Manager |
+| DELETE | `/iot/devices/:id` | Delete a device and its readings | Admin, Manager |
+| GET | `/iot/devices/:id/readings` | Latest readings of a device | All roles |
+| POST | `/iot/ingest` | Receive sensor readings, with the X-Device-Key header | Public |
 
-## Irigații
+## Irrigation
 
-| Metodă | Cale | Descriere | Acces |
+| Method | Path | Description | Access |
 |---|---|---|---|
-| POST | `/irrigation/estimate` | Calculează durata și ETA irigării | Toate rolurile |
-| GET | `/irrigation` | Listează irigările | Toate rolurile |
-| POST | `/irrigation` | Pornește o irigare | Admin, Manager, Operator |
-| GET | `/irrigation/:id` | Detaliile și progresul irigării | Toate rolurile |
-| POST | `/irrigation/:id/pause` | Pune irigarea pe pauză | Admin, Manager, Operator |
-| POST | `/irrigation/:id/resume` | Reia irigarea | Admin, Manager, Operator |
-| POST | `/irrigation/:id/complete` | Finalizează irigarea | Admin, Manager, Operator |
-| POST | `/irrigation/:id/cancel` | Anulează irigarea | Admin, Manager, Operator |
-| GET | `/parcels/:id/water` | Necesarul de apă, precipitațiile primite și deficitul | Toate rolurile |
+| POST | `/irrigation/estimate` | Calculate irrigation duration and ETA | All roles |
+| GET | `/irrigation` | List irrigations | All roles |
+| POST | `/irrigation` | Start an irrigation | Admin, Manager, Operator |
+| GET | `/irrigation/:id` | Irrigation details and progress | All roles |
+| POST | `/irrigation/:id/pause` | Pause the irrigation | Admin, Manager, Operator |
+| POST | `/irrigation/:id/resume` | Resume the irrigation | Admin, Manager, Operator |
+| POST | `/irrigation/:id/complete` | Complete the irrigation | Admin, Manager, Operator |
+| POST | `/irrigation/:id/cancel` | Cancel the irrigation | Admin, Manager, Operator |
+| GET | `/parcels/:id/water` | Water requirement, rainfall received and deficit | All roles |
 
-## Utilaje
+## Machines
 
-| Metodă | Cale | Descriere | Acces |
+| Method | Path | Description | Access |
 |---|---|---|---|
-| GET | `/machines` | Listează utilajele | Toate rolurile |
-| POST | `/machines` | Adaugă un utilaj | Admin, Manager |
-| PATCH | `/machines/:id` | Modifică un utilaj | Admin, Manager |
-| DELETE | `/machines/:id` | Arhivează un utilaj | Admin, Manager |
+| GET | `/machines` | List machines | All roles |
+| POST | `/machines` | Add a machine | Admin, Manager |
+| PATCH | `/machines/:id` | Update a machine | Admin, Manager |
+| DELETE | `/machines/:id` | Archive a machine | Admin, Manager |
 
-## Hartă
+## Map
 
-| Metodă | Cale | Descriere | Acces |
+| Method | Path | Description | Access |
 |---|---|---|---|
-| GET | `/map/overview` | Situația live a tuturor parcelelor, pentru afișarea pe hartă | Toate rolurile |
+| GET | `/map/overview` | Live status of all parcels, for display on the map | All roles |
 
-## Notificări
+## Notifications
 
-| Metodă | Cale | Descriere | Acces |
+| Method | Path | Description | Access |
 |---|---|---|---|
-| GET | `/notifications` | Ultimele notificări ale utilizatorului | Toate rolurile |
-| POST | `/notifications/:id/read` | Marchează notificarea drept citită | Toate rolurile |
+| GET | `/notifications` | Latest notifications of the user | All roles |
+| POST | `/notifications/:id/read` | Mark the notification as read | All roles |
 
-## Parcele
+## Parcels
 
-| Metodă | Cale | Descriere | Acces |
+| Method | Path | Description | Access |
 |---|---|---|---|
-| GET | `/parcels` | Listează parcelele fermei | Toate rolurile |
-| POST | `/parcels` | Creează o parcelă și pornește analiza solului | Admin, Manager |
-| POST | `/parcels/import` | Importă parcele din GeoJSON, KML, KMZ, SHP sau APIA LPIS | Admin, Manager |
-| GET | `/parcels/export` | Exportă parcelele active | Toate rolurile |
-| GET | `/parcels/:id` | Detaliile unei parcele | Toate rolurile |
-| PATCH | `/parcels/:id` | Modifică datele sau conturul parcelei | Admin, Manager |
-| POST | `/parcels/:id/archive` | Arhivează parcela | Admin, Manager |
-| POST | `/parcels/:id/restore` | Restaurează parcela din arhivă | Admin, Manager |
+| GET | `/parcels` | List the farm’s parcels | All roles |
+| POST | `/parcels` | Create a parcel and start the soil analysis | Admin, Manager |
+| POST | `/parcels/import` | Import parcels from GeoJSON, KML, KMZ, SHP or APIA LPIS | Admin, Manager |
+| GET | `/parcels/export` | Export active parcels | All roles |
+| GET | `/parcels/:id` | Parcel details | All roles |
+| PATCH | `/parcels/:id` | Update the parcel data or outline | Admin, Manager |
+| POST | `/parcels/:id/tillage` | Set the tillage technology of a year; the current one follows the history | Admin, Manager |
+| POST | `/parcels/:id/archive` | Archive the parcel | Admin, Manager |
+| POST | `/parcels/:id/restore` | Restore the parcel from the archive | Admin, Manager |
 
-## Plan tehnologic
+## Technology plan
 
-| Metodă | Cale | Descriere | Acces |
+| Method | Path | Description | Access |
 |---|---|---|---|
-| POST | `/parcels/wizard/analyze` | Analizează parcela și generează planul fără să salveze nimic | Admin, Manager, Agronom |
-| POST | `/parcels/wizard/complete` | Salvează parcela, culturile, planul tehnologic și task-urile | Admin, Manager, Agronom |
-| GET | `/parcels/:id/plan` | Planul activ și rapoartele salvate ale parcelei | Toate rolurile |
+| POST | `/parcels/wizard/analyze` | Analyse the parcel and generate the plan without saving anything | Admin, Manager, Agronomist |
+| POST | `/parcels/wizard/complete` | Save the parcel, crops, technology plan and tasks | Admin, Manager, Agronomist |
+| GET | `/parcels/:id/plan` | The active plan and saved reports of the parcel | All roles |
 
-## Rapoarte
+## Reports
 
-| Metodă | Cale | Descriere | Acces |
+| Method | Path | Description | Access |
 |---|---|---|---|
-| GET | `/reports/:type` | Generează un raport în JSON, PDF sau Excel | Toate rolurile |
+| GET | `/reports/:type` | Generate a report in JSON, PDF or Excel | All roles |
 
-## Satelit
+## Satellite
 
-| Metodă | Cale | Descriere | Acces |
+| Method | Path | Description | Access |
 |---|---|---|---|
-| GET | `/parcels/:id/satellite` | Istoricul NDVI, NDRE și Health Index | Toate rolurile |
-| POST | `/parcels/:id/satellite/refresh` | Descarcă observațiile Sentinel-2 pentru perioada indicată | Admin, Manager, Agronom |
-| GET | `/parcels/:id/satellite/compare` | Compară două date de observație | Toate rolurile |
-| GET | `/parcels/:id/satellite/image` | Imaginea colorată a indicelui pentru o dată | Toate rolurile |
+| GET | `/parcels/:id/satellite` | NDVI, NDRE and Health Index history | All roles |
+| POST | `/parcels/:id/satellite/refresh` | Download Sentinel-2 observations for the given period | Admin, Manager, Agronomist |
+| GET | `/parcels/:id/satellite/compare` | Compare two observation dates | All roles |
+| GET | `/parcels/:id/satellite/image` | Coloured index image for a date | All roles |
 
-## Sol
+## Soil
 
-| Metodă | Cale | Descriere | Acces |
+| Method | Path | Description | Access |
 |---|---|---|---|
-| GET | `/parcels/:id/soil` | Profilul de sol al parcelei | Toate rolurile |
-| POST | `/parcels/:id/soil/refresh` | Reinterogează SoilGrids | Admin, Manager, Agronom |
+| GET | `/parcels/:id/soil` | Soil profile of the parcel | All roles |
+| POST | `/parcels/:id/soil/refresh` | Query SoilGrids again | Admin, Manager, Agronomist |
 
 ## To Do
 
-| Metodă | Cale | Descriere | Acces |
+| Method | Path | Description | Access |
 |---|---|---|---|
-| GET | `/tasks/types` | Task-urile predefinite | Toate rolurile |
-| GET | `/tasks` | Listează task-urile | Toate rolurile |
-| POST | `/tasks` | Creează un task | Admin, Manager, Agronom |
-| PATCH | `/tasks/:id` | Modifică un task | Admin, Manager, Agronom |
-| POST | `/tasks/:id/status` | Schimbă statusul. Operatorii pot schimba doar task-urile proprii. | Toate rolurile |
-| DELETE | `/tasks/:id` | Șterge un task | Admin, Manager, Agronom |
+| GET | `/tasks/types` | Predefined tasks | All roles |
+| GET | `/tasks` | List tasks | All roles |
+| POST | `/tasks` | Create a task | Admin, Manager, Agronomist |
+| PATCH | `/tasks/:id` | Update a task | Admin, Manager, Agronomist |
+| POST | `/tasks/:id/status` | Change the status. Operators can only change their own tasks. | All roles |
+| DELETE | `/tasks/:id` | Delete a task | Admin, Manager, Agronomist |
 
-## Echipă
+## Team
 
-| Metodă | Cale | Descriere | Acces |
+| Method | Path | Description | Access |
 |---|---|---|---|
-| GET | `/team` | Listează membrii fermei | Toate rolurile |
-| POST | `/team` | Adaugă un membru. Parola este necesară doar pentru conturile noi. | Admin |
-| PATCH | `/team/:userId` | Schimbă rolul unui membru | Admin |
-| DELETE | `/team/:userId` | Elimină un membru din fermă | Admin |
+| GET | `/team` | List farm members | All roles |
+| POST | `/team` | Add a member. A password is required only for new accounts. | Admin |
+| PATCH | `/team/:userId` | Change a member’s role | Admin |
+| DELETE | `/team/:userId` | Remove a member from the farm | Admin |
 
-## Meteo
+## Weather
 
-| Metodă | Cale | Descriere | Acces |
+| Method | Path | Description | Access |
 |---|---|---|---|
-| GET | `/parcels/:id/weather/forecast` | Prognoză pentru 24 de ore, 7 sau 14 zile | Toate rolurile |
-| GET | `/parcels/:id/weather/history` | Istoric meteo pentru 30 de zile sau 12 luni | Toate rolurile |
-| GET | `/parcels/:id/weather/windows` | Ferestre optime pentru lucrări, pe următoarele 7 zile | Toate rolurile |
-| GET | `/alerts` | Alertele meteo ale fermei | Toate rolurile |
-| POST | `/parcels/:id/alerts/check` | Verifică acum alertele meteo pentru parcelă | Toate rolurile |
+| GET | `/parcels/:id/weather/forecast` | Forecast for 24 hours, 7 or 14 days | All roles |
+| GET | `/parcels/:id/weather/history` | Weather history for 30 days or 12 months | All roles |
+| GET | `/parcels/:id/weather/windows` | Optimal windows for field work over the next 7 days | All roles |
+| GET | `/alerts` | Farm weather alerts | All roles |
+| POST | `/parcels/:id/alerts/check` | Check weather alerts for the parcel now | All roles |
 
 ## Work
 
-| Metodă | Cale | Descriere | Acces |
+| Method | Path | Description | Access |
 |---|---|---|---|
-| POST | `/work/estimate` | Calculează capacitatea, durata și ETA | Toate rolurile |
-| GET | `/work` | Listează lucrările | Toate rolurile |
-| POST | `/work` | Pornește o lucrare | Admin, Manager, Operator |
-| GET | `/work/:id` | Detaliile și progresul unei lucrări | Toate rolurile |
-| POST | `/work/:id/location` | Trimite poziția GPS a utilajului | Admin, Manager, Operator |
-| GET | `/work/:id/location` | Ultima poziție GPS a utilajului | Toate rolurile |
-| POST | `/work/:id/pause` | Pune lucrarea pe pauză | Admin, Manager, Operator |
-| POST | `/work/:id/resume` | Reia lucrarea | Admin, Manager, Operator |
-| POST | `/work/:id/complete` | Finalizează lucrarea | Admin, Manager, Operator |
-| POST | `/work/:id/cancel` | Anulează lucrarea | Admin, Manager, Operator |
+| POST | `/work/estimate` | Calculate capacity, duration and ETA | All roles |
+| GET | `/work` | List operations | All roles |
+| POST | `/work` | Start an operation | Admin, Manager, Operator |
+| GET | `/work/:id` | Details and progress of an operation | All roles |
+| POST | `/work/:id/location` | Send the machine’s GPS position | Admin, Manager, Operator |
+| GET | `/work/:id/location` | Latest GPS position of the machine | All roles |
+| POST | `/work/:id/pause` | Pause the operation | Admin, Manager, Operator |
+| POST | `/work/:id/resume` | Resume the operation | Admin, Manager, Operator |
+| POST | `/work/:id/complete` | Complete the operation | Admin, Manager, Operator |
+| POST | `/work/:id/cancel` | Cancel the operation | Admin, Manager, Operator |

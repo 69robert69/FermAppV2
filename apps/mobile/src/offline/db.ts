@@ -61,7 +61,7 @@ export async function enqueue(item: OutboxItem) {
   );
 }
 
-/** Operațiunile care așteaptă trimiterea, în ordinea în care au fost făcute. */
+/** Operations waiting to be sent, in the order they were made. */
 export async function pendingOperations(): Promise<OutboxItem[]> {
   const connection = await db();
   const rows = await connection.getAllAsync<{ id: string; method: OutboxItem['method']; path: string; body: string | null }>(
@@ -95,7 +95,7 @@ export async function failedOperations() {
   );
 }
 
-/** Datele locale ale contului se șterg la deconectare. */
+/** The account's local data is deleted on sign-out. */
 export async function clearLocalData() {
   const connection = await db();
   await connection.execAsync('DELETE FROM cache; DELETE FROM outbox;');

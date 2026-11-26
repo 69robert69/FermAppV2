@@ -7,15 +7,16 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useFonts } from 'expo-font';
 import * as SplashScreen from 'expo-splash-screen';
 import { StatusBar } from 'expo-status-bar';
-import { useEffect } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { PaperProvider } from 'react-native-paper';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 import { queryClient } from './src/api/queryClient';
+import { AppLoader } from './src/features/loading';
 import { RootNavigator } from './src/navigation/RootNavigator';
 import { startSyncListener } from './src/offline/sync';
 import { useAuth } from './src/store/auth';
-import { paperTheme } from './src/theme';
+import { colors, paperTheme } from './src/theme';
 
 void SplashScreen.preventAutoHideAsync();
 
@@ -31,29 +32,46 @@ export default function App() {
     BarlowCondensed_600SemiBold,
   });
   const status = useAuth((state) => state.status);
+  const sessionReady = status !== 'loading';
+  const [cacheRestored, setCacheRestored] = useState(false);
+  const [loaderDone, setLoaderDone] = useState(false);
+  const markCacheRestored = useCallback(() => setCacheRestored(true), []);
+  const finishLoader = useCallback(() => setLoaderDone(true), []);
 
   useEffect(() => {
     void useAuth.getState().restore();
     return startSyncListener();
   }, []);
 
+  // The native splash only covers font loading; the themed loader takes over from there.
   useEffect(() => {
-    if (fontsLoaded && status !== 'loading') void SplashScreen.hideAsync();
-  }, [fontsLoaded, status]);
+    if (fontsLoaded) void SplashScreen.hideAsync();
+  }, [fontsLoaded]);
 
-  if (!fontsLoaded || status === 'loading') return null;
+  if (!fontsLoaded) return null;
+
+  // Loading steps: fonts, saved session, offline data cache.
+  const loadProgress = (1 + Number(sessionReady) + Number(cacheRestored)) / 3;
 
   return (
-    <GestureHandlerRootView style={{ flex: 1 }}>
+    <GestureHandlerRootView style={{ flex: 1, backgroundColor: colors.loam }}>
       <SafeAreaProvider>
-        <PersistQueryClientProvider client={queryClient} persistOptions={{ persister, maxAge: ONE_WEEK }}>
-          <PaperProvider theme={paperTheme}>
-            <BottomSheetModalProvider>
-              <StatusBar style="light" />
-              <RootNavigator />
-            </BottomSheetModalProvider>
-          </PaperProvider>
-        </PersistQueryClientProvider>
+        {sessionReady ? (
+          <PersistQueryClientProvider
+            client={queryClient}
+            persistOptions={{ persister, maxAge: ONE_WEEK }}
+            onSuccess={markCacheRestored}
+            onError={markCacheRestored}
+          >
+            <PaperProvider theme={paperTheme}>
+              <BottomSheetModalProvider>
+                <StatusBar style="light" />
+                <RootNavigator />
+              </BottomSheetModalProvider>
+            </PaperProvider>
+          </PersistQueryClientProvider>
+        ) : null}
+        {loaderDone ? null : <AppLoader progress={loadProgress} onFinish={finishLoader} />}
       </SafeAreaProvider>
     </GestureHandlerRootView>
   );

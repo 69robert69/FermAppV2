@@ -20,7 +20,7 @@ interface StoredWrite extends PendingWrite {
 }
 
 const SEND_TIMEOUT_MS = 15_000;
-/** Erori definitive: reîncercarea nu poate schimba rezultatul. */
+/** Permanent errors: retrying cannot change the result. */
 const REJECTED = new Set(['permission-denied', 'invalid-argument', 'not-found', 'failed-precondition']);
 
 let database: Promise<SQLite.SQLiteDatabase> | null = null;
@@ -50,7 +50,7 @@ let pendingCache: StoredWrite[] = [];
 let onQueued: (writes: readonly PendingWrite[]) => void = () => undefined;
 let onRejected: (code: string) => void = () => undefined;
 
-/** Ecranele se reîmprospătează imediat, iar o scriere refuzată de server devine vizibilă. */
+/** Screens refresh immediately, and a write rejected by the server becomes visible. */
 export function observeWrites(handlers: { queued: typeof onQueued; rejected: typeof onRejected }) {
   onQueued = handlers.queued;
   onRejected = handlers.rejected;
@@ -80,22 +80,19 @@ async function refreshPending() {
   listeners.forEach((listener) => listener());
 }
 
-/** Salvează scrierile pe telefon, apoi încearcă să le trimită. Un grup se aplică integral sau deloc. */
+/** Saves the writes on the phone, then tries to send them. A group is applied entirely or not at all. */
 export async function queueWrites(writes: PendingWrite[]) {
   const connection = await db();
   const batchId = `${Date.now()}-${Math.random().toString(36).slice(2)}`;
-  await connection.withTransactionAsync(async () => {
-    for (const write of writes) {
-      await connection.runAsync(
-        'INSERT INTO writes (batch_id, kind, collection, doc_id, data) VALUES (?, ?, ?, ?, ?)',
-        batchId,
-        write.kind,
-        write.collection,
-        write.docId,
-        write.data === undefined ? null : JSON.stringify(write.data),
-      );
-    }
-  });
+  // One multi-row INSERT is atomic on its own. An explicit transaction is not: expo-sqlite
+  // shares the connection, so two groups queued at once interleave their BEGIN and COMMIT
+  // ("cannot commit - no transaction is active").
+  if (writes.length) {
+    await connection.runAsync(
+      `INSERT INTO writes (batch_id, kind, collection, doc_id, data) VALUES ${writes.map(() => '(?, ?, ?, ?, ?)').join(', ')}`,
+      writes.flatMap((write) => [batchId, write.kind, write.collection, write.docId, write.data === undefined ? null : JSON.stringify(write.data)]),
+    );
+  }
   await refreshPending();
   onQueued(writes);
   void flushWrites();
@@ -121,7 +118,7 @@ function sendGroup(group: StoredWrite[]) {
   return batch.commit();
 }
 
-/** Firestore nu răspunde la scrieri cât timp este offline, deci așteptarea are o limită. */
+/** Firestore does not answer writes while offline, so the wait has a limit. */
 function withTimeout(promise: Promise<void>) {
   return new Promise<void>((resolve, reject) => {
     const timer = setTimeout(() => reject(new Error('TIMEOUT')), SEND_TIMEOUT_MS);
@@ -132,9 +129,9 @@ function withTimeout(promise: Promise<void>) {
 let flushing: Promise<void> | null = null;
 let flushAgain = false;
 
-/** Trimite scrierile în ordine și se oprește la prima problemă de conexiune. */
+/** Sends the writes in order and stops at the first connection problem. */
 export function flushWrites(): Promise<void> {
-  // Scrierile apărute în timpul unei trimiteri pleacă imediat după ea.
+  // Writes that appear during a send go out right after it.
   if (flushing) flushAgain = true;
   flushing ??= (async () => {
     const network = await NetInfo.fetch();
@@ -150,7 +147,7 @@ export function flushWrites(): Promise<void> {
       } catch (error) {
         const code = error instanceof FirebaseError ? error.code.replace('firestore/', '') : '';
         if (!REJECTED.has(code)) break;
-        // O notificare trimisă deja de alt telefon nu este o eroare.
+        // A notification already sent by another phone is not an error.
         if (group.every((write) => write.kind === 'once')) {
           await connection.runAsync('DELETE FROM writes WHERE batch_id = ?', batchId);
         } else {
@@ -188,14 +185,14 @@ export async function writeSnapshot(key: string, value: unknown) {
   await connection.runAsync('INSERT OR REPLACE INTO snapshots (key, value) VALUES (?, ?)', key, JSON.stringify(value));
 }
 
-/** Datele contului se șterg de pe telefon la deconectare. */
+/** The account data is deleted from the phone on sign-out. */
 export async function clearFirebaseLocalData() {
   const connection = await db();
   await connection.execAsync('DELETE FROM writes; DELETE FROM snapshots;');
   await refreshPending();
 }
 
-/** Sincronizează automat la pornire și la revenirea conexiunii. */
+/** Syncs automatically on startup and when the connection returns. */
 export function startOutboxSync() {
   void refreshPending().then(flushWrites);
   return NetInfo.addEventListener((state) => {

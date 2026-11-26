@@ -5,7 +5,7 @@ import { evaluateRotation, type CropHistoryEntry } from './rotation';
 const DAY_MS = 86_400_000;
 const MIN_DAYS_BEFORE_SOWING = 7;
 const IRRIGATION_DOSE_MM = 30;
-const MONTHS = ['ianuarie', 'februarie', 'martie', 'aprilie', 'mai', 'iunie', 'iulie', 'august', 'septembrie', 'octombrie', 'noiembrie', 'decembrie'];
+const MONTHS = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
 
 export const OTHER_CROP = 'OTHER';
 export type LastCrop = CropCode | typeof OTHER_CROP;
@@ -38,22 +38,22 @@ export type PlanTaskType =
 interface CropCalendar {
   sowing: readonly [month: number, day: number];
   emergenceDays: number;
-  /** Zile de la semănat. Lipsește la culturile care nu primesc azot fazial. */
+  /** Days from sowing. Missing for crops that do not receive top-dressing nitrogen. */
   topDressingDays: number | null;
   diseaseDays: number;
   pestDays: number;
   harvestDays: number;
-  /** Perioada în care lipsa apei afectează cel mai mult producția. */
+  /** Period when water shortage affects yield the most. */
   criticalMonths: readonly [from: number, to: number];
-  /** Partea din precipitațiile anuale disponibilă culturii. */
+  /** Share of annual rainfall available to the crop. */
   rainShare: number;
   priceEurPerT: number;
   costEurHa: number;
-  /** Necesar de N, P₂O₅ și K₂O, în kg pentru o tonă de producție. */
+  /** N, P₂O₅ and K₂O requirement, in kg per tonne of yield. */
   nutrientsPerT: readonly [n: number, p: number, k: number];
 }
 
-/** Valori orientative pentru condițiile din România. */
+/** Indicative values for conditions in Romania. */
 export const CROP_CALENDARS: Record<CropCode, CropCalendar> = {
   WHEAT: { sowing: [10, 5], emergenceDays: 12, topDressingDays: 165, diseaseDays: 205, pestDays: 225, harvestDays: 275, criticalMonths: [4, 5], rainShare: 0.8, priceEurPerT: 200, costEurHa: 800, nutrientsPerT: [25, 10, 6] },
   BARLEY: { sowing: [9, 28], emergenceDays: 12, topDressingDays: 165, diseaseDays: 195, pestDays: 215, harvestDays: 270, criticalMonths: [4, 5], rainShare: 0.8, priceEurPerT: 180, costEurHa: 700, nutrientsPerT: [24, 10, 7] },
@@ -74,11 +74,11 @@ export interface PlanStep {
   taskType: PlanTaskType;
   date: string;
   priority: 'MEDIUM' | 'HIGH';
-  /** Termenul a trecut, deci pasul nu mai devine task. */
+  /** The deadline has passed, so the step no longer becomes a task. */
   past: boolean;
 }
 
-/** Anul agricol următor. După 1 august, recolta anului curent este considerată ultima cultură. */
+/** Next agricultural year. After 1 August, the current year's harvest is considered the last crop. */
 export const nextSeasonYear = (now: Date = new Date()) =>
   now.getUTCMonth() >= 7 ? now.getUTCFullYear() + 1 : now.getUTCFullYear();
 
@@ -91,9 +91,9 @@ const sowingIn = (crop: CropCode, year: number) => {
 
 export interface CalendarOptions {
   now?: Date;
-  /** Data reală a semănatului, dacă a fost înregistrată. */
+  /** Actual sowing date, if it was recorded. */
   sowingDate?: Date | null;
-  /** Anul recoltei, pentru o cultură deja înregistrată. Altfel se alege următoarea fereastră posibilă. */
+  /** Harvest year, for an already recorded crop. Otherwise the next possible window is chosen. */
   harvestYear?: number;
 }
 
@@ -109,7 +109,7 @@ function resolveSowing(crop: CropCode, { now = new Date(), sowingDate, harvestYe
   return thisYear >= earliest ? thisYear : sowingIn(crop, now.getUTCFullYear() + 1);
 }
 
-/** Calendarul tehnologic al culturii, calculat pornind de la data semănatului. */
+/** The crop's technology calendar, computed from the sowing date. */
 export function planCalendar(crop: CropCode, options: CalendarOptions = {}) {
   const calendar = CROP_CALENDARS[crop];
   const today = startOfDay(options.now ?? new Date());
@@ -118,25 +118,25 @@ export function planCalendar(crop: CropCode, options: CalendarOptions = {}) {
   const planned = options.harvestYear === undefined && !options.sowingDate;
 
   const definitions: { key: PlanStepKey; title: string; taskType: PlanTaskType; days: number; priority?: 'HIGH' }[] = [
-    { key: 'SOIL_PREP', title: 'Pregătirea terenului', taskType: 'SOIL_PREP', days: -26 },
-    { key: 'SEED_PURCHASE', title: 'Achiziție sămânță', taskType: 'SEED_PURCHASE', days: -11 },
-    { key: 'BASE_FERTILIZATION', title: 'Fertilizare de bază', taskType: 'FERTILIZATION', days: -6 },
-    { key: 'SOWING', title: 'Semănat', taskType: 'SOWING', days: 0, priority: 'HIGH' },
-    { key: 'PRE_EMERGENT', title: 'Erbicid preemergent', taskType: 'HERBICIDE', days: 2 },
-    { key: 'EMERGENCE_CHECK', title: 'Verificare răsărire', taskType: 'EMERGENCE_CHECK', days: calendar.emergenceDays },
+    { key: 'SOIL_PREP', title: 'Seedbed preparation', taskType: 'SOIL_PREP', days: -26 },
+    { key: 'SEED_PURCHASE', title: 'Seed purchase', taskType: 'SEED_PURCHASE', days: -11 },
+    { key: 'BASE_FERTILIZATION', title: 'Base fertilization', taskType: 'FERTILIZATION', days: -6 },
+    { key: 'SOWING', title: 'Sowing', taskType: 'SOWING', days: 0, priority: 'HIGH' },
+    { key: 'PRE_EMERGENT', title: 'Pre-emergence herbicide', taskType: 'HERBICIDE', days: 2 },
+    { key: 'EMERGENCE_CHECK', title: 'Emergence check', taskType: 'EMERGENCE_CHECK', days: calendar.emergenceDays },
     ...(calendar.topDressingDays === null
       ? []
-      : [{ key: 'TOP_DRESSING' as const, title: 'Fertilizare fazială', taskType: 'FERTILIZATION' as const, days: calendar.topDressingDays }]),
-    { key: 'PEST_MONITORING', title: 'Monitorizare dăunători', taskType: 'PEST_CHECK', days: calendar.pestDays },
-    { key: 'DISEASE_MONITORING', title: 'Monitorizare boli', taskType: 'DISEASE_CHECK', days: calendar.diseaseDays },
-    { key: 'HARVEST_PREP', title: 'Pregătire recoltare', taskType: 'HARVEST_PREP', days: calendar.harvestDays - 14 },
-    { key: 'HARVEST', title: 'Recoltare', taskType: 'HARVEST', days: calendar.harvestDays, priority: 'HIGH' },
+      : [{ key: 'TOP_DRESSING' as const, title: 'Top dressing', taskType: 'FERTILIZATION' as const, days: calendar.topDressingDays }]),
+    { key: 'PEST_MONITORING', title: 'Pest monitoring', taskType: 'PEST_CHECK', days: calendar.pestDays },
+    { key: 'DISEASE_MONITORING', title: 'Disease monitoring', taskType: 'DISEASE_CHECK', days: calendar.diseaseDays },
+    { key: 'HARVEST_PREP', title: 'Harvest preparation', taskType: 'HARVEST_PREP', days: calendar.harvestDays - 14 },
+    { key: 'HARVEST', title: 'Harvest', taskType: 'HARVEST', days: calendar.harvestDays, priority: 'HIGH' },
   ];
 
   const steps: PlanStep[] = definitions
     .map(({ days, priority, ...step }) => {
       const date = addDays(sowing, days);
-      // Pașii pregătitori rămași în urmă la un plan nou se fac imediat.
+      // Overdue preparatory steps in a new plan are done immediately.
       const due = planned && date < today ? today : date;
       return { ...step, priority: priority ?? ('MEDIUM' as const), date: due.toISOString(), past: due < today };
     })
@@ -158,13 +158,13 @@ export interface PlanClimate {
 }
 
 export interface RankedCrop extends CropRecommendation {
-  /** Motivul scorului, într-o singură propoziție. */
+  /** The reason for the score, in a single sentence. */
   reason: string;
 }
 
 function joinClauses(clauses: string[]) {
   if (clauses.length < 2) return clauses[0] ?? '';
-  return `${clauses.slice(0, -1).join(', ')} și ${clauses[clauses.length - 1]}`;
+  return `${clauses.slice(0, -1).join(', ')} and ${clauses[clauses.length - 1]}`;
 }
 
 function explain(
@@ -183,36 +183,36 @@ function explain(
   if (rotation.score >= 70) {
     if (previous && previous.crop !== recommendation.crop) {
       const previousProfile = CROPS[previous.crop];
-      good.push(`parcela a avut ${previousProfile.name.toLowerCase()} anul trecut`);
-      if (previousProfile.family === 'LEGUME') good.push(`valorifică azotul lăsat în sol de ${previousProfile.name.toLowerCase()}`);
+      good.push(`the parcel had ${previousProfile.name.toLowerCase()} last year`);
+      if (previousProfile.family === 'LEGUME') good.push(`it uses the nitrogen left in the soil by ${previousProfile.name.toLowerCase()}`);
     } else {
-      good.push('rotația este favorabilă');
+      good.push('the rotation is favourable');
     }
-    if (profile.family === 'LEGUME') good.push('îmbogățește solul în azot');
+    if (profile.family === 'LEGUME') good.push('it enriches the soil with nitrogen');
   } else {
     weak.push(rotation.explanation.replace(/\.$/, '').replace(/^./, (letter) => letter.toLowerCase()));
   }
 
   if (soil) {
     const [min, max] = profile.phRange;
-    if (soil.ph >= min && soil.ph <= max) good.push(`pH-ul de ${soil.ph} este optim`);
-    else weak.push(`pH-ul de ${soil.ph} este în afara intervalului ${min}-${max}`);
-    if (!profile.textures.includes(soil.texture)) weak.push('textura solului nu este potrivită');
+    if (soil.ph >= min && soil.ph <= max) good.push(`the pH of ${soil.ph} is optimal`);
+    else weak.push(`the pH of ${soil.ph} is outside the ${min}-${max} range`);
+    if (!profile.textures.includes(soil.texture)) weak.push('the soil texture is not suitable');
   }
   if (climate) {
     const needed = profile.waterMm[0];
-    if (climate.annualPrecipitationMm >= needed) good.push(`precipitațiile de ${Math.round(climate.annualPrecipitationMm)} mm acoperă necesarul minim`);
-    else weak.push(`precipitațiile de ${Math.round(climate.annualPrecipitationMm)} mm sunt sub necesarul minim de ${needed} mm`);
+    if (climate.annualPrecipitationMm >= needed) good.push(`rainfall of ${Math.round(climate.annualPrecipitationMm)} mm covers the minimum requirement`);
+    else weak.push(`rainfall of ${Math.round(climate.annualPrecipitationMm)} mm is below the minimum requirement of ${needed} mm`);
   }
 
   if (recommendation.score >= 70 && good.length > 0) {
-    return `${profile.name} se potrivește deoarece ${joinClauses(good)}.`;
+    return `${profile.name} is a good fit because ${joinClauses(good)}.`;
   }
-  if (weak.length > 0) return `${profile.name} are un scor mai mic deoarece ${joinClauses(weak)}.`;
-  return `${profile.name} are un scor orientativ, deoarece lipsesc date despre ${joinClauses(recommendation.missingData)}.`;
+  if (weak.length > 0) return `${profile.name} has a lower score because ${joinClauses(weak)}.`;
+  return `${profile.name} has an indicative score, because data is missing about ${joinClauses(recommendation.missingData)}.`;
 }
 
-/** Ordonează culturile după sol, climă și rotație, cu explicația fiecărui scor. */
+/** Ranks crops by soil, climate and rotation, with an explanation for each score. */
 export function rankCropsForParcel(input: {
   year: number;
   history: readonly CropHistoryEntry[];
@@ -245,7 +245,7 @@ export interface ParcelReport {
   recommendedScore: number;
   compatibilityScore: number;
   expectedYieldTHa: number;
-  /** Lipsesc pentru operatori, care nu au acces la datele financiare. */
+  /** Missing for operators, who have no access to financial data. */
   expectedProfitEurHa?: number;
   priceEurPerT?: number;
   costEurHa?: number;
@@ -281,14 +281,14 @@ export interface ParcelPlanInput {
   crop: CropCode;
   parcelName: string;
   areaHa: number;
-  /** Culturile anterioare, inclusiv ultima cultură declarată. */
+  /** Previous crops, including the last declared crop. */
   history: readonly CropHistoryEntry[];
-  /** Denumirea ultimei culturi, când nu face parte din catalog. */
+  /** Name of the last crop, when it is not part of the catalog. */
   lastCropName?: string | null;
   soil: PlanSoil | null;
   climate: PlanClimate | null;
   now?: Date;
-  /** Anul unei culturi deja înregistrate. */
+  /** Year of an already recorded crop. */
   year?: number;
   sowingDate?: Date | null;
 }
@@ -296,7 +296,7 @@ export interface ParcelPlanInput {
 const roundTo5 = (value: number) => Math.round(value / 5) * 5;
 const period = ([from, to]: readonly [number, number]) => `${MONTHS[from - 1]}-${MONTHS[to - 1]}`;
 
-/** Generează planul complet al culturii: pași, calendar, apă, nutrienți, monitorizare și raport. */
+/** Generates the full crop plan: steps, calendar, water, nutrients, monitoring and report. */
 export function buildParcelPlan(input: ParcelPlanInput): ParcelPlanData {
   const { crop, parcelName, areaHa, history, soil, climate, now = new Date(), year: fixedYear, sowingDate } = input;
   const profile = CROPS[crop];
@@ -304,7 +304,7 @@ export function buildParcelPlan(input: ParcelPlanInput): ParcelPlanData {
   const schedule = planCalendar(crop, { now, sowingDate, harvestYear: fixedYear });
   const year = fixedYear ?? schedule.seasonYear;
 
-  // Toate culturile se compară în același an agricol, ca scorurile să rămână comparabile.
+  // All crops are compared in the same agricultural year, so the scores stay comparable.
   const comparisonYear = Math.min(year, Math.max(nextSeasonYear(now), ...history.map((entry) => entry.year + 1)));
   const recommendations = rankCropsForParcel({ year: comparisonYear, history, soil, climate });
   const chosen = recommendations.find((item) => item.crop === crop)!;
@@ -330,37 +330,37 @@ export function buildParcelPlan(input: ParcelPlanInput): ParcelPlanData {
   const hasTopDressing = calendar.topDressingDays !== null;
   const fertilization: FertilizationStage[] = [
     {
-      stage: 'Fertilizare de bază',
+      stage: 'Base fertilization',
       date: dateOf('BASE_FERTILIZATION'),
       nKgHa: roundTo5(hasTopDressing ? nitrogen * 0.3 : nitrogen),
       pKgHa: roundTo5(expectedYieldTHa * pPerT),
       kKgHa: roundTo5(expectedYieldTHa * kPerT),
     },
     ...(hasTopDressing
-      ? [{ stage: 'Fertilizare fazială', date: dateOf('TOP_DRESSING'), nKgHa: roundTo5(nitrogen * 0.7), pKgHa: 0, kKgHa: 0 }]
+      ? [{ stage: 'Top dressing', date: dateOf('TOP_DRESSING'), nKgHa: roundTo5(nitrogen * 0.7), pKgHa: 0, kKgHa: 0 }]
       : []),
   ];
 
   const risks: string[] = [];
   if (deficitMm) {
-    risks.push(`Secetă în perioada ${criticalPeriod}.`);
-    risks.push(`Deficit de precipitații estimat la ${deficitMm} mm pe sezon.`);
+    risks.push(`Drought during ${criticalPeriod}.`);
+    risks.push(`Rainfall deficit estimated at ${deficitMm} mm per season.`);
   }
   if (rotation.score < 70) risks.push(rotation.explanation);
   if (soil && (soil.ph < profile.phRange[0] || soil.ph > profile.phRange[1])) {
-    risks.push(`pH-ul de ${soil.ph} este în afara intervalului optim ${profile.phRange[0]}-${profile.phRange[1]}.`);
+    risks.push(`The pH of ${soil.ph} is outside the optimal range of ${profile.phRange[0]}-${profile.phRange[1]}.`);
   }
-  if (risks.length === 0) risks.push('Datele disponibile nu indică riscuri majore.');
+  if (risks.length === 0) risks.push('The available data does not indicate major risks.');
 
   const advice = [
     deficitMm
-      ? `Planifică minimum ${passes} ${passes === 1 ? 'ciclu' : 'cicluri'} de irigare de ${IRRIGATION_DOSE_MM} mm în perioada critică de dezvoltare (${criticalPeriod}).`
+      ? `Plan at least ${passes} irrigation ${passes === 1 ? 'cycle' : 'cycles'} of ${IRRIGATION_DOSE_MM} mm during the critical growth period (${criticalPeriod}).`
       : effectiveRainMm === null
-        ? `Verifică rezerva de apă înainte de perioada critică (${criticalPeriod}).`
-        : `Precipitațiile medii acoperă necesarul de apă. Urmărește umiditatea solului în perioada ${criticalPeriod}.`,
+        ? `Check the water reserve before the critical period (${criticalPeriod}).`
+        : `Average rainfall covers the water requirement. Monitor soil moisture during ${criticalPeriod}.`,
   ];
   if (best.crop !== crop && best.score - chosen.score >= 10) {
-    advice.push(`${best.name} are un scor mai bun pe această parcelă: ${best.score}%.`);
+    advice.push(`${best.name} scores better on this parcel: ${best.score}%.`);
   }
 
   const lastCropName = input.lastCropName ?? (previous ? CROPS[previous.crop].name : null);

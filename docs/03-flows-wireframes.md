@@ -1,144 +1,144 @@
-# Fluxuri și wireframe-uri
+# Flows and wireframes
 
-## Fluxurile aplicației
+## App flows
 
-### Creare parcelă
-
-```text
-Hartă → Parcelă nouă → atinge colțurile → suprafața se calculează live
-     → completează numele → Salvează
-     → API validează conturul și salvează parcela
-     → SoilGrids rulează în fundal → profilul de sol apare în tabul Sol
-```
-
-### Evaluare rotație
+### Creating a parcel
 
 ```text
-Parcelă → Rotație → API citește istoricul → motorul calculează scorul 0-100
-       → ✅ Recomandat (70+) / ⚠️ Acceptabil (40-69) / ❌ Nerecomandat (sub 40)
-       → explicația afișează motivul principal
+Map → New parcel → tap the corners → the area is calculated live
+    → fill in the name → Save
+    → the API validates the outline and saves the parcel
+    → SoilGrids runs in the background → the soil profile appears in the Soil tab
 ```
 
-### Lucrare live
+### Rotation evaluation
 
 ```text
-Work → parcelă, utilaj, lățime, viteză, eficiență
-    → Capacitate = Lățime × Viteză × Eficiență / 10
-    → Pornește → Socket.IO anunță echipa → cronometrul rulează pe telefon
-    → Pauză / Reia / Finalizează, sau finalizare automată la 100%
-    → consum de motorină calculat → notificare push
+Parcel → Rotation → the API reads the history → the engine calculates the 0-100 score
+       → ✅ Recommended (70+) / ⚠️ Acceptable (40-69) / ❌ Not recommended (below 40)
+       → the explanation shows the main reason
 ```
 
-### Irigare
+### Live field work
 
 ```text
-Irigații → parcelă, sistem, traseu, viteză → durată = traseu / viteză
-        → Pornește → cronometru live și procent realizat
-        → la final: status actualizat și notificare push
-        → doza aplicată intră în bilanțul de apă
+Work → parcel, machine, width, speed, efficiency
+     → Capacity = Width × Speed × Efficiency / 10
+     → Start → Socket.IO notifies the team → the timer runs on the phone
+     → Pause / Resume / Complete, or automatic completion at 100%
+     → diesel consumption calculated → push notification
 ```
 
-### Alerte meteo
+### Irrigation
 
 ```text
-La 30 de minute: prognoză pentru fiecare parcelă → reguli de alertă
-→ alertă nouă? → salvare + Socket.IO + push
-→ aceeași alertă nu se repetă în aceeași zi
+Irrigation → parcel, system, route, speed → duration = route / speed
+           → Start → live timer and percent done
+           → at the end: status updated and push notification
+           → the applied dose goes into the water balance
 ```
 
-### Sincronizare offline
+### Weather alerts
 
 ```text
-Fără semnal: citirile vin din SQLite, modificările intră în coadă
-Semnalul revine: coada se trimite în ordine, cu cheie de idempotență
-  2xx → operațiune ștearsă
-  4xx → operațiune marcată și afișată în Setări
-  rețea sau 5xx → se reia mai târziu
+Every 30 minutes: forecast for each parcel → alert rules
+→ new alert? → save + Socket.IO + push
+→ the same alert is not repeated on the same day
 ```
 
-### Asistent AI
+### Offline sync
 
 ```text
-Întrebare + parcelă → server adună istoric, sol, NDVI, lucrări, rotație, prognoză
-→ Claude răspunde pe baza acestor date
-→ fără cheie sau la eroare: rezumat calculat din aceleași date
+No signal: reads come from SQLite, changes go into the queue
+Signal returns: the queue is sent in order, with an idempotency key
+  2xx → operation deleted
+  4xx → operation flagged and shown in Settings
+  network or 5xx → retried later
 ```
 
-## Wireframe-uri
+### AI assistant
+
+```text
+Question + parcel → the server gathers history, soil, NDVI, field work, rotation, forecast
+→ Claude answers based on this data
+→ without a key or on error: a summary calculated from the same data
+```
+
+## Wireframes
 
 ### Dashboard
 
 ```text
 ┌──────────────────────────────┐
-│ Ferma Demo               [⚙] │
+│ Demo Farm                [⚙] │
 │ ┌──────────────────────────┐ │
-│ │ ▱ ▰ ▱ ▰ ▱   contururi    │ │
-│ │ 12 parcele   270,4 ha    │ │
-│ │ 133,5 ha     136,9 ha    │ │
-│ │ cultivat     liber       │ │
+│ │ ▱ ▰ ▱ ▰ ▱   outlines     │ │
+│ │ 12 parcels   270.4 ha    │ │
+│ │ 133.5 ha     136.9 ha    │ │
+│ │ cultivated   free        │ │
 │ └──────────────────────────┘ │
-│ Alerte meteo                 │
-│ ⛈ Ploaie în 3 ore, Sud-1     │
-│ În desfășurare               │
-│ Semănat, Nord 3         42%  │
-│ ▓▓▓▓▓▓░░░░  se termină 16:40 │
-│ Culturi în 2026              │
-│ Grâu    ▓▓▓▓▓▓░░   84 ha     │
+│ Weather alerts               │
+│ ⛈ Rain in 3 hours, South-1   │
+│ In progress                  │
+│ Sowing, North 3         42%  │
+│ ▓▓▓▓▓▓░░░░  finishes 16:40   │
+│ Crops in 2026                │
+│ Wheat   ▓▓▓▓▓▓░░   84 ha     │
 ├──────────────────────────────┤
 │ ▦   ◫   ⚙   ☑   💧  ▤   ✦   │
 └──────────────────────────────┘
 ```
 
-### Hartă
+### Map
 
 ```text
 ┌──────────────────────────────┐
 │                         [◎]  │
-│    ╱▔▔▔▔╲  verde        [⇅]  │
-│   ▕ Nord ▏                   │
-│    ╲____╱     ╱▔▔▔╲ galben   │
-│              ▕ Sud ▏         │
-│               ╲___╱          │
+│    ╱▔▔▔▔▔╲  green       [⇅]  │
+│   ▕ North ▏                  │
+│    ╲_____╱    ╱▔▔▔▔▔╲ yellow │
+│              ▕ South ▏       │
+│               ╲_____╱        │
 │ ┌──────────────────────────┐ │
-│ │ ▱ Nord 3, 68 ha, Grâu    │ │
-│ │ NDVI 0,72                │ │
-│ │ [ Deschide parcela ]     │ │
+│ │ ▱ North 3, 68 ha, Wheat  │ │
+│ │ NDVI 0.72                │ │
+│ │ [ Open parcel ]          │ │
 │ └──────────────────────────┘ │
 └──────────────────────────────┘
 ```
 
-### Editor parcelă
+### Parcel editor
 
 ```text
 ┌──────────────────────────────┐
-│ ← Parcelă                    │
+│ ← Parcel                     │
 │  ●───────●              [↶]  │
-│  │ hartă  ╲             [🗑]  │
+│  │  map   ╲             [🗑]  │
 │  ●─────────●                 │
 ├──────────────────────────────┤
-│ 68,42 ha      3.412 m        │
-│ [Nume parcelă            ]   │
-│ [Cod] [Localitate] [Județ]   │
-│ [ Salvează parcela ]         │
+│ 68.42 ha      3,412 m        │
+│ [Parcel name             ]   │
+│ [Code] [Locality] [County]   │
+│ [ Save parcel ]              │
 └──────────────────────────────┘
 ```
 
-### Detalii parcelă
+### Parcel details
 
 ```text
 ┌──────────────────────────────┐
-│ ← Nord 3                 [✎] │
-│ ▱  68,42 ha, NV-003          │
-│ (Culturi)(Rotație)(Sol)(Mete…│
+│ ← North 3                [✎] │
+│ ▱  68.42 ha, NV-003          │
+│ (Crops)(Rotation)(Soil)(Wea… │
 │ ┌──────────────────────────┐ │
-│ │ Floarea-soarelui      22 │ │
-│ │ ❌ Nerecomandat          │ │
-│ │ A fost cultivată acum 2  │ │
-│ │ ani. Pauză minimă 4 ani. │ │
+│ │ Sunflower             22 │ │
+│ │ ❌ Not recommended       │ │
+│ │ It was grown 2 years     │ │
+│ │ ago. Minimum break 4 yrs.│ │
 │ └──────────────────────────┘ │
 │ ┌──────────────────────────┐ │
-│ │ Soia                  90 │ │
-│ │ ✅ Recomandat            │ │
+│ │ Soybean               90 │ │
+│ │ ✅ Recommended           │ │
 │ └──────────────────────────┘ │
 └──────────────────────────────┘
 ```
@@ -148,16 +148,16 @@ Semnalul revine: coada se trimite în ordine, cu cheie de idempotență
 ```text
 ┌──────────────────────────────┐
 │ Work                    [🚜] │
-│ Semănat, Nord 3         42%  │
+│ Sowing, North 3         42%  │
 │ ▓▓▓▓▓▓░░░░░                  │
-│ Scurs 02:14:08    ETA 16:40  │
-│ [ Pauză ]  [ Finalizează ]   │
-│ Pornește o lucrare           │
-│ (Nord 3)(Sud-1)              │
-│ (Arat)(Discuit)(Semănat)     │
+│ Elapsed 02:14:08  ETA 16:40  │
+│ [ Pause ]  [ Complete ]      │
+│ Start an operation           │
+│ (North 3)(South-1)           │
+│ (Ploughing)(Discing)(Sowing) │
 │ [6 m] [8 km/h] [80 %]        │
-│ 3,84 ha/oră  17,8 ore        │
-│ [ Pornește lucrarea ]        │
+│ 3.84 ha/hour  17.8 hours     │
+│ [ Start operation ]          │
 └──────────────────────────────┘
 ```
 
@@ -167,57 +167,57 @@ Semnalul revine: coada se trimite în ordine, cu cheie de idempotență
 ┌──────────────────────────────┐
 │ To Do                        │
 │ (To Do)(In Progress)(Done)   │
-│ ┃ Erbicidare         Începe  │
-│ ┃ Sud-1, Ana, Ridicată       │
-│ ┃ Termen: 20 nov.            │
-│ Adaugă un task               │
-│ (Fertilizare)(Erbicidare)    │
-│ [Termen] (Parcelă)(Responsabil)│
-│ [ Salvează task-ul ]         │
+│ ┃ Herbicide appl.     Start  │
+│ ┃ South-1, Ana, High         │
+│ ┃ Due: 20 Nov                │
+│ Add a task                   │
+│ (Fertilization)(Herbicide)   │
+│ [Deadline] (Parcel)(Assignee)│
+│ [ Save task ]                │
 └──────────────────────────────┘
 ```
 
-### Irigații
+### Irrigation
 
 ```text
 ┌──────────────────────────────┐
-│ Irigații                     │
+│ Irrigation                   │
 │ Lunca Mare              61%  │
-│ Tambur, 400 m la 25 m/oră    │
+│ Hose reel, 400 m at 25 m/hour│
 │ ▓▓▓▓▓▓▓░░░░                  │
-│ Scurs 09:45:12    ETA 22:00  │
-│ [ Pauză ]  [ Finalizează ]   │
-│ Pornește o irigare           │
-│ (Tambur)(Pivot)(Liniar)      │
-│ [Traseu m] [Viteză m/oră]    │
-│ [ Pornește irigarea ]        │
+│ Elapsed 09:45:12  ETA 22:00  │
+│ [ Pause ]  [ Complete ]      │
+│ Start an irrigation          │
+│ (Hose reel)(Pivot)(Linear)   │
+│ [Route m] [Speed m/hour]     │
+│ [ Start irrigation ]         │
 └──────────────────────────────┘
 ```
 
-### Rapoarte
+### Reports
 
 ```text
 ┌──────────────────────────────┐
-│ Rapoarte                     │
-│ (Lucrări)(Motorină)(Costuri) │
+│ Reports                      │
+│ (Field work)(Diesel)(Costs)  │
 │        ‹   2026   ›          │
 │ [ Export PDF ][ Export Excel]│
-│ Data    Parcelă   Lucrare    │
-│ 02.05   Nord 3    Semănat    │
-│ 04.05   Sud-1     Erbicidat  │
+│ Date    Parcel    Operation  │
+│ 02.05   North 3   Sowing     │
+│ 04.05   South-1   Spraying   │
 └──────────────────────────────┘
 ```
 
-### Asistent AI
+### AI assistant
 
 ```text
 ┌──────────────────────────────┐
-│ Asistent                     │
-│ (Nord 3)(Sud-1)(Lunca Mare)  │
-│        Ce cultiv anul viitor?│
-│ Parcela Nord 3 are pH 6,8 și │
-│ materie organică 3,9%. Se    │
-│ recomandă grâu sau soia.     │
-│ [Întrebarea ta           ] ➤ │
+│ Assistant                    │
+│ (North 3)(South-1)(Lunca M.) │
+│  What should I grow next yr? │
+│ Parcel North 3 has pH 6.8    │
+│ and 3.9% organic matter.     │
+│ Wheat or soybean is recomm.  │
+│ [Your question           ] ➤ │
 └──────────────────────────────┘
 ```

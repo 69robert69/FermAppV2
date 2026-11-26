@@ -2,9 +2,15 @@ import {
   computeGeoMetrics,
   estimateIrrigation,
   estimateWork,
+  isTillageSystem,
+  parseTillageHistory,
+  tillageInYear,
+  taskForFinishedWork,
   timedProgress,
+  withTillageYear,
   type CropCode,
   type PolygonGeometry,
+  type TillageSystem,
 } from '@fermapp/domain';
 import { collection, doc } from 'firebase/firestore';
 import { firestore } from './app';
@@ -12,12 +18,19 @@ import { useFirebaseSession } from './auth';
 import { queueWrites, type PendingWrite } from './outbox';
 import type { CollectionName, IrrigationDoc, MachineWorkDoc, NotificationDoc, ParcelDoc, RunState, TaskDoc, UserProfile } from './types';
 
-/** Identificatorul se generează pe telefon, deci documentul poate fi creat și offline. */
+/** The task a finished operation carries out, closed together with it. */
+function linkedTaskWrites(tasks: readonly TaskDoc[] | undefined, run: MachineWorkDoc, now: Date): PendingWrite[] {
+  if (!tasks) return [];
+  const task = taskForFinishedWork(tasks.filter((item) => item.parcelId === run.parcelId), run.type, now);
+  return task ? [{ kind: 'update', collection: 'tasks', docId: task.id, data: { status: 'DONE', completedAt: now.toISOString() } }] : [];
+}
+
+/** The identifier is generated on the phone, so the document can be created offline too. */
 export const newId = (name: CollectionName) => doc(collection(firestore, name)).id;
 
 export function session() {
   const { profile } = useFirebaseSession.getState();
-  if (!profile) throw new Error('Sesiunea nu este activă.');
+  if (!profile) throw new Error('The session is not active.');
   return profile;
 }
 
@@ -46,8 +59,10 @@ export async function createParcel(input: {
   locality?: string;
   notes?: string;
   irrigatedAreaHa?: number | null;
+  tillageSystem?: string | null;
 }) {
   const id = newId('parcels');
+  const tillage = isTillageSystem(input.tillageSystem) ? input.tillageSystem : null;
   await queueWrites([
     {
       kind: 'set',
@@ -63,6 +78,8 @@ export async function createParcel(input: {
         locality: input.locality ?? null,
         notes: input.notes ?? null,
         irrigatedAreaHa: input.irrigatedAreaHa ?? null,
+        tillageSystem: tillage,
+        tillageHistory: tillage ? [{ year: new Date().getFullYear(), system: tillage }] : [],
         currentCrop: null,
         plannedCrop: null,
         rotationScore: null,
@@ -153,6 +170,7 @@ export async function createMachine(input: Record<string, unknown>) {
         fuelConsumptionMax: input.fuelConsumptionMax ?? null,
         tankCapacity: input.tankCapacity ?? null,
         weight: input.weight ?? null,
+        tillageSystems: Array.isArray(input.tillageSystems) ? input.tillageSystems.filter(isTillageSystem) : [],
         width: null,
         speed: null,
         currentStatus: 'IDLE',
@@ -163,7 +181,26 @@ export async function createMachine(input: Record<string, unknown>) {
   return id;
 }
 
-/** Poziția GPS trimisă de telefonul operatorului în timpul lucrării. */
+/** Sets the technology of a year; the current technology follows the history. */
+export function setParcelTillage(parcel: ParcelDoc, system: TillageSystem, year: number) {
+  const history = withTillageYear(parseTillageHistory(parcel.tillageHistory), { year, system });
+  const current = tillageInYear({ areaHa: parcel.area, system: null, history }, new Date().getFullYear());
+  return queueWrites([
+    { kind: 'update', collection: 'parcels', docId: parcel.id, data: { tillageSystem: current, tillageHistory: history } },
+  ]);
+}
+
+/** Changes the editable fields of a machine. */
+export function updateMachine(id: string, input: Record<string, unknown>) {
+  const data: Record<string, unknown> = {};
+  if (Array.isArray(input.tillageSystems)) data.tillageSystems = input.tillageSystems.filter(isTillageSystem);
+  for (const key of ['name', 'type', 'brand', 'model', 'powerHp'] as const) if (key in input) data[key] = input[key] ?? null;
+  if ('avgConsumptionLh' in input) data.fuelConsumption = input.avgConsumptionLh ?? null;
+  if ('operatorId' in input) data.operator = input.operatorId ?? null;
+  return queueWrites([{ kind: 'update', collection: 'machines', docId: id, data }]);
+}
+
+/** GPS position sent by the operator's phone during the operation. */
 export const updateWorkLocation = (id: string, location: { lat: number; lng: number; headingDeg?: number | null; speedKmh?: number | null }) =>
   queueWrites([
     {
@@ -252,8 +289,8 @@ export const runProgress = (run: TimedRun, now = new Date()) =>
     now,
   });
 
-/** Pauză, reluare sau încheiere pentru o lucrare ori o irigare. */
-export function controlRun(name: 'machineWork' | 'irrigations', run: TimedRun, action: 'pause' | 'resume' | 'complete' | 'cancel') {
+/** Pause, resume or completion of an operation or an irrigation. */
+export function controlRun(name: 'machineWork' | 'irrigations', run: TimedRun, action: 'pause' | 'resume' | 'complete' | 'cancel', tasks?: readonly TaskDoc[]) {
   const now = new Date();
   const finished: Record<string, RunState> = { complete: 'COMPLETED', cancel: 'CANCELLED' };
   const data: Record<string, unknown> =
@@ -267,7 +304,8 @@ export function controlRun(name: 'machineWork' | 'irrigations', run: TimedRun, a
           }
         : { status: finished[action], pausedAt: null, finishDate: now.toISOString() };
   if (name === 'irrigations') data.percentCompleted = runProgress(run, now).percent;
-  return queueWrites([{ kind: 'update', collection: name, docId: run.id, data }]);
+  const linked = name === 'machineWork' && action === 'complete' ? linkedTaskWrites(tasks, run as MachineWorkDoc, now) : [];
+  return queueWrites([{ kind: 'update', collection: name, docId: run.id, data }, ...linked]);
 }
 
 export const addObservation = (parcelId: string, text: string) =>
@@ -283,7 +321,7 @@ export const addObservation = (parcelId: string, text: string) =>
 export const markNotificationRead = (id: string) =>
   queueWrites([{ kind: 'update', collection: 'notifications', docId: id, data: { readAt: nowIso() } }]);
 
-/** Identificatorul fix împiedică dublarea când mai multe telefoane observă același eveniment. */
+/** The fixed identifier prevents duplicates when several phones observe the same event. */
 export function notificationWrites(
   members: readonly Pick<UserProfile, 'uid'>[],
   eventId: string,
@@ -297,12 +335,13 @@ export function notificationWrites(
   }));
 }
 
-/** Fără Cloud Functions, primul telefon deschis încheie operațiunile ajunse la termen. */
+/** Without Cloud Functions, the first open phone completes the operations that are due. */
 export async function completeFinishedRuns(input: {
   work: readonly MachineWorkDoc[];
   irrigations: readonly IrrigationDoc[];
   members: readonly UserProfile[];
   parcelName: (parcelId: string) => string;
+  tasks?: readonly TaskDoc[];
 }) {
   const now = new Date();
   const isDone = (run: TimedRun) => run.status === 'RUNNING' && runProgress(run, now).finished;
@@ -310,12 +349,13 @@ export async function completeFinishedRuns(input: {
   const writes: PendingWrite[] = [];
   for (const run of input.work.filter(isDone)) {
     writes.push({ kind: 'update', collection: 'machineWork', docId: run.id, data: closing });
-    writes.push(...notificationWrites(input.members, run.id, { kind: 'WORK_DONE', title: 'Lucrare finalizată', body: `Lucrarea de pe parcela ${input.parcelName(run.parcelId)} s-a încheiat.` }));
+    writes.push(...linkedTaskWrites(input.tasks, run, now));
+    writes.push(...notificationWrites(input.members, run.id, { kind: 'WORK_DONE', title: 'Operation completed', body: `The operation on parcel ${input.parcelName(run.parcelId)} has ended.` }));
   }
   for (const run of input.irrigations.filter(isDone)) {
     writes.push({ kind: 'update', collection: 'irrigations', docId: run.id, data: { ...closing, percentCompleted: 100 } });
-    writes.push(...notificationWrites(input.members, run.id, { kind: 'IRRIGATION_DONE', title: 'Irigare finalizată', body: `Irigarea de pe parcela ${input.parcelName(run.parcelId)} s-a încheiat.` }));
+    writes.push(...notificationWrites(input.members, run.id, { kind: 'IRRIGATION_DONE', title: 'Irrigation completed', body: `The irrigation on parcel ${input.parcelName(run.parcelId)} has ended.` }));
   }
-  // Fiecare scriere merge separat, ca o notificare deja trimisă să nu blocheze restul.
+  // Each write goes separately, so a notification already sent does not block the rest.
   for (const write of writes) await queueWrites([write]);
 }

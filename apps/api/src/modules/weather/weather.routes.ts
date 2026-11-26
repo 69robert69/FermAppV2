@@ -6,14 +6,14 @@ import { prisma } from '../../lib/prisma';
 import { ApiRouter, idParams, ROLES } from '../../lib/route';
 import { checkParcelAlerts } from './weather.service';
 
-export const weatherRoutes = new ApiRouter('', 'Meteo');
+export const weatherRoutes = new ApiRouter('', 'Weather');
 
 const OPERATIONS: FieldOperation[] = ['SPRAYING', 'FERTILIZING', 'SOWING', 'HARVESTING'];
 
 weatherRoutes.get(
   '/parcels/:id/weather/forecast',
   {
-    summary: 'Prognoză pentru 24 de ore, 7 sau 14 zile',
+    summary: 'Forecast for 24 hours, 7 or 14 days',
     roles: ROLES.all,
     params: idParams,
     query: z.object({ range: z.enum(['24h', '7d', '14d']).default('7d') }),
@@ -39,7 +39,7 @@ const isoDate = (date: Date) => date.toISOString().slice(0, 10);
 weatherRoutes.get(
   '/parcels/:id/weather/history',
   {
-    summary: 'Istoric meteo pentru 30 de zile sau 12 luni',
+    summary: 'Weather history for 30 days or 12 months',
     roles: ROLES.all,
     params: idParams,
     query: z.object({ range: z.enum(['30d', '12m']).default('30d') }),
@@ -64,7 +64,7 @@ weatherRoutes.get(
 
 weatherRoutes.get(
   '/parcels/:id/weather/windows',
-  { summary: 'Ferestre optime pentru lucrări, pe următoarele 7 zile', roles: ROLES.all, params: idParams },
+  { summary: 'Optimal windows for field work over the next 7 days', roles: ROLES.all, params: idParams },
   async ({ auth, params }) => {
     const parcel = await requireParcel(auth.farmId, params.id);
     const forecast = await getForecast(parcel.centerLat, parcel.centerLng);
@@ -81,7 +81,7 @@ weatherRoutes.get(
 weatherRoutes.get(
   '/alerts',
   {
-    summary: 'Alertele meteo ale fermei',
+    summary: 'Farm weather alerts',
     roles: ROLES.all,
     query: z.object({
       parcelId: z.uuid().optional(),
@@ -99,7 +99,7 @@ weatherRoutes.get(
 
 weatherRoutes.post(
   '/parcels/:id/alerts/check',
-  { summary: 'Verifică acum alertele meteo pentru parcelă', roles: ROLES.all, status: 200, params: idParams },
+  { summary: 'Check weather alerts for the parcel now', roles: ROLES.all, status: 200, params: idParams },
   async ({ auth, params }) => {
     const parcel = await requireParcel(auth.farmId, params.id);
     return checkParcelAlerts(parcel);

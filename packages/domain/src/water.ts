@@ -4,7 +4,7 @@ export interface WaterBalanceInput {
   crop: CropCode;
   precipitationMm: number;
   irrigationMm?: number;
-  /** Doza aplicată la o trecere de irigare, în mm. */
+  /** Dose applied in one irrigation pass, in mm. */
   doseMm?: number;
 }
 
@@ -21,7 +21,7 @@ export interface WaterBalance {
   suggestion: string;
 }
 
-/** Bilanțul de apă pe sezon, raportat la mijlocul intervalului de necesar al culturii. */
+/** Seasonal water balance, relative to the midpoint of the crop's requirement range. */
 export function waterBalance(input: WaterBalanceInput): WaterBalance {
   const { crop, precipitationMm, irrigationMm = 0, doseMm = 30 } = input;
   const profile = CROPS[crop];
@@ -33,11 +33,11 @@ export function waterBalance(input: WaterBalanceInput): WaterBalance {
 
   let suggestion: string;
   if (deficitMm === 0) {
-    suggestion = `${profile.name}: necesarul de apă este acoperit, irigarea nu este necesară.`;
+    suggestion = `${profile.name}: the water requirement is covered, irrigation is not needed.`;
   } else if (receivedMm >= requiredMinMm) {
-    suggestion = `${profile.name}: apa primită atinge pragul minim. Irigarea este opțională, cu ${irrigationPasses} treceri de ${doseMm} mm pentru producție maximă.`;
+    suggestion = `${profile.name}: water received reaches the minimum threshold. Irrigation is optional, with ${irrigationPasses} passes of ${doseMm} mm for maximum yield.`;
   } else {
-    suggestion = `${profile.name}: deficit de ${Math.round(deficitMm)} mm. Se recomandă ${irrigationPasses} treceri de irigare de ${doseMm} mm.`;
+    suggestion = `${profile.name}: deficit of ${Math.round(deficitMm)} mm. ${irrigationPasses} irrigation passes of ${doseMm} mm are recommended.`;
   }
 
   return {

@@ -8,8 +8,8 @@ export const firebaseConfig = {
   measurementId: 'G-TKZ23NDDK7',
 };
 
-/** Fără cheie, aplicația folosește în continuare serverul actual. */
+/** Without a key, the app keeps using the current server. */
 export const isFirebaseConfigured = firebaseConfig.apiKey.length > 0;
 
-/** Aplicația trece pe Firebase doar când este pornită explicit în acest mod. */
+/** The app switches to Firebase only when it is explicitly started in this mode. */
 export const usesFirebase = isFirebaseConfigured && process.env.EXPO_PUBLIC_BACKEND === 'firebase';

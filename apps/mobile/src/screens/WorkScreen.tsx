@@ -1,4 +1,4 @@
-import { estimateWork } from '@fermapp/domain';
+import { checkMachineCompatibility, checkWorkCompatibility, estimateWork, TILLAGE_SYSTEMS } from '@fermapp/domain';
 import { useNavigation, useRoute, type NavigationProp } from '@react-navigation/native';
 import { useQuery } from '@tanstack/react-query';
 import { useEffect, useMemo, useState } from 'react';
@@ -10,6 +10,8 @@ import { ParcelPicker } from '../components/pickers';
 import { RunCard } from '../components/RunCard';
 import { Choice, Empty, Field, IconButton, Panel, QueryState, Row, Screen, Section, Stat, Txt } from '../components/ui';
 import { machineFuelLPerH, WorkCostPanel } from '../features/catalog/WorkCostPanel';
+import { isRunActive } from '../features/operations/finish';
+import { CompatibilityNotice, TillageBadge } from '../features/tillage';
 import { usesFirebase } from '../firebase/config';
 import { clock, isPositive, number, parseNumber, shortDate, WORK_TYPES } from '../lib/format';
 import { useAction, useParcels } from '../lib/hooks';
@@ -28,12 +30,18 @@ export function WorkScreen() {
   const parcels = useParcels();
 
   const [parcelId, setParcelId] = useState<string | null>(null);
-  const preselected = (useRoute().params as { parcelId?: string } | undefined)?.parcelId;
+  // The map action wheel can preselect the parcel, the machine and the operation.
+  const routeParams = useRoute().params as { parcelId?: string; machineId?: string; type?: string } | undefined;
+  const preselected = routeParams?.parcelId;
   useEffect(() => {
     if (preselected) setParcelId(preselected);
   }, [preselected]);
   const [machineId, setMachineId] = useState<string | null>(null);
   const [type, setType] = useState<string | null>(null);
+  useEffect(() => {
+    if (routeParams?.machineId) setMachineId(routeParams.machineId);
+    if (routeParams?.type) setType(routeParams.type);
+  }, [routeParams?.machineId, routeParams?.type]);
   const [width, setWidth] = useState('');
   const [speed, setSpeed] = useState('');
   const [efficiency, setEfficiency] = useState('80');
@@ -83,7 +91,8 @@ export function WorkScreen() {
   );
 
   const items = work.data ?? [];
-  const active = items.filter((item) => item.status === 'RUNNING' || item.status === 'PAUSED');
+  // A run that reached 100% is finished even before the server closes it.
+  const active = items.filter((item) => isRunActive(item));
   const history = items.filter((item) => item.status === 'COMPLETED' || item.status === 'CANCELLED').slice(0, 15);
   const mayControl = (item: WorkSession) => canOperate(role) && (role !== 'OPERATOR' || item.operator.id === user?.id);
 
@@ -92,8 +101,8 @@ export function WorkScreen() {
       title="Work"
       action={
         <View style={{ flexDirection: 'row' }}>
-          {usesFirebase ? <IconButton icon="book-open-variant" label="Catalog agricol" onPress={() => navigation.navigate('Catalog')} /> : null}
-          <IconButton icon="tractor" label="Utilaje" onPress={() => navigation.navigate('Machines')} />
+          {usesFirebase ? <IconButton icon="book-open-variant" label="Farm catalog" onPress={() => navigation.navigate('Catalog')} /> : null}
+          <IconButton icon="tractor" label="Machines" onPress={() => navigation.navigate('Machines')} />
         </View>
       }
       onRefresh={() => void work.refetch()}
@@ -102,13 +111,13 @@ export function WorkScreen() {
       <QueryState query={work}>
         {() =>
           active.length > 0 ? (
-            <Section title="Lucrări active">
+            <Section title="Active operations">
               {active.map((item) => (
                 <RunCard
                   key={item.id}
                   run={item}
                   title={`${WORK_TYPES[item.type]}, ${item.parcel.name}`}
-                  subtitle={`${item.machine?.name ?? 'Fără utilaj'}, ${item.capacityHaH} ha/oră`}
+                  subtitle={`${item.machine?.name ?? 'No machine'}, ${item.capacityHaH} ha/hour`}
                   canControl={mayControl(item)}
                   busy={control.isPending}
                   onAction={(action) => control.mutate({ id: item.id, action })}
@@ -120,25 +129,35 @@ export function WorkScreen() {
       </QueryState>
 
       {canOperate(role) ? (
-        <Section title="Pornește o lucrare">
+        <Section title="Start an operation">
           <Panel>
             <ParcelPicker value={parcelId} onChange={setParcelId} />
-            <Choice label="Lucrare" options={typeOptions} value={type} onChange={setType} />
+            {parcel?.tillageSystem ? (
+              <View style={{ flexDirection: 'row', alignItems: 'center', gap: space.sm }}>
+                <TillageBadge system={parcel.tillageSystem} size="sm" />
+                <Txt variant="small" style={{ flex: 1 }}>
+                  {`Recommended: ${TILLAGE_SYSTEMS[parcel.tillageSystem].operations.map((operation) => operation.label).join(', ')}`}
+                </Txt>
+              </View>
+            ) : null}
+            <Choice label="Operation" options={typeOptions} value={type} onChange={setType} />
+            <CompatibilityNotice check={checkWorkCompatibility(parcel?.tillageSystem, type)} />
             <Choice
-              label="Utilaj (opțional)"
+              label="Machine (optional)"
               options={(machines.data ?? []).map((machine) => ({ value: machine.id, label: machine.name }))}
               value={machineId}
               onChange={setMachineId}
             />
+            <CompatibilityNotice check={checkMachineCompatibility(selectedMachine, parcel?.tillageSystem)} />
             <View style={{ flexDirection: 'row', gap: space.sm }}>
-              <Field style={{ flex: 1 }} label="Lățime (m)" value={width} onChangeText={setWidth} keyboardType="decimal-pad" />
-              <Field style={{ flex: 1 }} label="Viteză (km/h)" value={speed} onChangeText={setSpeed} keyboardType="decimal-pad" />
-              <Field style={{ flex: 1 }} label="Eficiență (%)" value={efficiency} onChangeText={setEfficiency} keyboardType="decimal-pad" />
+              <Field style={{ flex: 1 }} label="Width (m)" value={width} onChangeText={setWidth} keyboardType="decimal-pad" />
+              <Field style={{ flex: 1 }} label="Speed (km/h)" value={speed} onChangeText={setSpeed} keyboardType="decimal-pad" />
+              <Field style={{ flex: 1 }} label="Efficiency (%)" value={efficiency} onChangeText={setEfficiency} keyboardType="decimal-pad" />
             </View>
             {estimate ? (
               <View style={{ flexDirection: 'row' }}>
-                <Stat value={number(estimate.capacityHaH, 2)} unit="ha/oră" label="Capacitate" color={colors.wheat} />
-                <Stat value={number(estimate.durationHours)} unit="ore" label="Durată" />
+                <Stat value={number(estimate.capacityHaH, 2)} unit="ha/hour" label="Capacity" color={colors.wheat} />
+                <Stat value={number(estimate.durationHours)} unit="hours" label="Duration" />
                 <Stat value={clock(estimate.eta)} label={`ETA, ${shortDate(estimate.eta)}`} />
               </View>
             ) : null}
@@ -158,23 +177,23 @@ export function WorkScreen() {
               />
             ) : null}
             <Button mode="contained" disabled={!parcelId || !type || !inputsValid || start.isPending} loading={start.isPending} onPress={() => start.mutate()}>
-              Pornește lucrarea
+              Start operation
             </Button>
-            {queuedNote ? <Txt variant="small" color={colors.wheat}>Lucrarea pornește pe server când revine conexiunea.</Txt> : null}
+            {queuedNote ? <Txt variant="small" color={colors.wheat}>The operation starts on the server when the connection returns.</Txt> : null}
           </Panel>
         </Section>
       ) : null}
 
-      <Section title="Istoric">
+      <Section title="History">
         {history.length === 0 ? (
-          <Empty icon="history" title="Nicio lucrare încheiată" />
+          <Empty icon="history" title="No completed operations" />
         ) : (
           <Panel>
             {history.map((item) => (
               <Row
                 key={item.id}
                 label={`${shortDate(item.startedAt)}, ${WORK_TYPES[item.type]}, ${item.parcel.name}`}
-                value={item.status === 'CANCELLED' ? 'Anulată' : `${Math.round(item.progressPct)}%`}
+                value={item.status === 'CANCELLED' ? 'Cancelled' : `${Math.round(item.progressPct)}%`}
               />
             ))}
           </Panel>

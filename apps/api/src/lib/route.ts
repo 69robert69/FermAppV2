@@ -29,7 +29,7 @@ export class FileResult {
 
 interface Spec<B extends ZodType, Q extends ZodType, P extends ZodType> {
   summary: string;
-  /** `public` lasă ruta fără autentificare JWT. */
+  /** `public` leaves the route without JWT authentication. */
   roles: readonly Role[] | 'public';
   body?: B;
   query?: Q;
@@ -37,7 +37,7 @@ interface Spec<B extends ZodType, Q extends ZodType, P extends ZodType> {
   status?: number;
   file?: boolean;
   produces?: string;
-  /** Limitator aplicat doar acestei rute. */
+  /** Rate limiter applied only to this route. */
   limiter?: RequestHandler;
 }
 
@@ -74,7 +74,7 @@ function parse<T extends ZodType>(schema: T, value: unknown, where: string): z.o
   const result = schema.safeParse(value);
   if (result.success) return result.data;
   throw badRequest(
-    `Date invalide în ${where}.`,
+    `Invalid data in ${where}.`,
     result.error.issues.map((issue) => ({ field: issue.path.join('.'), message: issue.message })),
   );
 }
@@ -85,11 +85,11 @@ function authenticate(req: Request): AuthContext {
   return verifyAccessToken(header.slice(7));
 }
 
-/** Reia răspunsul salvat când aplicația retrimite o operațiune din coada offline. */
+/** Replays the saved response when the app resends an operation from the offline queue. */
 async function reserveIdempotency(req: Request, res: Response, auth: AuthContext): Promise<string | null | 'replayed'> {
   const key = req.header('idempotency-key');
   if (!key) return null;
-  if (key.length > 128) throw badRequest('Cheia de idempotență este prea lungă.');
+  if (key.length > 128) throw badRequest('The idempotency key is too long.');
   const route = `${req.method} ${req.originalUrl.split('?')[0]}`;
   try {
     const record = await prisma.idempotencyRecord.create({ data: { userId: auth.userId, key, route } });
@@ -100,14 +100,14 @@ async function reserveIdempotency(req: Request, res: Response, auth: AuthContext
   const existing = await prisma.idempotencyRecord.findUnique({
     where: { userId_key: { userId: auth.userId, key } },
   });
-  if (existing && existing.route !== route) throw conflict('Cheia de idempotență a fost folosită pentru altă operațiune.');
+  if (existing && existing.route !== route) throw conflict('The idempotency key was used for a different operation.');
   if (!existing || existing.statusCode === 0) {
-    // O rezervare veche înseamnă că serverul s-a oprit în timpul procesării, deci operațiunea se reia.
+    // A stale reservation means the server stopped during processing, so the operation is retried.
     if (existing && Date.now() - existing.createdAt.getTime() > STALE_RESERVATION_MS) {
       await prisma.idempotencyRecord.update({ where: { id: existing.id }, data: { createdAt: new Date() } });
       return existing.id;
     }
-    throw conflict('Operațiunea este deja în curs de procesare.');
+    throw conflict('The operation is already being processed.');
   }
   res.setHeader('Idempotency-Replayed', 'true');
   if (existing.statusCode === 204) res.status(204).end();
@@ -146,7 +146,7 @@ export class ApiRouter {
 
     const middlewares: RequestHandler[] = spec.limiter ? [spec.limiter] : [];
 
-    // Autentificarea rulează înaintea încărcării, ca fișierele anonime să nu ajungă în memorie.
+    // Authentication runs before the upload, so anonymous files never reach memory.
     const guard: RequestHandler = (req, res, next) => {
       if (spec.roles !== 'public') {
         const auth = authenticate(req);
@@ -161,9 +161,9 @@ export class ApiRouter {
     this.router[method](path, ...middlewares, async (req: Request, res: Response) => {
       const auth = res.locals.auth as AuthContext;
       const ctx = {
-        body: spec.body ? parse(spec.body, req.body, 'corpul cererii') : undefined,
-        query: spec.query ? parse(spec.query, req.query, 'parametrii de interogare') : undefined,
-        params: spec.params ? parse(spec.params, req.params, 'adresă') : undefined,
+        body: spec.body ? parse(spec.body, req.body, 'the request body') : undefined,
+        query: spec.query ? parse(spec.query, req.query, 'the query parameters') : undefined,
+        params: spec.params ? parse(spec.params, req.params, 'the URL') : undefined,
         auth,
         file: req.file,
         req,

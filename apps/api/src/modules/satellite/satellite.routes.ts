@@ -6,16 +6,16 @@ import { notConfigured, notFound } from '../../lib/errors';
 import { prisma } from '../../lib/prisma';
 import { ApiRouter, FileResult, idParams, ROLES } from '../../lib/route';
 
-export const satelliteRoutes = new ApiRouter('/parcels/:id/satellite', 'Satelit');
+export const satelliteRoutes = new ApiRouter('/parcels/:id/satellite', 'Satellite');
 
-const isoDate = z.string().regex(/^\d{4}-\d{2}-\d{2}$/, 'Data trebuie să aibă formatul AAAA-LL-ZZ.');
+const isoDate = z.string().regex(/^\d{4}-\d{2}-\d{2}$/, 'The date must have the format YYYY-MM-DD.');
 
 const withHealth = (observation: { ndvi: number; ndre: number | null }) => vegetationHealth(observation.ndvi, observation.ndre);
 
 satelliteRoutes.get(
   '/',
   {
-    summary: 'Istoricul NDVI, NDRE și Health Index',
+    summary: 'NDVI, NDRE and Health Index history',
     roles: ROLES.all,
     params: idParams,
     query: z.object({ limit: z.coerce.number().int().min(1).max(200).default(60) }),
@@ -37,7 +37,7 @@ satelliteRoutes.get(
 satelliteRoutes.post(
   '/refresh',
   {
-    summary: 'Descarcă observațiile Sentinel-2 pentru perioada indicată',
+    summary: 'Download Sentinel-2 observations for the given period',
     roles: ROLES.planners,
     status: 200,
     params: idParams,
@@ -45,7 +45,7 @@ satelliteRoutes.post(
   },
   async ({ auth, params, body }) => {
     const parcel = await requireParcel(auth.farmId, params.id);
-    if (!isSentinelConfigured()) throw notConfigured('Serviciul de imagini satelitare');
+    if (!isSentinelConfigured()) throw notConfigured('The satellite imagery service');
     const to = new Date();
     const from = new Date(to.getTime() - body.days * 86_400_000);
     const observations = await fetchObservations(
@@ -77,7 +77,7 @@ satelliteRoutes.post(
 satelliteRoutes.get(
   '/compare',
   {
-    summary: 'Compară două date de observație',
+    summary: 'Compare two observation dates',
     roles: ROLES.all,
     params: idParams,
     query: z.object({ from: isoDate, to: isoDate }),
@@ -89,7 +89,7 @@ satelliteRoutes.get(
         where: { parcelId_date: { parcelId: params.id, date: new Date(date) } },
       });
     const [before, after] = await Promise.all([find(query.from), find(query.to)]);
-    if (!before || !after) throw notFound('Observația pentru una dintre date');
+    if (!before || !after) throw notFound('The observation for one of the dates');
     const round = (value: number) => Math.round(value * 1000) / 1000;
     return {
       before: { ...before, health: withHealth(before) },
@@ -106,7 +106,7 @@ satelliteRoutes.get(
 satelliteRoutes.get(
   '/image',
   {
-    summary: 'Imaginea colorată a indicelui pentru o dată',
+    summary: 'Coloured index image for a date',
     roles: ROLES.all,
     produces: 'image/png',
     params: idParams,

@@ -1,4 +1,4 @@
-import { validatePolygon, type PolygonGeometry } from '@fermapp/domain';
+import { parseTillageHistory, TILLAGE_CODES, tillageInYear, validatePolygon, withTillageYear, type PolygonGeometry } from '@fermapp/domain';
 import type { Prisma } from '@prisma/client';
 import { z } from 'zod';
 import { requireParcel } from '../../lib/access';
@@ -9,7 +9,7 @@ import { ApiRouter, FileResult, idParams, ROLES } from '../../lib/route';
 import { refreshSoilProfile } from '../soil/soil.service';
 import { exportParcels, IMPORT_FORMATS, metricsFor, parseGeoFile, type ExportParcel } from './geo-io';
 
-export const parcelRoutes = new ApiRouter('/parcels', 'Parcele');
+export const parcelRoutes = new ApiRouter('/parcels', 'Parcels');
 
 const position = z.tuple([z.number().min(-180).max(180), z.number().min(-90).max(90)]);
 export const polygonSchema = z
@@ -32,6 +32,7 @@ export const parcelFields = {
   county: text(60).optional(),
   notes: text(2000).optional(),
   irrigatedAreaHa: z.number().min(0).max(100_000).nullable().optional(),
+  tillageSystem: z.enum(TILLAGE_CODES).nullable().optional(),
 };
 
 async function nextCode(farmId: string, offset = 0) {
@@ -52,11 +53,11 @@ const geometryData = (geometry: PolygonGeometry) => {
 
 export const loadSoilInBackground = (parcel: { id: string; centerLat: number; centerLng: number }) => {
   void refreshSoilProfile(parcel.id, parcel.centerLat, parcel.centerLng).catch((error) =>
-    logger.error('Profil de sol eșuat', error),
+    logger.error('Soil profile failed', error),
   );
 };
 
-/** Datele necesare pentru crearea unei parcele. */
+/** The data required to create a parcel. */
 export async function createParcelData(farmId: string, body: z.output<z.ZodObject<typeof parcelFields>>) {
   return {
     farmId,
@@ -66,6 +67,11 @@ export async function createParcelData(farmId: string, body: z.output<z.ZodObjec
     county: body.county,
     notes: body.notes,
     irrigatedAreaHa: body.irrigatedAreaHa,
+    // The technology chosen at creation is also the first entry of its history.
+    tillageSystem: body.tillageSystem ?? null,
+    tillageHistory: body.tillageSystem
+      ? ([{ year: new Date().getFullYear(), system: body.tillageSystem }] as Prisma.InputJsonValue)
+      : undefined,
     ...geometryData(body.geometry as PolygonGeometry),
   };
 }
@@ -73,7 +79,7 @@ export async function createParcelData(farmId: string, body: z.output<z.ZodObjec
 parcelRoutes.get(
   '/',
   {
-    summary: 'Listează parcelele fermei',
+    summary: 'List the farm’s parcels',
     roles: ROLES.all,
     query: z.object({
       archived: z.enum(['true', 'false']).default('false'),
@@ -107,7 +113,7 @@ parcelRoutes.get(
 
 parcelRoutes.post(
   '/',
-  { summary: 'Creează o parcelă și pornește analiza solului', roles: ROLES.managers, body: z.object(parcelFields) },
+  { summary: 'Create a parcel and start the soil analysis', roles: ROLES.managers, body: z.object(parcelFields) },
   async ({ auth, body }) => {
     const parcel = await prisma.parcel.create({ data: await createParcelData(auth.farmId, body) });
     loadSoilInBackground(parcel);
@@ -118,7 +124,7 @@ parcelRoutes.post(
 parcelRoutes.post(
   '/import',
   {
-    summary: 'Importă parcele din GeoJSON, KML, KMZ, SHP sau APIA LPIS',
+    summary: 'Import parcels from GeoJSON, KML, KMZ, SHP or APIA LPIS',
     roles: ROLES.managers,
     file: true,
     query: z.object({
@@ -127,7 +133,7 @@ parcelRoutes.post(
     }),
   },
   async ({ auth, query, file }) => {
-    if (!file) throw badRequest('Atașează fișierul în câmpul „file”.');
+    if (!file) throw badRequest('Attach the file in the "file" field.');
     const { parcels, problems } = await parseGeoFile(query.format, file.buffer);
     const preview = parcels.map((parcel) => ({
       name: parcel.name,
@@ -172,7 +178,7 @@ parcelRoutes.post(
 parcelRoutes.get(
   '/export',
   {
-    summary: 'Exportă parcelele active',
+    summary: 'Export active parcels',
     roles: ROLES.all,
     produces: 'application/octet-stream',
     query: z.object({ format: z.enum(IMPORT_FORMATS) }),
@@ -183,13 +189,13 @@ parcelRoutes.get(
       orderBy: { name: 'asc' },
     });
     const file = await exportParcels(query.format, parcels as unknown as ExportParcel[]);
-    return new FileResult(file.buffer, file.contentType, `parcele.${file.extension}`);
+    return new FileResult(file.buffer, file.contentType, `parcels.${file.extension}`);
   },
 );
 
 parcelRoutes.get(
   '/:id',
-  { summary: 'Detaliile unei parcele', roles: ROLES.all, params: idParams },
+  { summary: 'Parcel details', roles: ROLES.all, params: idParams },
   async ({ auth, params }) => {
     await requireParcel(auth.farmId, params.id);
     return prisma.parcel.findUniqueOrThrow({
@@ -206,7 +212,7 @@ parcelRoutes.get(
 parcelRoutes.patch(
   '/:id',
   {
-    summary: 'Modifică datele sau conturul parcelei',
+    summary: 'Update the parcel data or outline',
     roles: ROLES.managers,
     params: idParams,
     body: z.object({
@@ -232,8 +238,31 @@ parcelRoutes.patch(
 );
 
 parcelRoutes.post(
+  '/:id/tillage',
+  {
+    summary: 'Set the tillage technology of a year; the current one follows the history',
+    roles: ROLES.managers,
+    status: 200,
+    params: idParams,
+    body: z.object({
+      system: z.enum(TILLAGE_CODES),
+      year: z.number().int().min(1990).max(2100).default(() => new Date().getFullYear()),
+    }),
+  },
+  async ({ auth, params, body }) => {
+    const parcel = await requireParcel(auth.farmId, params.id);
+    const history = withTillageYear(parseTillageHistory(parcel.tillageHistory), { year: body.year, system: body.system });
+    const current = tillageInYear({ areaHa: parcel.areaHa, system: null, history }, new Date().getFullYear());
+    return prisma.parcel.update({
+      where: { id: params.id },
+      data: { tillageSystem: current, tillageHistory: history as unknown as Prisma.InputJsonValue },
+    });
+  },
+);
+
+parcelRoutes.post(
   '/:id/archive',
-  { summary: 'Arhivează parcela', roles: ROLES.managers, status: 200, params: idParams },
+  { summary: 'Archive the parcel', roles: ROLES.managers, status: 200, params: idParams },
   async ({ auth, params }) => {
     await requireParcel(auth.farmId, params.id);
     return prisma.parcel.update({ where: { id: params.id }, data: { archivedAt: new Date() } });
@@ -242,7 +271,7 @@ parcelRoutes.post(
 
 parcelRoutes.post(
   '/:id/restore',
-  { summary: 'Restaurează parcela din arhivă', roles: ROLES.managers, status: 200, params: idParams },
+  { summary: 'Restore the parcel from the archive', roles: ROLES.managers, status: 200, params: idParams },
   async ({ auth, params }) => {
     await requireParcel(auth.farmId, params.id);
     return prisma.parcel.update({ where: { id: params.id }, data: { archivedAt: null } });

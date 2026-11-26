@@ -12,7 +12,7 @@ export const iotRoutes = new ApiRouter('/iot', 'IoT');
 
 const publicDevice = ({ keyHash: _keyHash, ...device }: IotDevice) => device;
 
-iotRoutes.get('/devices', { summary: 'Listează dispozitivele IoT', roles: ROLES.all }, async ({ auth }) => {
+iotRoutes.get('/devices', { summary: 'List IoT devices', roles: ROLES.all }, async ({ auth }) => {
   const devices = await prisma.iotDevice.findMany({ where: { farmId: auth.farmId }, orderBy: { name: 'asc' } });
   return devices.map(publicDevice);
 });
@@ -20,7 +20,7 @@ iotRoutes.get('/devices', { summary: 'Listează dispozitivele IoT', roles: ROLES
 iotRoutes.post(
   '/devices',
   {
-    summary: 'Înregistrează un dispozitiv. Cheia se afișează o singură dată.',
+    summary: 'Register a device. The key is shown only once.',
     roles: ROLES.managers,
     body: z.object({
       name: z.string().trim().min(1).max(120),
@@ -40,17 +40,17 @@ iotRoutes.post(
 
 iotRoutes.delete(
   '/devices/:id',
-  { summary: 'Șterge un dispozitiv și citirile lui', roles: ROLES.managers, params: idParams },
+  { summary: 'Delete a device and its readings', roles: ROLES.managers, params: idParams },
   async ({ auth, params }) => {
     const { count } = await prisma.iotDevice.deleteMany({ where: { id: params.id, farmId: auth.farmId } });
-    if (count === 0) throw notFound('Dispozitivul');
+    if (count === 0) throw notFound('Device');
   },
 );
 
 iotRoutes.get(
   '/devices/:id/readings',
   {
-    summary: 'Ultimele citiri ale unui dispozitiv',
+    summary: 'Latest readings of a device',
     roles: ROLES.all,
     params: idParams,
     query: z.object({
@@ -60,7 +60,7 @@ iotRoutes.get(
   },
   async ({ auth, params, query }) => {
     const device = await prisma.iotDevice.findFirst({ where: { id: params.id, farmId: auth.farmId } });
-    if (!device) throw notFound('Dispozitivul');
+    if (!device) throw notFound('Device');
     const readings = await prisma.iotReading.findMany({
       where: { deviceId: device.id, metric: query.metric },
       orderBy: { recordedAt: 'desc' },
@@ -81,7 +81,7 @@ const ingestLimiter = rateLimit({
 iotRoutes.post(
   '/ingest',
   {
-    summary: 'Primește citiri de la senzori, cu antetul X-Device-Key',
+    summary: 'Receive sensor readings, with the X-Device-Key header',
     roles: 'public',
     status: 202,
     limiter: ingestLimiter,
@@ -89,7 +89,7 @@ iotRoutes.post(
   },
   async ({ req, body }) => {
     const device = await authenticateDeviceKey(String(req.headers['x-device-key'] ?? ''));
-    if (!device) throw unauthorized('Cheie de dispozitiv invalidă.');
+    if (!device) throw unauthorized('Invalid device key.');
     return { accepted: await ingestTelemetry(device, body) };
   },
 );

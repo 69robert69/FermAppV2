@@ -1,146 +1,146 @@
-# Arhitectură
+# Architecture
 
-## Imagine de ansamblu
+## Overview
 
 ```text
-Aplicație mobilă (Expo)
-  SQLite: cache + coadă offline
+Mobile app (Expo)
+  SQLite: cache + offline queue
   Zustand, TanStack Query
         │ HTTPS REST + Socket.IO
         ▼
-API Express (instanțe fără stare) ──── Redis: cache, blocări, Socket.IO
-        │                         └─── Joburi: progres, alerte, mementouri
+Express API (stateless instances) ──── Redis: cache, locks, Socket.IO
+        │                         └─── Jobs: progress, alerts, reminders
         ▼
 PostgreSQL (Prisma)
 
-Servicii externe: Open-Meteo, OpenWeatherMap, SoilGrids, NASA POWER,
+External services: Open-Meteo, OpenWeatherMap, SoilGrids, NASA POWER,
 Copernicus Sentinel-2, Claude API, Expo Push
-Senzori: MQTT, REST, WebSocket ──► același punct de ingestie
+Sensors: MQTT, REST, WebSocket ──► the same ingestion point
 ```
 
-Regulile agronomice stau în `packages/domain`, fără dependențe. Serverul și telefonul folosesc același cod pentru suprafețe, capacitate de lucru, rotație și ETA. Estimările rămân identice online și offline.
+The agronomic rules live in `packages/domain`, with no dependencies. The server and the phone use the same code for areas, work capacity, rotation and ETA. Estimates stay identical online and offline.
 
-## Decizii principale
+## Main decisions
 
-| Decizie | Motiv |
+| Decision | Reason |
 |---|---|
-| Monorepo cu pachet de domeniu comun | O singură sursă pentru formulele agronomice |
-| PostgreSQL în Docker | Rulează identic local și în cloud, fără dependență de un furnizor |
-| Geometrie GeoJSON în coloană JSON | Suficientă pentru funcțiile actuale. PostGIS se adaugă când apar interogări spațiale |
-| Fermă activă în token, cu apartenență la mai multe ferme | Un consultant agronom poate lucra pentru mai mulți clienți |
-| Chei de idempotență pentru modificări | O operațiune offline retrimisă nu se dublează |
-| Progres calculat din timp | Lucrările și irigările rămân corecte după repornirea serverului sau a telefonului |
-| Fără date inventate | Serviciile neconfigurate returnează o stare clară |
+| Monorepo with a shared domain package | A single source for the agronomic formulas |
+| PostgreSQL in Docker | Runs the same locally and in the cloud, with no vendor lock-in |
+| GeoJSON geometry in a JSON column | Enough for the current features. PostGIS is added when spatial queries appear |
+| Active farm in the token, with membership in several farms | An agronomist consultant can work for several clients |
+| Idempotency keys for changes | A resent offline operation is not duplicated |
+| Progress calculated from time | Field work and irrigation stay correct after the server or the phone restarts |
+| No invented data | Unconfigured services return a clear status |
 
-## Structura backend
+## Backend structure
 
 ```text
 apps/api/
 ├── Dockerfile
 ├── prisma/
-│   ├── schema.prisma            modelele bazei de date
-│   ├── migrations/              migrările SQL
-│   └── seed.ts                  date demo
-├── scripts/generate-docs.ts     OpenAPI și lista de endpointuri
+│   ├── schema.prisma            database models
+│   ├── migrations/              SQL migrations
+│   └── seed.ts                  demo data
+├── scripts/generate-docs.ts     OpenAPI and the endpoint list
 ├── src/
-│   ├── app.ts                   middleware, rute, Swagger
-│   ├── server.ts                pornire și oprire controlată
-│   ├── config/env.ts            validarea configurației
+│   ├── app.ts                   middleware, routes, Swagger
+│   ├── server.ts                startup and graceful shutdown
+│   ├── config/env.ts            configuration validation
 │   ├── integrations/
-│   │   ├── openMeteo.ts         prognoză și istoric
-│   │   ├── openWeather.ts       prognoză pentru alerte
-│   │   ├── soilGrids.ts         profil de sol
-│   │   ├── nasaPower.ts         climă și GDD
-│   │   └── sentinel.ts          NDVI, NDRE, imagini
-│   ├── jobs/scheduler.ts        progres, mementouri, alerte
+│   │   ├── openMeteo.ts         forecast and history
+│   │   ├── openWeather.ts       forecast for alerts
+│   │   ├── soilGrids.ts         soil profile
+│   │   ├── nasaPower.ts         climate and GDD
+│   │   └── sentinel.ts          NDVI, NDRE, images
+│   ├── jobs/scheduler.ts        progress, reminders, alerts
 │   ├── lib/
-│   │   ├── route.ts             rute validate, roluri, idempotență, OpenAPI
-│   │   ├── openapi.ts           documentul Swagger
-│   │   ├── access.ts            verificări de apartenență la fermă
-│   │   ├── cache.ts             Redis cu rezervă în memorie
+│   │   ├── route.ts             validated routes, roles, idempotency, OpenAPI
+│   │   ├── openapi.ts           the Swagger document
+│   │   ├── access.ts            farm membership checks
+│   │   ├── cache.ts             Redis with in-memory fallback
 │   │   ├── errors.ts, http.ts, logger.ts, prisma.ts, tokens.ts
-│   ├── middleware/error.ts      format unitar pentru erori
-│   ├── realtime/socket.ts       camere pe fermă, spațiul /iot
+│   ├── middleware/error.ts      uniform error format
+│   ├── realtime/socket.ts       per-farm rooms, the /iot namespace
 │   └── modules/
 │       ├── auth/  team/  dashboard/  notifications/
 │       ├── parcels/             CRUD, GeoJSON, KML, KMZ, SHP, LPIS
-│       ├── crops/               istoric, rotație, recomandări, climă
+│       ├── crops/               history, rotation, recommendations, climate
 │       ├── machines/  work/  tasks/  irrigation/
 │       ├── weather/  soil/  satellite/
 │       ├── costs/  reports/  ai/  iot/
-└── test/                        teste de integrare pe PostgreSQL real
+└── test/                        integration tests on a real PostgreSQL
 ```
 
-## Structura frontend
+## Frontend structure
 
 ```text
 apps/mobile/
 ├── App.tsx, index.ts, app.config.ts, metro.config.js
 └── src/
-    ├── api/            client HTTP, tipuri, TanStack Query
+    ├── api/            HTTP client, types, TanStack Query
     ├── components/     ui, ParcelShape, RunCard, pickers
-    ├── lib/            formatare și hook-uri
-    ├── navigation/     cele 7 tab-uri și ecranele secundare
-    ├── notifications/  înregistrare push
-    ├── offline/        SQLite, coadă, sincronizare, sarcină de fundal
-    ├── realtime/       evenimente Socket.IO
+    ├── lib/            formatting and hooks
+    ├── navigation/     the 7 tabs and the secondary screens
+    ├── notifications/  push registration
+    ├── offline/        SQLite, queue, sync, background task
+    ├── realtime/       Socket.IO events
     ├── screens/
     │   ├── AuthScreen, DashboardScreen, MapScreen
     │   ├── ParcelEditorScreen, ParcelDetailScreen
     │   ├── WorkScreen, MachinesScreen, TasksScreen
     │   ├── IrrigationScreen, ReportsScreen
     │   └── AssistantScreen, SettingsScreen
-    ├── store/auth.ts   sesiune în stocarea securizată
-    └── theme.ts        culori, fonturi, spațiere
+    ├── store/auth.ts   session in secure storage
+    └── theme.ts        colours, fonts, spacing
 ```
 
-## Acoperirea modulelor
+## Module coverage
 
-| # | Modul | Server | Mobil |
+| # | Module | Server | Mobile |
 |---|---|---|---|
-| 1 | Parcele și hartă | `modules/parcels` | `MapScreen`, `ParcelEditorScreen` |
-| 2 | Istoric culturi | `modules/crops` | Parcelă, tab Culturi |
-| 3 | Motor de rotație | `domain/rotation.ts` | Parcelă, tab Rotație |
-| 4 | Utilaje | `modules/machines` | `MachinesScreen` |
+| 1 | Parcels and map | `modules/parcels` | `MapScreen`, `ParcelEditorScreen` |
+| 2 | Crop history | `modules/crops` | Parcel, Crops tab |
+| 3 | Rotation engine | `domain/rotation.ts` | Parcel, Rotation tab |
+| 4 | Machines | `modules/machines` | `MachinesScreen` |
 | 5 | Work | `modules/work` | `WorkScreen` |
 | 6 | To Do | `modules/tasks` | `TasksScreen` |
-| 7 | Irigații | `modules/irrigation` | `IrrigationScreen` |
-| 8 | Open-Meteo | `integrations/openMeteo.ts` | Parcelă, tab Meteo |
-| 9 | OpenWeatherMap și alerte | `modules/weather` | Dashboard, notificări |
-| 10 | Analiza solului | `modules/soil` | Parcelă, tab Sol |
-| 11 | Recomandări culturi | `domain/recommendations.ts` | Parcelă, tab Rotație |
-| 12 | NASA POWER | `integrations/nasaPower.ts` | Recomandări și API `/climate`, `/development` |
-| 13 | Ferestre de lucru | `domain/windows.ts` | Parcelă, tab Ferestre |
-| 14 | Necesar apă | `domain/water.ts` | Parcelă, tab Apă |
-| 15 | Satelit și NDVI | `modules/satellite` | Parcelă, tab Satelit, culori pe hartă |
-| 16 | Costuri | `modules/costs` | Parcelă, tab Costuri |
-| 17 | Rapoarte PDF și Excel | `modules/reports` | `ReportsScreen` |
-| 18 | Asistent AI | `modules/ai` | `AssistantScreen` |
-| 19 | IoT | `modules/iot` | Doar API, pregătit pentru integrare |
+| 7 | Irrigation | `modules/irrigation` | `IrrigationScreen` |
+| 8 | Open-Meteo | `integrations/openMeteo.ts` | Parcel, Weather tab |
+| 9 | OpenWeatherMap and alerts | `modules/weather` | Dashboard, notifications |
+| 10 | Soil analysis | `modules/soil` | Parcel, Soil tab |
+| 11 | Crop recommendations | `domain/recommendations.ts` | Parcel, Rotation tab |
+| 12 | NASA POWER | `integrations/nasaPower.ts` | Recommendations and the `/climate`, `/development` API |
+| 13 | Work windows | `domain/windows.ts` | Parcel, Work windows tab |
+| 14 | Water requirement | `domain/water.ts` | Parcel, Water tab |
+| 15 | Satellite and NDVI | `modules/satellite` | Parcel, Satellite tab, colours on the map |
+| 16 | Costs | `modules/costs` | Parcel, Costs tab |
+| 17 | PDF and Excel reports | `modules/reports` | `ReportsScreen` |
+| 18 | AI assistant | `modules/ai` | `AssistantScreen` |
+| 19 | IoT | `modules/iot` | API only, ready for integration |
 
-## Roluri și permisiuni
+## Roles and permissions
 
-| Acțiune | Administrator | Manager Fermă | Consultant Agronom | Operator Utilaj |
+| Action | Administrator | Farm Manager | Agronomist Consultant | Machine Operator |
 |---|:--:|:--:|:--:|:--:|
-| Vede parcele, meteo, sol, satelit | ✓ | ✓ | ✓ | ✓ |
-| Creează, modifică, arhivează parcele | ✓ | ✓ | | |
-| Gestionează utilaje și senzori | ✓ | ✓ | | |
-| Completează istoricul culturilor | ✓ | ✓ | ✓ | |
-| Creează task-uri | ✓ | ✓ | ✓ | |
-| Schimbă statusul task-urilor | ✓ | ✓ | ✓ | Doar ale lui |
-| Pornește lucrări | ✓ | ✓ | | Doar pentru el |
-| Controlează lucrări | ✓ | ✓ | | Doar ale lui |
-| Pornește și controlează irigări | ✓ | ✓ | | ✓ |
-| Vede costuri | ✓ | ✓ | ✓ | |
-| Modifică costuri | ✓ | ✓ | | |
-| Gestionează echipa | ✓ | | | |
+| Views parcels, weather, soil, satellite | ✓ | ✓ | ✓ | ✓ |
+| Creates, edits, archives parcels | ✓ | ✓ | | |
+| Manages machines and sensors | ✓ | ✓ | | |
+| Fills in the crop history | ✓ | ✓ | ✓ | |
+| Creates tasks | ✓ | ✓ | ✓ | |
+| Changes task status | ✓ | ✓ | ✓ | Own tasks only |
+| Starts operations | ✓ | ✓ | | For themselves only |
+| Controls operations | ✓ | ✓ | | Own operations only |
+| Starts and controls irrigation | ✓ | ✓ | | ✓ |
+| Views costs | ✓ | ✓ | ✓ | |
+| Edits costs | ✓ | ✓ | | |
+| Manages the team | ✓ | | | |
 
-## Securitate
+## Security
 
-- Parolele se păstrează cu bcrypt, iar tokenurile de refresh doar ca hash.
-- Tokenurile de refresh se rotesc, iar reutilizarea unuia revocă toată sesiunea.
-- Fiecare interogare se limitează la ferma din token.
-- Limitele de cereri protejează autentificarea, asistentul AI și ingestia IoT.
-- Importurile au limite de dimensiune și sunt verificate înainte de dezarhivare.
-- Cheile senzorilor se afișează o singură dată și se salvează doar ca hash.
-- Retragerea accesului la o fermă devine completă la expirarea tokenului de acces, în maximum 15 minute.
+- Passwords are stored with bcrypt, and refresh tokens only as hashes.
+- Refresh tokens are rotated, and reusing one revokes the whole session.
+- Every query is restricted to the farm in the token.
+- Rate limits protect authentication, the AI assistant and IoT ingestion.
+- Imports have size limits and are checked before extraction.
+- Sensor keys are shown only once and stored only as hashes.
+- Revoking access to a farm becomes complete when the access token expires, within 15 minutes at most.

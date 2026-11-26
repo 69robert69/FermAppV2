@@ -13,6 +13,7 @@ import { authRoutes } from './modules/auth/auth.routes';
 import { costRoutes } from './modules/costs/costs.routes';
 import { cropRoutes } from './modules/crops/crops.routes';
 import { dashboardRoutes } from './modules/dashboard/dashboard.routes';
+import { economicsRoutes } from './modules/economics/economics.routes';
 import { intelligenceRoutes } from './modules/intelligence/intelligence.routes';
 import { iotRoutes } from './modules/iot/iot.routes';
 import { irrigationRoutes } from './modules/irrigation/irrigation.routes';
@@ -33,7 +34,7 @@ const modules = [
   { base: '/auth', routes: authRoutes },
   { base: '/team', routes: teamRoutes },
   { base: '', routes: dashboardRoutes },
-  // Rutele fixe ale parcelelor se înregistrează înaintea celor cu :id din alte module.
+  // Fixed parcel routes are registered before the :id routes of other modules.
   { base: '/parcels', routes: planRoutes },
   { base: '/parcels', routes: parcelRoutes },
   { base: '/map', routes: mapRoutes },
@@ -47,6 +48,7 @@ const modules = [
   { base: '', routes: irrigationRoutes },
   { base: '', routes: weatherRoutes },
   { base: '', routes: costRoutes },
+  { base: '', routes: economicsRoutes },
   { base: '/reports', routes: reportRoutes },
   { base: '/ai', routes: aiRoutes },
   { base: '/iot', routes: iotRoutes },
@@ -79,7 +81,7 @@ export function createApp() {
       limit: env.NODE_ENV === 'test' ? 100_000 : 600,
       standardHeaders: 'draft-7',
       legacyHeaders: false,
-      message: { error: { code: 'RATE_LIMITED', message: 'Prea multe cereri. Reîncearcă în curând.' } },
+      message: { error: { code: 'RATE_LIMITED', message: 'Too many requests. Try again shortly.' } },
     }),
   );
   for (const { base, routes } of modules) api.use(base || '/', routes.router);

@@ -38,31 +38,31 @@ export function AuthScreen() {
         <View style={{ gap: space.xs, marginBottom: space.lg }}>
           <Txt variant="display" color={colors.wheat}>FermApp</Txt>
           <Txt color={colors.straw}>
-            {registering ? 'Creează contul și prima ta fermă.' : 'Parcelele, lucrările și apa fermei tale, într-un singur loc.'}
+            {registering ? 'Create your account and your first farm.' : 'Your farm’s parcels, field work and water, in one place.'}
           </Txt>
         </View>
         {registering ? (
           <>
-            <Field label="Numele tău" value={fullName} onChangeText={setFullName} autoComplete="name" />
-            <Field label="Numele fermei" value={farmName} onChangeText={setFarmName} />
+            <Field label="Your name" value={fullName} onChangeText={setFullName} autoComplete="name" />
+            <Field label="Farm name" value={farmName} onChangeText={setFarmName} />
           </>
         ) : null}
         <Field label="Email" value={email} onChangeText={setEmail} autoCapitalize="none" keyboardType="email-address" autoComplete="email" />
         <Field
-          label="Parolă"
+          label="Password"
           value={password}
           onChangeText={setPassword}
           secureTextEntry
           autoComplete={registering ? 'new-password' : 'current-password'}
         />
-        {registering ? <Txt variant="small">Parola trebuie să aibă minimum 10 caractere.</Txt> : null}
-        {registering && usesFirebase ? <Txt variant="small">Ai primit o invitație? Lasă numele fermei necompletat.</Txt> : null}
+        {registering ? <Txt variant="small">The password must be at least 10 characters long.</Txt> : null}
+        {registering && usesFirebase ? <Txt variant="small">Did you receive an invitation? Leave the farm name empty.</Txt> : null}
         {error ? <HelperText type="error" visible>{error}</HelperText> : null}
         <Button mode="contained" loading={busy} disabled={busy || !email || !password} onPress={() => void submit()}>
-          {registering ? 'Creează contul' : 'Intră în cont'}
+          {registering ? 'Create account' : 'Sign in'}
         </Button>
         <Button onPress={() => { setMode(registering ? 'login' : 'register'); setError(null); }}>
-          {registering ? 'Am deja un cont' : 'Creează un cont nou'}
+          {registering ? 'I already have an account' : 'Create a new account'}
         </Button>
       </ScrollView>
     </KeyboardAvoidingView>

@@ -15,9 +15,9 @@ import { useCatalogSeeds, useCatalogTractors, useSeedRanking, type CatalogSeed, 
 
 type Props = NativeStackScreenProps<RootStackParams, 'CatalogDetail'>;
 
-const MISSING = 'Necompletat';
+const MISSING = 'Not filled in';
 const level = (value: CatalogLevel | null) => (value ? LEVEL_LABELS[value] : MISSING);
-const SOIL_LABELS = { SANDY: 'Nisipos', LOAMY: 'Lutos', CLAY_LOAM: 'Lutos-argilos', CLAY: 'Argilos' } as const;
+const SOIL_LABELS = { SANDY: 'Sandy', LOAMY: 'Loam', CLAY_LOAM: 'Clay loam', CLAY: 'Clay' } as const;
 
 function SeedDetails({ seed }: { seed: CatalogSeed }) {
   const [parcelId, setParcelId] = useState<string | null>(null);
@@ -28,24 +28,24 @@ function SeedDetails({ seed }: { seed: CatalogSeed }) {
     <>
       <Panel>
         <Txt variant="title">{seed.name}</Txt>
-        <Row label="Tip" value={SEED_TYPE_LABELS[seed.type]} />
-        <Row label="Cultură" value={CROPS[seed.crop].name} />
-        <Row label="Producător" value={seed.brand ?? MISSING} />
-        <Row label="Grupa FAO" value={seed.fao ? `${seed.fao}${seed.maturityGroup ? `, ${seed.maturityGroup.toLowerCase()}` : ''}` : MISSING} />
-        <Row label="Zile de vegetație" value={seed.vegetationDays ?? MISSING} />
-        <Row label="Rezistență la secetă" value={level(seed.droughtTolerance)} />
-        <Row label="Producție așteptată" value={seed.expectedYieldMin !== null && seed.expectedYieldMax !== null ? `${number(seed.expectedYieldMin)}-${number(seed.expectedYieldMax)} t/ha` : MISSING} />
-        <Row label="Regiuni recomandate" value={seed.recommendedRegions.join(', ') || MISSING} />
-        <Row label="Necesar de apă" value={level(seed.waterRequirement)} />
-        <Row label="Compatibilitate sol" value={seed.soilPreference.map((item) => SOIL_LABELS[item]).join(', ') || MISSING} />
+        <Row label="Type" value={SEED_TYPE_LABELS[seed.type]} />
+        <Row label="Crop" value={CROPS[seed.crop].name} />
+        <Row label="Manufacturer" value={seed.brand ?? MISSING} />
+        <Row label="FAO group" value={seed.fao ? `${seed.fao}${seed.maturityGroup ? `, ${seed.maturityGroup.toLowerCase()}` : ''}` : MISSING} />
+        <Row label="Growing days" value={seed.vegetationDays ?? MISSING} />
+        <Row label="Drought resistance" value={level(seed.droughtTolerance)} />
+        <Row label="Expected yield" value={seed.expectedYieldMin !== null && seed.expectedYieldMax !== null ? `${number(seed.expectedYieldMin)}-${number(seed.expectedYieldMax)} t/ha` : MISSING} />
+        <Row label="Recommended regions" value={seed.recommendedRegions.join(', ') || MISSING} />
+        <Row label="Water requirement" value={level(seed.waterRequirement)} />
+        <Row label="Soil compatibility" value={seed.soilPreference.map((item) => SOIL_LABELS[item]).join(', ') || MISSING} />
         {seed.notes ? <Txt variant="small">{seed.notes}</Txt> : null}
       </Panel>
-      <Section title="Compatibilitate cu parcela">
+      <Section title="Compatibility with the parcel">
         <Panel>
           <ParcelPicker value={parcelId} onChange={setParcelId} />
           {match ? (
             <View style={{ gap: space.sm }}>
-              <Row label={`Locul ${position} din ${ranking.data?.length}`} value={`${match.score}%`} />
+              <Row label={`Rank ${position} of ${ranking.data?.length}`} value={`${match.score}%`} />
               <ProgressTrack percent={match.score} color={colors.leaf} />
               <Txt variant="small">{match.reason}</Txt>
             </View>
@@ -60,14 +60,14 @@ function TractorDetails({ tractor }: { tractor: CatalogTractor }) {
   return (
     <Panel>
       <Txt variant="title">{`${tractor.brand} ${tractor.model}`}</Txt>
-      <Row label="Serie" value={tractor.series ?? MISSING} />
-      <Row label="Putere" value={`${tractor.horsePower} CP`} />
-      <Row label="Consum" value={`${number(tractor.fuelConsumptionMin)}-${number(tractor.fuelConsumptionMax)} l/oră`} />
-      {tractor.fuelEstimated ? <Txt variant="small">Consumul este estimat din putere. Corectează-l după fișa tehnică.</Txt> : null}
-      <Row label="Rezervor" value={tractor.tankCapacity ? `${tractor.tankCapacity} l` : MISSING} />
-      <Row label="Greutate" value={tractor.weight ? `${tractor.weight} kg` : MISSING} />
-      <Row label="Tracțiune" value={tractor.driveSystem ?? MISSING} />
-      <Row label="Categorie" value={tractor.category} />
+      <Row label="Series" value={tractor.series ?? MISSING} />
+      <Row label="Power" value={`${tractor.horsePower} HP`} />
+      <Row label="Consumption" value={`${number(tractor.fuelConsumptionMin)}-${number(tractor.fuelConsumptionMax)} l/hour`} />
+      {tractor.fuelEstimated ? <Txt variant="small">Consumption is estimated from power. Correct it using the data sheet.</Txt> : null}
+      <Row label="Tank" value={tractor.tankCapacity ? `${tractor.tankCapacity} l` : MISSING} />
+      <Row label="Weight" value={tractor.weight ? `${tractor.weight} kg` : MISSING} />
+      <Row label="Drive" value={tractor.driveSystem ?? MISSING} />
+      <Row label="Category" value={tractor.category} />
       <Txt variant="small">{tractor.recommendedUsage}</Txt>
     </Panel>
   );
@@ -90,12 +90,12 @@ export function CatalogDetailScreen({ route, navigation }: Props) {
   );
 
   const confirmDelete = () =>
-    Alert.alert('Șterge din catalog', 'Produsul dispare din catalogul fermei.', [
-      { text: 'Renunță', style: 'cancel' },
-      { text: 'Șterge', style: 'destructive', onPress: () => remove.mutate() },
+    Alert.alert('Delete from catalog', 'The product will be removed from the farm catalog.', [
+      { text: 'Cancel', style: 'cancel' },
+      { text: 'Delete', style: 'destructive', onPress: () => remove.mutate() },
     ]);
 
-  if (!seed && !tractor) return <Screen><Empty icon="book-search-outline" title="Produsul nu a fost găsit" /></Screen>;
+  if (!seed && !tractor) return <Screen><Empty icon="book-search-outline" title="The product was not found" /></Screen>;
 
   return (
     <Screen>
@@ -103,8 +103,8 @@ export function CatalogDetailScreen({ route, navigation }: Props) {
       {tractor ? <TractorDetails tractor={tractor} /> : null}
       {role === 'ADMIN' ? (
         <View style={{ flexDirection: 'row', gap: space.sm }}>
-          <Button style={{ flex: 1 }} mode="contained" onPress={() => navigation.navigate('CatalogEditor', { kind, id })}>Editează</Button>
-          <Button style={{ flex: 1 }} textColor={colors.rust} loading={remove.isPending} disabled={remove.isPending} onPress={confirmDelete}>Șterge</Button>
+          <Button style={{ flex: 1 }} mode="contained" onPress={() => navigation.navigate('CatalogEditor', { kind, id })}>Edit</Button>
+          <Button style={{ flex: 1 }} textColor={colors.rust} loading={remove.isPending} disabled={remove.isPending} onPress={confirmDelete}>Delete</Button>
         </View>
       ) : null}
     </Screen>

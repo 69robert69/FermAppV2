@@ -25,7 +25,7 @@ import {
   savePlan,
 } from './plan.service';
 
-export const planRoutes = new ApiRouter('/parcels', 'Plan tehnologic');
+export const planRoutes = new ApiRouter('/parcels', 'Technology plan');
 
 const choice = {
   lastCrop: z.union([z.enum(CROP_CODES), z.literal(OTHER_CROP)]),
@@ -38,11 +38,11 @@ const exactlyOneTarget = (value: { parcelId?: string; geometry?: unknown; draft?
 
 const analyzeBody = z
   .object({ ...choice, parcelId: z.uuid().optional(), name: z.string().trim().max(120).optional(), geometry: polygonSchema.optional() })
-  .refine(exactlyOneTarget, { message: 'Trimite fie parcela existentă, fie conturul parcelei noi.' });
+  .refine(exactlyOneTarget, { message: 'Send either the existing parcel or the outline of the new parcel.' });
 
 const completeBody = z
   .object({ ...choice, parcelId: z.uuid().optional(), draft: z.object(parcelFields).optional() })
-  .refine(exactlyOneTarget, { message: 'Trimite fie parcela existentă, fie datele parcelei noi.' });
+  .refine(exactlyOneTarget, { message: 'Send either the existing parcel or the data of the new parcel.' });
 
 async function buildPlanFor(
   auth: AuthContext,
@@ -66,7 +66,7 @@ async function buildPlanFor(
   ]);
   return buildParcelPlan({
     crop: input.plannedCrop,
-    parcelName: existing?.name ?? input.name ?? 'Parcelă nouă',
+    parcelName: existing?.name ?? input.name ?? 'New parcel',
     areaHa: existing?.areaHa ?? metrics!.areaHa,
     history: historyWithLastCrop(history, input.lastCrop),
     lastCropName: lastCropLabel(input.lastCrop, input.lastCropName),
@@ -77,7 +77,7 @@ async function buildPlanFor(
 planRoutes.post(
   '/wizard/analyze',
   {
-    summary: 'Analizează parcela și generează planul fără să salveze nimic',
+    summary: 'Analyse the parcel and generate the plan without saving anything',
     roles: ROLES.planners,
     status: 200,
     body: analyzeBody,
@@ -88,19 +88,19 @@ planRoutes.post(
 planRoutes.post(
   '/wizard/complete',
   {
-    summary: 'Salvează parcela, culturile, planul tehnologic și task-urile',
+    summary: 'Save the parcel, crops, technology plan and tasks',
     roles: ROLES.planners,
     body: completeBody,
   },
   async ({ auth, body }) => {
-    if (body.draft && auth.role === 'AGRONOMIST') throw forbidden('Doar managerii pot crea parcele noi.');
+    if (body.draft && auth.role === 'AGRONOMIST') throw forbidden('Only managers can create new parcels.');
     const plan = await buildPlanFor(auth, {
       ...body,
       name: body.draft?.name,
       geometry: body.draft?.geometry,
     });
     const lastYear = nextSeasonYear() - 1;
-    if (plan.year <= lastYear) throw badRequest('Anul planului trebuie să fie după ultima cultură.');
+    if (plan.year <= lastYear) throw badRequest('The plan year must be after the last crop.');
 
     const parcel = await prisma.$transaction(async (tx) => {
       const target = body.parcelId
@@ -141,7 +141,7 @@ planRoutes.post(
 
 planRoutes.get(
   '/:id/plan',
-  { summary: 'Planul activ și rapoartele salvate ale parcelei', roles: ROLES.all, params: idParams },
+  { summary: 'The active plan and saved reports of the parcel', roles: ROLES.all, params: idParams },
   async ({ auth, params }) => {
     await requireParcel(auth.farmId, params.id);
     const plans = await prisma.parcelPlan.findMany({

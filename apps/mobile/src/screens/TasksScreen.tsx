@@ -1,12 +1,14 @@
+import { checkTaskCompatibility } from '@fermapp/domain';
 import { useRoute } from '@react-navigation/native';
 import { useQuery } from '@tanstack/react-query';
 import { useEffect, useState } from 'react';
-import { Pressable, View } from 'react-native';
+import { Pressable, StyleSheet, View } from 'react-native';
 import { Button } from 'react-native-paper';
 import { apiGet, apiSend } from '../api/client';
 import type { Task, TaskPriority, TaskStatus, TeamMember } from '../api/types';
 import { ParcelPicker } from '../components/pickers';
 import { CalendarList } from '../features/plan/PlanViews';
+import { CompatibilityNotice, useParcelById } from '../features/tillage';
 import { Choice, Empty, Field, Panel, QueryState, Screen, Section, Txt } from '../components/ui';
 import { parseRoDate, PRIORITIES, shortDate, TASK_TYPES, toRoDate } from '../lib/format';
 import { useAction } from '../lib/hooks';
@@ -22,9 +24,9 @@ const STATUS: { value: TaskView; label: string }[] = [
   { value: 'CALENDAR', label: 'Calendar' },
 ];
 const NEXT: Record<TaskStatus, { status: TaskStatus; label: string }> = {
-  TODO: { status: 'IN_PROGRESS', label: 'Începe' },
-  IN_PROGRESS: { status: 'DONE', label: 'Finalizează' },
-  DONE: { status: 'TODO', label: 'Redeschide' },
+  TODO: { status: 'IN_PROGRESS', label: 'Start' },
+  IN_PROGRESS: { status: 'DONE', label: 'Complete' },
+  DONE: { status: 'TODO', label: 'Reopen' },
 };
 const PRIORITY_COLOR: Record<TaskPriority, string> = { LOW: colors.straw, MEDIUM: colors.water, HIGH: colors.amber, URGENT: colors.rust };
 
@@ -42,6 +44,7 @@ export function TasksScreen() {
     if (preselected) setParcelId(preselected);
   }, [preselected]);
   const [assigneeId, setAssigneeId] = useState<string | null>(null);
+  const taskParcel = useParcelById(parcelId);
 
   const add = useAction<void>(
     async () => {
@@ -72,7 +75,7 @@ export function TasksScreen() {
         {(items) =>
           filter === 'CALENDAR' ? (
             items.length === 0 ? (
-              <Empty icon="calendar-blank-outline" title="Nicio activitate programată" />
+              <Empty icon="calendar-blank-outline" title="No scheduled activities" />
             ) : (
               <Panel>
                 <CalendarList
@@ -87,7 +90,7 @@ export function TasksScreen() {
               </Panel>
             )
           ) : visible.length === 0 ? (
-            <Empty icon="checkbox-marked-circle-outline" title="Nimic în această coloană" />
+            <Empty icon="checkbox-marked-circle-outline" title="Nothing in this column" />
           ) : (
             <>
               {visible.map((task) => {
@@ -95,14 +98,21 @@ export function TasksScreen() {
                 return (
                   <Panel key={task.id} style={{ borderLeftWidth: 4, borderLeftColor: PRIORITY_COLOR[task.priority] }}>
                     <View style={{ flexDirection: 'row', gap: space.md }}>
-                      <View style={{ flex: 1 }}>
+                      <View style={{ flex: 1, gap: 2 }}>
+                        {task.source === 'AI' ? (
+                          <View style={styles.aiBadge} accessibilityLabel="AI generated task">
+                            <Txt variant="small" color={colors.wheat} style={styles.aiBadgeText}>🤖 AI Generated</Txt>
+                          </View>
+                        ) : null}
                         <Txt variant="subtitle">{task.title}</Txt>
                         <Txt variant="small">
-                          {[task.parcel?.name, task.assignee?.fullName, `Prioritate ${PRIORITIES[task.priority]?.toLowerCase()}`].filter(Boolean).join(', ')}
+                          {[task.parcel?.name, task.assignee?.fullName, task.machine?.name, `${PRIORITIES[task.priority]} priority`].filter(Boolean).join(', ')}
                         </Txt>
                         <Txt variant="small" color={overdue ? colors.rust : undefined}>
-                          {`${overdue ? 'Depășit' : 'Termen'}: ${shortDate(task.dueDate)}`}
+                          {`${overdue ? 'Overdue' : 'Due'}: ${shortDate(task.dueDate)}`}
+                          {task.windowStart && task.windowEnd ? `  ·  window ${shortDate(task.windowStart)}–${shortDate(task.windowEnd)}` : ''}
                         </Txt>
+                        {task.aiReason ? <Txt variant="small" color={colors.chaff}>{task.aiReason}</Txt> : null}
                       </View>
                       {mayMove(task) ? (
                         <Pressable
@@ -123,15 +133,16 @@ export function TasksScreen() {
       </QueryState>
 
       {canPlan(role) ? (
-        <Section title="Adaugă un task">
+        <Section title="Add a task">
           <Panel>
             <Choice label="Task" options={Object.entries(TASK_TYPES).map(([value, label]) => ({ value, label }))} value={type} onChange={setType} />
-            <Choice label="Prioritate" options={(Object.keys(PRIORITIES) as TaskPriority[]).map((value) => ({ value, label: PRIORITIES[value]! }))} value={priority} onChange={setPriority} />
-            <Field label="Termen limită (ZZ.LL.AAAA)" value={due} onChangeText={setDue} />
+            <Choice label="Priority" options={(Object.keys(PRIORITIES) as TaskPriority[]).map((value) => ({ value, label: PRIORITIES[value]! }))} value={priority} onChange={setPriority} />
+            <Field label="Deadline (DD.MM.YYYY)" value={due} onChangeText={setDue} />
             <ParcelPicker value={parcelId} onChange={setParcelId} />
-            <Choice label="Responsabil" options={(team.data ?? []).map((member) => ({ value: member.userId, label: member.fullName }))} value={assigneeId} onChange={setAssigneeId} />
+            <CompatibilityNotice check={checkTaskCompatibility(taskParcel?.tillageSystem, type)} />
+            <Choice label="Assignee" options={(team.data ?? []).map((member) => ({ value: member.userId, label: member.fullName }))} value={assigneeId} onChange={setAssigneeId} />
             <Button mode="contained" disabled={!type || !parseRoDate(due) || add.isPending} loading={add.isPending} onPress={() => add.mutate()}>
-              Salvează task-ul
+              Save task
             </Button>
           </Panel>
         </Section>
@@ -139,3 +150,8 @@ export function TasksScreen() {
     </Screen>
   );
 }
+
+const styles = StyleSheet.create({
+  aiBadge: { alignSelf: 'flex-start', paddingHorizontal: 8, paddingVertical: 1, borderRadius: 10, borderWidth: 1, borderColor: colors.wheat },
+  aiBadgeText: { fontSize: 11, lineHeight: 16 },
+});

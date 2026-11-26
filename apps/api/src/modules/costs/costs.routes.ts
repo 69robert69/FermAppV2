@@ -6,14 +6,14 @@ import { notFound } from '../../lib/errors';
 import { prisma } from '../../lib/prisma';
 import { ApiRouter, idParams, ROLES } from '../../lib/route';
 
-export const costRoutes = new ApiRouter('', 'Costuri');
+export const costRoutes = new ApiRouter('', 'Costs');
 
 const fields = {
   parcelId: z.uuid(),
   year: z.number().int().min(2000).max(2100),
   category: z.enum(COST_CATEGORIES),
   amount: z.number().positive().max(100_000_000),
-  currency: z.string().trim().length(3).toUpperCase().default('RON'),
+  currency: z.literal('EUR').default('EUR'),
   date: z.coerce.date().optional(),
   notes: z.string().trim().max(500).nullable().optional(),
 };
@@ -23,7 +23,7 @@ const serialize = (cost: CostEntry) => ({ ...cost, amount: Number(cost.amount) }
 costRoutes.get(
   '/costs',
   {
-    summary: 'Listează costurile',
+    summary: 'List costs',
     roles: ROLES.planners,
     query: z.object({
       parcelId: z.uuid().optional(),
@@ -42,7 +42,7 @@ costRoutes.get(
 
 costRoutes.post(
   '/costs',
-  { summary: 'Adaugă un cost', roles: ROLES.managers, body: z.object(fields) },
+  { summary: 'Add a cost', roles: ROLES.managers, body: z.object(fields) },
   async ({ auth, body }) => {
     await requireParcel(auth.farmId, body.parcelId);
     return serialize(await prisma.costEntry.create({ data: { ...body, farmId: auth.farmId } }));
@@ -51,7 +51,7 @@ costRoutes.post(
 
 async function requireCost(farmId: string, id: string) {
   const cost = await prisma.costEntry.findFirst({ where: { id, farmId } });
-  if (!cost) throw notFound('Costul');
+  if (!cost) throw notFound('Cost');
   return cost;
 }
 
@@ -60,7 +60,7 @@ const { parcelId: _parcelId, ...editable } = fields;
 costRoutes.patch(
   '/costs/:id',
   {
-    summary: 'Modifică un cost',
+    summary: 'Update a cost',
     roles: ROLES.managers,
     params: idParams,
     body: z.object({ ...editable, currency: z.string().trim().length(3).toUpperCase().optional() }).partial(),
@@ -73,7 +73,7 @@ costRoutes.patch(
 
 costRoutes.delete(
   '/costs/:id',
-  { summary: 'Șterge un cost', roles: ROLES.managers, params: idParams },
+  { summary: 'Delete a cost', roles: ROLES.managers, params: idParams },
   async ({ auth, params }) => {
     await requireCost(auth.farmId, params.id);
     await prisma.costEntry.delete({ where: { id: params.id } });
@@ -83,7 +83,7 @@ costRoutes.delete(
 costRoutes.get(
   '/parcels/:id/costs/summary',
   {
-    summary: 'Cost pe hectar, cost total și profit estimat sau real',
+    summary: 'Cost per hectare, total cost and estimated or actual profit',
     roles: ROLES.planners,
     params: idParams,
     query: z.object({ year: z.coerce.number().int().min(2000).max(2100).optional() }),

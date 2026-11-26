@@ -9,12 +9,12 @@ import { notify } from '../notifications/notifications.service';
 
 type SourcedAlert = WeatherAlertDraft & { source: string };
 
-/** Open-Meteo aduce codurile de grindină, iar OpenWeatherMap are prioritate pentru celelalte tipuri. */
+/** Open-Meteo provides hail codes, and OpenWeatherMap takes priority for the other types. */
 async function collectAlerts(parcel: Pick<Parcel, 'name' | 'centerLat' | 'centerLng'>): Promise<SourcedAlert[]> {
   const byType = new Map<string, SourcedAlert>();
 
   const forecast = await getForecast(parcel.centerLat, parcel.centerLng).catch((error) => {
-    logger.warn('Open-Meteo indisponibil pentru alerte', (error as Error).message);
+    logger.warn('Open-Meteo unavailable for alerts', (error as Error).message);
     return null;
   });
   if (forecast) {
@@ -25,7 +25,7 @@ async function collectAlerts(parcel: Pick<Parcel, 'name' | 'centerLat' | 'center
 
   if (isOpenWeatherConfigured()) {
     const hours = await getOwmHours(parcel.centerLat, parcel.centerLng).catch((error) => {
-      logger.warn('OpenWeatherMap indisponibil pentru alerte', (error as Error).message);
+      logger.warn('OpenWeatherMap unavailable for alerts', (error as Error).message);
       return null;
     });
     if (hours) {
@@ -37,7 +37,7 @@ async function collectAlerts(parcel: Pick<Parcel, 'name' | 'centerLat' | 'center
   return [...byType.values()];
 }
 
-/** Salvează alertele noi; aceeași alertă nu se repetă în aceeași zi pe aceeași parcelă. */
+/** Saves new alerts; the same alert is not repeated on the same day for the same parcel. */
 export async function checkParcelAlerts(parcel: Parcel) {
   const alerts = await collectAlerts(parcel);
   const created = [];

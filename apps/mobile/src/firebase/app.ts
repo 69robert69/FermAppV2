@@ -4,7 +4,7 @@ import * as FirebaseAuth from 'firebase/auth';
 import { initializeFirestore, memoryLocalCache } from 'firebase/firestore';
 import { firebaseConfig } from './config';
 
-// Funcția există doar în varianta React Native a pachetului, pe care tipurile implicite nu o descriu.
+// The function exists only in the React Native build of the package, which the default types do not describe.
 const { getReactNativePersistence } = FirebaseAuth as unknown as {
   getReactNativePersistence: (storage: typeof AsyncStorage) => FirebaseAuth.Persistence;
 };
@@ -16,7 +16,7 @@ export const auth = existing
   ? FirebaseAuth.getAuth(firebaseApp)
   : FirebaseAuth.initializeAuth(firebaseApp, { persistence: getReactNativePersistence(AsyncStorage) });
 
-// În Expo Go, Firestore păstrează datele doar în memorie. Persistența durabilă este în outbox.ts.
+// In Expo Go, Firestore keeps data only in memory. Durable persistence lives in outbox.ts.
 export const firestore = initializeFirestore(firebaseApp, {
   localCache: memoryLocalCache(),
   experimentalAutoDetectLongPolling: true,

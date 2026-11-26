@@ -19,9 +19,9 @@ const params = {
 
 async function requireControllableWork(auth: AuthContext, id: string) {
   const work = await prisma.workSession.findFirst({ where: { id, farmId: auth.farmId } });
-  if (!work) throw notFound('Lucrarea');
+  if (!work) throw notFound('Operation');
   if (auth.role === 'OPERATOR' && work.operatorId !== auth.userId) {
-    throw forbidden('Poți controla doar lucrările proprii.');
+    throw forbidden('You can only control your own operations.');
   }
   return work;
 }
@@ -36,7 +36,7 @@ async function publish(id: string) {
 workRoutes.post(
   '/estimate',
   {
-    summary: 'Calculează capacitatea, durata și ETA',
+    summary: 'Calculate capacity, duration and ETA',
     roles: ROLES.all,
     status: 200,
     body: z.object({ parcelId: z.uuid(), ...params }),
@@ -50,7 +50,7 @@ workRoutes.post(
 workRoutes.get(
   '/',
   {
-    summary: 'Listează lucrările',
+    summary: 'List operations',
     roles: ROLES.all,
     query: z.object({
       status: z.enum(RunStatus).optional(),
@@ -72,7 +72,7 @@ workRoutes.get(
 workRoutes.post(
   '/',
   {
-    summary: 'Pornește o lucrare',
+    summary: 'Start an operation',
     roles: ROLES.field,
     body: z.object({
       parcelId: z.uuid(),
@@ -86,7 +86,7 @@ workRoutes.post(
   async ({ auth, body }) => {
     const parcel = await requireActiveParcel(auth.farmId, body.parcelId);
     if (body.machineId) await requireMachine(auth.farmId, body.machineId);
-    // Operatorul pornește lucrări doar în numele lui.
+    // Operators can only start operations in their own name.
     const operatorId = auth.role === 'OPERATOR' ? auth.userId : (body.operatorId ?? auth.userId);
     await requireMember(auth.farmId, operatorId);
 
@@ -94,7 +94,7 @@ workRoutes.post(
       const busy = await prisma.workSession.findFirst({
         where: { machineId: body.machineId, status: { in: ['RUNNING', 'PAUSED'] } },
       });
-      if (busy) throw conflict('Utilajul este deja folosit într-o lucrare activă.');
+      if (busy) throw conflict('The machine is already used in an active operation.');
     }
 
     const estimate = estimateWork(parcel.areaHa, body);
@@ -120,10 +120,10 @@ workRoutes.post(
 
 workRoutes.get(
   '/:id',
-  { summary: 'Detaliile și progresul unei lucrări', roles: ROLES.all, params: idParams },
+  { summary: 'Details and progress of an operation', roles: ROLES.all, params: idParams },
   async ({ auth, params: { id } }) => {
     const work = await prisma.workSession.findFirst({ where: { id, farmId: auth.farmId }, include: workInclude });
-    if (!work) throw notFound('Lucrarea');
+    if (!work) throw notFound('Operation');
     return serializeWork(work);
   },
 );
@@ -131,7 +131,7 @@ workRoutes.get(
 workRoutes.post(
   '/:id/location',
   {
-    summary: 'Trimite poziția GPS a utilajului',
+    summary: 'Send the machine’s GPS position',
     roles: ROLES.field,
     status: 204,
     params: idParams,
@@ -145,7 +145,7 @@ workRoutes.post(
   },
   async ({ auth, params: { id }, body }) => {
     const work = await requireControllableWork(auth, id);
-    if (work.status !== 'RUNNING' && work.status !== 'PAUSED') throw conflict('Lucrarea este încheiată.');
+    if (work.status !== 'RUNNING' && work.status !== 'PAUSED') throw conflict('The operation has ended.');
     const location = await prisma.machineLocation.create({
       data: { ...body, workSessionId: work.id, machineId: work.machineId },
     });
@@ -164,10 +164,10 @@ workRoutes.post(
 
 workRoutes.get(
   '/:id/location',
-  { summary: 'Ultima poziție GPS a utilajului', roles: ROLES.all, params: idParams },
+  { summary: 'Latest GPS position of the machine', roles: ROLES.all, params: idParams },
   async ({ auth, params: { id } }) => {
     const work = await prisma.workSession.findFirst({ where: { id, farmId: auth.farmId } });
-    if (!work) throw notFound('Lucrarea');
+    if (!work) throw notFound('Operation');
     const location = await prisma.machineLocation.findFirst({
       where: { workSessionId: id },
       orderBy: { recordedAt: 'desc' },
@@ -178,24 +178,24 @@ workRoutes.get(
 
 workRoutes.post(
   '/:id/pause',
-  { summary: 'Pune lucrarea pe pauză', roles: ROLES.field, status: 200, params: idParams },
+  { summary: 'Pause the operation', roles: ROLES.field, status: 200, params: idParams },
   async ({ auth, params: { id } }) => {
     await requireControllableWork(auth, id);
     const { count } = await prisma.workSession.updateMany({
       where: { id, status: 'RUNNING' },
       data: { status: 'PAUSED', pausedAt: new Date() },
     });
-    if (count === 0) throw conflict('Doar o lucrare în desfășurare poate fi pusă pe pauză.');
+    if (count === 0) throw conflict('Only a running operation can be paused.');
     return publish(id);
   },
 );
 
 workRoutes.post(
   '/:id/resume',
-  { summary: 'Reia lucrarea', roles: ROLES.field, status: 200, params: idParams },
+  { summary: 'Resume the operation', roles: ROLES.field, status: 200, params: idParams },
   async ({ auth, params: { id } }) => {
     const work = await requireControllableWork(auth, id);
-    if (work.status !== 'PAUSED' || !work.pausedAt) throw conflict('Lucrarea nu este pe pauză.');
+    if (work.status !== 'PAUSED' || !work.pausedAt) throw conflict('The operation is not paused.');
     const pausedFor = BigInt(Date.now() - work.pausedAt.getTime());
     await prisma.workSession.update({
       where: { id },
@@ -207,24 +207,24 @@ workRoutes.post(
 
 workRoutes.post(
   '/:id/complete',
-  { summary: 'Finalizează lucrarea', roles: ROLES.field, status: 200, params: idParams },
+  { summary: 'Complete the operation', roles: ROLES.field, status: 200, params: idParams },
   async ({ auth, params: { id } }) => {
     await requireControllableWork(auth, id);
-    if (!(await completeWork(id))) throw conflict('Lucrarea este deja încheiată.');
+    if (!(await completeWork(id))) throw conflict('The operation has already ended.');
     return publish(id);
   },
 );
 
 workRoutes.post(
   '/:id/cancel',
-  { summary: 'Anulează lucrarea', roles: ROLES.field, status: 200, params: idParams },
+  { summary: 'Cancel the operation', roles: ROLES.field, status: 200, params: idParams },
   async ({ auth, params: { id } }) => {
     await requireControllableWork(auth, id);
     const { count } = await prisma.workSession.updateMany({
       where: { id, status: { in: ['RUNNING', 'PAUSED'] } },
       data: { status: 'CANCELLED', completedAt: new Date(), pausedAt: null },
     });
-    if (count === 0) throw conflict('Lucrarea este deja încheiată.');
+    if (count === 0) throw conflict('The operation has already ended.');
     return publish(id);
   },
 );

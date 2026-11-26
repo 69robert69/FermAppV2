@@ -22,7 +22,7 @@ interface SoilResponse {
   properties: { layers: { name: string; unit_measure: { d_factor: number }; depths: { label: string; values: { mean: number | null } }[] }[] };
 }
 
-/** Profilul complet de sol al locației, din SoilGrids. */
+/** The full soil profile of the location, from SoilGrids. */
 export async function fetchSoilProfile(lat: number, lng: number) {
   const properties = ['phh2o', 'clay', 'sand', 'soc', 'wv0033', 'wv1500'].map((name) => `property=${name}`);
   const depths = Object.keys(DEPTHS).map((depth) => `depth=${depth}`);
@@ -87,10 +87,10 @@ async function loadClimate(lat: number, lng: number): Promise<PlanClimate | null
   return { seasonTempC: Math.round((seasonSum / seasonDays) * 10) / 10, annualPrecipitationMm: Math.round(rain / CLIMATE_YEARS), gddBase10: Math.round(degreeDays / CLIMATE_YEARS) };
 }
 
-/** Sursele indisponibile lasă scorul orientativ, fără să oprească planificarea. */
+/** Unavailable sources leave the score indicative, without stopping planning. */
 const siteKey = (lat: number, lng: number) => `site:${lat.toFixed(3)}:${lng.toFixed(3)}`;
 
-/** Datele deja salvate. Lipsa lor pornește încărcarea în fundal, fără să blocheze ecranul. */
+/** Data already saved. If it is missing, loading starts in the background, without blocking the screen. */
 export async function cachedSiteData(lat: number, lng: number) {
   const saved = await readSnapshot<{ soil: PlanSoil | null; climate: PlanClimate | null }>(siteKey(lat, lng));
   if (!saved?.soil || !saved.climate) void loadSiteData(lat, lng).catch(() => undefined);
@@ -116,7 +116,7 @@ export interface PlanRequest {
   history: readonly CropHistoryEntry[];
 }
 
-/** Generează planul pe telefon, fără să salveze nimic. */
+/** Generates the plan on the phone, without saving anything. */
 export async function previewPlan(request: PlanRequest, now = new Date()) {
   const { parcel, plannedCrop, lastCrop, lastCropName, history } = request;
   const lastYear = nextSeasonYear(now) - 1;
@@ -127,7 +127,7 @@ export async function previewPlan(request: PlanRequest, now = new Date()) {
     parcelName: parcel.name,
     areaHa: parcel.area,
     history: fullHistory,
-    lastCropName: lastCrop === OTHER_CROP ? lastCropName?.trim() || 'Altă cultură' : undefined,
+    lastCropName: lastCrop === OTHER_CROP ? lastCropName?.trim() || 'Other crop' : undefined,
     ...site,
     now,
   });
@@ -138,7 +138,7 @@ interface ExistingPlan {
   activePlanIds: readonly string[];
 }
 
-/** Recalculează planul unei culturi deja înregistrate, de exemplu după schimbarea ei. */
+/** Recalculates the plan of an already recorded crop, for example after changing it. */
 export async function regeneratePlan(input: ExistingPlan & {
   parcel: PlanParcel;
   crop: CropCode;
@@ -152,7 +152,7 @@ export async function regeneratePlan(input: ExistingPlan & {
   return savePlan({ parcel, lastCrop: null }, plan, { tasks, activePlanIds }, 'CROP_CHANGED');
 }
 
-/** Salvează planul și înlocuiește task-urile nepornite ale planului anterior. */
+/** Saves the plan and replaces the not-started tasks of the previous plan. */
 export async function savePlan(
   target: { parcel: PlanParcel; lastCrop: LastCrop | null },
   plan: ParcelPlanData,
@@ -180,7 +180,7 @@ export async function savePlan(
           docId: `${parcel.id}_${lastYear}`,
           data: { ...farmFields(), parcelId: parcel.id, year: lastYear, crop: lastCrop, sowingDate: null, harvestDate: null },
         }]),
-    // La o recalculare, cultura există deja și își păstrează datele introduse.
+    // On a recalculation, the crop already exists and keeps its entered data.
     ...(isWizard
       ? [{
           kind: 'set' as const,
@@ -220,7 +220,7 @@ export async function savePlan(
           planStepKey: step.key,
           type: step.taskType,
           title: `${step.title}: ${plan.cropName}`,
-          description: `Generat automat din planul tehnologic ${plan.year}.`,
+          description: `Generated automatically from the ${plan.year} technology plan.`,
           priority: step.priority,
           status: 'TODO',
           responsibleUser: null,

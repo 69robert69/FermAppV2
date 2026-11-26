@@ -9,7 +9,7 @@ import { ApiRouter, idParams, ROLES } from '../../lib/route';
 import { emitToFarm } from '../../realtime/socket';
 import { completeIrrigation, irrigationInclude, serializeIrrigation } from './irrigation.service';
 
-export const irrigationRoutes = new ApiRouter('', 'Irigații');
+export const irrigationRoutes = new ApiRouter('', 'Irrigation');
 
 const route = {
   routeLengthM: z.number().positive().max(100_000),
@@ -18,7 +18,7 @@ const route = {
 
 async function requireRun(farmId: string, id: string) {
   const run = await prisma.irrigationRun.findFirst({ where: { id, farmId } });
-  if (!run) throw notFound('Irigarea');
+  if (!run) throw notFound('Irrigation');
   return run;
 }
 
@@ -31,14 +31,14 @@ async function publish(id: string) {
 
 irrigationRoutes.post(
   '/irrigation/estimate',
-  { summary: 'Calculează durata și ETA irigării', roles: ROLES.all, status: 200, body: z.object(route) },
+  { summary: 'Calculate irrigation duration and ETA', roles: ROLES.all, status: 200, body: z.object(route) },
   async ({ body }) => estimateIrrigation(body.routeLengthM, body.speedMPerH),
 );
 
 irrigationRoutes.get(
   '/irrigation',
   {
-    summary: 'Listează irigările',
+    summary: 'List irrigations',
     roles: ROLES.all,
     query: z.object({ status: z.enum(RunStatus).optional(), parcelId: z.uuid().optional() }),
   },
@@ -56,7 +56,7 @@ irrigationRoutes.get(
 irrigationRoutes.post(
   '/irrigation',
   {
-    summary: 'Pornește o irigare',
+    summary: 'Start an irrigation',
     roles: ROLES.field,
     body: z.object({
       parcelId: z.uuid(),
@@ -70,7 +70,7 @@ irrigationRoutes.post(
     const active = await prisma.irrigationRun.findFirst({
       where: { parcelId: body.parcelId, status: { in: ['RUNNING', 'PAUSED'] } },
     });
-    if (active) throw conflict('Parcela are deja o irigare activă.');
+    if (active) throw conflict('The parcel already has an active irrigation.');
     const run = await prisma.irrigationRun.create({
       data: {
         ...body,
@@ -84,7 +84,7 @@ irrigationRoutes.post(
 
 irrigationRoutes.get(
   '/irrigation/:id',
-  { summary: 'Detaliile și progresul irigării', roles: ROLES.all, params: idParams },
+  { summary: 'Irrigation details and progress', roles: ROLES.all, params: idParams },
   async ({ auth, params }) => {
     await requireRun(auth.farmId, params.id);
     return publish(params.id);
@@ -93,24 +93,24 @@ irrigationRoutes.get(
 
 irrigationRoutes.post(
   '/irrigation/:id/pause',
-  { summary: 'Pune irigarea pe pauză', roles: ROLES.field, status: 200, params: idParams },
+  { summary: 'Pause the irrigation', roles: ROLES.field, status: 200, params: idParams },
   async ({ auth, params }) => {
     await requireRun(auth.farmId, params.id);
     const { count } = await prisma.irrigationRun.updateMany({
       where: { id: params.id, status: 'RUNNING' },
       data: { status: 'PAUSED', pausedAt: new Date() },
     });
-    if (count === 0) throw conflict('Doar o irigare în desfășurare poate fi pusă pe pauză.');
+    if (count === 0) throw conflict('Only a running irrigation can be paused.');
     return publish(params.id);
   },
 );
 
 irrigationRoutes.post(
   '/irrigation/:id/resume',
-  { summary: 'Reia irigarea', roles: ROLES.field, status: 200, params: idParams },
+  { summary: 'Resume the irrigation', roles: ROLES.field, status: 200, params: idParams },
   async ({ auth, params }) => {
     const run = await requireRun(auth.farmId, params.id);
-    if (run.status !== 'PAUSED' || !run.pausedAt) throw conflict('Irigarea nu este pe pauză.');
+    if (run.status !== 'PAUSED' || !run.pausedAt) throw conflict('The irrigation is not paused.');
     await prisma.irrigationRun.update({
       where: { id: run.id },
       data: {
@@ -125,24 +125,24 @@ irrigationRoutes.post(
 
 irrigationRoutes.post(
   '/irrigation/:id/complete',
-  { summary: 'Finalizează irigarea', roles: ROLES.field, status: 200, params: idParams },
+  { summary: 'Complete the irrigation', roles: ROLES.field, status: 200, params: idParams },
   async ({ auth, params }) => {
     await requireRun(auth.farmId, params.id);
-    if (!(await completeIrrigation(params.id))) throw conflict('Irigarea este deja încheiată.');
+    if (!(await completeIrrigation(params.id))) throw conflict('The irrigation has already ended.');
     return publish(params.id);
   },
 );
 
 irrigationRoutes.post(
   '/irrigation/:id/cancel',
-  { summary: 'Anulează irigarea', roles: ROLES.field, status: 200, params: idParams },
+  { summary: 'Cancel the irrigation', roles: ROLES.field, status: 200, params: idParams },
   async ({ auth, params }) => {
     await requireRun(auth.farmId, params.id);
     const { count } = await prisma.irrigationRun.updateMany({
       where: { id: params.id, status: { in: ['RUNNING', 'PAUSED'] } },
       data: { status: 'CANCELLED', completedAt: new Date(), pausedAt: null },
     });
-    if (count === 0) throw conflict('Irigarea este deja încheiată.');
+    if (count === 0) throw conflict('The irrigation has already ended.');
     return publish(params.id);
   },
 );
@@ -150,7 +150,7 @@ irrigationRoutes.post(
 irrigationRoutes.get(
   '/parcels/:id/water',
   {
-    summary: 'Necesarul de apă, precipitațiile primite și deficitul',
+    summary: 'Water requirement, rainfall received and deficit',
     roles: ROLES.all,
     params: idParams,
     query: z.object({ year: z.coerce.number().int().min(2000).max(2100).optional() }),
@@ -161,9 +161,9 @@ irrigationRoutes.get(
     const season = await prisma.cropSeason.findUnique({
       where: { parcelId_year: { parcelId: parcel.id, year } },
     });
-    if (!season) throw notFound(`Cultura pentru anul ${year}`);
+    if (!season) throw notFound(`The crop for ${year}`);
 
-    // Fără date de semănat și recoltare se folosește sezonul de vegetație aprilie-septembrie.
+    // Without sowing and harvest dates, the April-September growing season is used.
     const start = (season.sowingDate ?? new Date(Date.UTC(year, 3, 1))).toISOString().slice(0, 10);
     const latestAvailable = new Date(Date.now() - 2 * 86_400_000);
     const seasonEnd = season.harvestDate ?? new Date(Date.UTC(year, 8, 30));

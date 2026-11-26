@@ -159,6 +159,7 @@ model Farm {
   irrigation    IrrigationRun[]
   alerts        WeatherAlert[]
   costs         CostEntry[]
+  economicDocuments EconomicDocument[]
   conversations AiConversation[]
   iotDevices    IotDevice[]
   notifications Notification[]
@@ -244,7 +245,7 @@ model Parcel {
   farmId     String    @db.Uuid
   name       String
   code       String
-  /// Poligon GeoJSON în WGS84.
+  /// GeoJSON polygon in WGS84.
   geometry   Json
   areaHa     Float
   perimeterM Float
@@ -253,11 +254,15 @@ model Parcel {
   locality   String?
   county     String?
   notes      String?
-  /// Suprafața echipată pentru irigații, în hectare.
+  /// Area equipped for irrigation, in hectares.
   irrigatedAreaHa Float?
-  /// Ultima cultură declarată la configurare: un cod de cultură sau OTHER.
+  /// Last crop declared at setup: a crop code or OTHER.
   lastCrop    String?
   plannedCrop CropCode?
+  /// Soil tillage technology in use: CONVENTIONAL, MINIMUM_TILL, STRIP_TILL or NO_TILL.
+  tillageSystem  String?
+  /// One entry per year: [{ year, system }], oldest first.
+  tillageHistory Json?
   archivedAt DateTime?
   createdAt  DateTime  @default(now())
   updatedAt  DateTime  @updatedAt
@@ -292,7 +297,7 @@ model CropSeason {
   sowingDate        DateTime?
   expectedHarvestDate DateTime?
   harvestDate       DateTime?
-  /// Producția totală a parcelei, în tone.
+  /// Total parcel yield, in tonnes.
   yieldT            Float?
   harvestMoisture   Float?
   expectedYieldTHa  Float?
@@ -308,14 +313,14 @@ model CropSeason {
   @@index([parcelId, year(sort: Desc)])
 }
 
-/// Planul tehnologic al unui an agricol. Versiunile vechi rămân în istoricul parcelei.
+/// Technology plan for an agricultural year. Old versions remain in the parcel history.
 model ParcelPlan {
   id        String   @id @default(uuid()) @db.Uuid
   parcelId  String   @db.Uuid
   year      Int
   crop      CropCode
   active    Boolean  @default(true)
-  /// WIZARD sau CROP_CHANGED.
+  /// WIZARD or CROP_CHANGED.
   trigger   String
   data      Json
   createdAt DateTime @default(now())
@@ -356,8 +361,10 @@ model Machine {
   brand            String?
   model            String?
   powerHp          Float?
-  /// Consum mediu, în litri pe oră.
+  /// Average consumption, in litres per hour.
   avgConsumptionLh Float?
+  /// Tillage technologies the machine suits. Empty means the defaults of its type.
+  tillageSystems   String[]    @default([])
   operatorId       String?     @db.Uuid
   archivedAt       DateTime?
   createdAt        DateTime    @default(now())
@@ -460,7 +467,7 @@ model Income {
   parcelId  String   @db.Uuid
   year      Int
   amount    Decimal  @db.Decimal(12, 2)
-  currency  String   @default("RON")
+  currency  String   @default("EUR")
   source    String?
   date      DateTime @default(now())
   createdAt DateTime @default(now())
@@ -566,7 +573,7 @@ model WeatherAlert {
   severity  AlertSeverity
   title     String
   message   String
-  /// Ora locală a parcelei.
+  /// Local time at the parcel.
   startsAt  String
   dedupeKey String
   source    String
@@ -604,7 +611,7 @@ model CostEntry {
   year      Int
   category  CostCategory
   amount    Decimal      @db.Decimal(12, 2)
-  currency  String       @default("RON")
+  currency  String       @default("EUR")
   date      DateTime     @default(now())
   notes     String?
   createdAt DateTime     @default(now())
@@ -694,4 +701,24 @@ model Notification {
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@index([userId, createdAt(sort: Desc)])
+}
+
+/// Economic data stored as documents: the farm settings (fuel price, labour rates,
+/// machine ownership costs) and one sheet per parcel and season (seed, fertiliser,
+/// crop protection, other costs, yields and prices). Amounts are in euro.
+model EconomicDocument {
+  id        String   @id @default(uuid()) @db.Uuid
+  farmId    String   @db.Uuid
+  /// "settings", or "sheet:<parcelId>:<year>".
+  key       String
+  parcelId  String?  @db.Uuid
+  year      Int?
+  data      Json
+  updatedAt DateTime @updatedAt
+  createdAt DateTime @default(now())
+
+  farm Farm @relation(fields: [farmId], references: [id], onDelete: Cascade)
+
+  @@unique([farmId, key])
+  @@index([farmId, year])
 }

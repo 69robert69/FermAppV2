@@ -16,7 +16,7 @@ const SOIL_RETRY_INTERVAL_MS = 6 * 3_600_000;
 const IDEMPOTENCY_RETENTION_MS = 7 * 86_400_000;
 const LOCATION_RETENTION_MS = 30 * 86_400_000;
 
-/** Trimite progresul live și încheie operațiunile ajunse la 100%. */
+/** Sends live progress and completes operations that have reached 100%. */
 export async function tickProgress(now = new Date()) {
   const [works, runs] = await Promise.all([
     prisma.workSession.findMany({ where: { status: 'RUNNING' }, include: workInclude }),
@@ -41,7 +41,7 @@ export async function tickProgress(now = new Date()) {
   }
 }
 
-/** Anunță responsabilul cu 24 de ore înainte de termen. */
+/** Notifies the assignee 24 hours before the deadline. */
 export async function sendTaskReminders(now = new Date()) {
   const tasks = await prisma.task.findMany({
     where: {
@@ -62,8 +62,8 @@ export async function sendTaskReminders(now = new Date()) {
     await notify({
       farmId: task.farmId,
       userIds: [task.assigneeId!],
-      title: task.dueDate < now ? 'Task depășit' : 'Termen apropiat',
-      body: `${task.title}${task.parcel ? ` pe parcela ${task.parcel.name}` : ''}.`,
+      title: task.dueDate < now ? 'Task overdue' : 'Deadline approaching',
+      body: `${task.title}${task.parcel ? ` on parcel ${task.parcel.name}` : ''}.`,
       data: { type: 'task', id: task.id },
     });
   }
@@ -72,7 +72,7 @@ export async function sendTaskReminders(now = new Date()) {
 async function checkWeatherAlerts() {
   const parcels = await prisma.parcel.findMany({ where: { archivedAt: null } });
   await mapLimit(parcels, 5, async (parcel) => {
-    await checkParcelAlerts(parcel).catch((error) => logger.warn('Verificare alerte eșuată', (error as Error).message));
+    await checkParcelAlerts(parcel).catch((error) => logger.warn('Alert check failed', (error as Error).message));
   });
 }
 
@@ -100,10 +100,10 @@ function every(name: string, intervalMs: number, job: () => Promise<unknown>) {
     if (running) return;
     running = true;
     try {
-      // Blocarea expiră înaintea următoarei rulări, astfel doar o instanță execută jobul.
+      // The lock expires before the next run, so only one instance executes the job.
       if (await acquireLock(`job:${name}`, Math.max(1, Math.floor(intervalMs / 1000) - 1))) await job();
     } catch (error) {
-      logger.error(`Job eșuat: ${name}`, error);
+      logger.error(`Job failed: ${name}`, error);
     } finally {
       running = false;
     }

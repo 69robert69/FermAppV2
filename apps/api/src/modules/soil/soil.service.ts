@@ -3,7 +3,7 @@ import { fetchSoilGrids } from '../../integrations/soilGrids';
 import { logger } from '../../lib/logger';
 import { prisma } from '../../lib/prisma';
 
-/** Interoghează SoilGrids și salvează profilul; o eroare rămâne vizibilă în status. */
+/** Queries SoilGrids and saves the profile; an error remains visible in the status. */
 export async function refreshSoilProfile(parcelId: string, lat: number, lng: number) {
   await prisma.soilProfile.upsert({
     where: { parcelId },
@@ -16,7 +16,7 @@ export async function refreshSoilProfile(parcelId: string, lat: number, lng: num
     if (!values) {
       return await prisma.soilProfile.update({
         where: { parcelId },
-        data: { status: 'FAILED', errorMessage: 'SoilGrids nu are date pentru această locație.' },
+        data: { status: 'FAILED', errorMessage: 'SoilGrids has no data for this location.' },
       });
     }
     const soil = classifySoil(values);
@@ -39,10 +39,10 @@ export async function refreshSoilProfile(parcelId: string, lat: number, lng: num
       },
     });
   } catch (error) {
-    logger.warn('Profil de sol indisponibil', { parcelId, reason: (error as Error).message });
+    logger.warn('Soil profile unavailable', { parcelId, reason: (error as Error).message });
     return prisma.soilProfile.update({
       where: { parcelId },
-      data: { status: 'FAILED', errorMessage: 'SoilGrids nu răspunde momentan. Reîncercarea este automată.' },
+      data: { status: 'FAILED', errorMessage: 'SoilGrids is not responding right now. It will be retried automatically.' },
     });
   }
 }

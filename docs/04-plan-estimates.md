@@ -1,71 +1,71 @@
-# Plan de implementare și estimări
+# Implementation plan and estimates
 
-Estimările sunt orientative și presupun o echipă cu experiență în React Native, Node.js și GIS. O lună înseamnă 20 de zile lucrătoare.
+The estimates are indicative and assume a team experienced in React Native, Node.js and GIS. One month means 20 working days.
 
-## Complexitate pe module, dacă proiectul ar începe de la zero
+## Complexity per module, if the project started from scratch
 
-| Modul | Complexitate | Zile-om |
+| Module | Complexity | Person-days |
 |---|---|--:|
-| Fundație: autentificare, roluri, erori, Swagger | Medie | 20 |
-| 1. Parcele, desenare, import și export GIS | Ridicată | 35 |
-| 2. Istoric culturi | Scăzută | 12 |
-| 3. Motor de rotație | Medie | 10 |
-| 4. Utilaje | Scăzută | 6 |
-| 5. Work în timp real | Medie | 18 |
-| 6. To Do și notificări | Scăzută | 10 |
-| 7. Irigații | Medie | 12 |
-| 8. Open-Meteo | Scăzută | 10 |
-| 9. OpenWeatherMap și alerte | Medie | 10 |
-| 10. Analiza solului | Scăzută | 8 |
-| 11. Recomandări culturi | Medie | 10 |
-| 12. NASA POWER și GDD | Scăzută | 8 |
-| 13. Ferestre optime de lucru | Medie | 8 |
-| 14. Necesar de apă | Scăzută | 6 |
-| 15. Satelit și NDVI | Ridicată | 25 |
-| 16. Costuri | Scăzută | 8 |
-| 17. Rapoarte PDF și Excel | Medie | 14 |
-| 18. Asistent AI | Medie | 15 |
-| 19. IoT | Medie | 15 |
-| Offline și sincronizare | Ridicată | 25 |
-| Design și interfață | Medie | 30 |
-| Testare și stabilizare | Ridicată | 40 |
-| Infrastructură și lansare | Medie | 20 |
+| Foundation: authentication, roles, errors, Swagger | Medium | 20 |
+| 1. Parcels, drawing, GIS import and export | High | 35 |
+| 2. Crop history | Low | 12 |
+| 3. Rotation engine | Medium | 10 |
+| 4. Machines | Low | 6 |
+| 5. Real-time Work | Medium | 18 |
+| 6. To Do and notifications | Low | 10 |
+| 7. Irrigation | Medium | 12 |
+| 8. Open-Meteo | Low | 10 |
+| 9. OpenWeatherMap and alerts | Medium | 10 |
+| 10. Soil analysis | Low | 8 |
+| 11. Crop recommendations | Medium | 10 |
+| 12. NASA POWER and GDD | Low | 8 |
+| 13. Optimal work windows | Medium | 8 |
+| 14. Water requirement | Low | 6 |
+| 15. Satellite and NDVI | High | 25 |
+| 16. Costs | Low | 8 |
+| 17. PDF and Excel reports | Medium | 14 |
+| 18. AI assistant | Medium | 15 |
+| 19. IoT | Medium | 15 |
+| Offline and sync | High | 25 |
+| Design and interface | Medium | 30 |
+| Testing and stabilization | High | 40 |
+| Infrastructure and launch | Medium | 20 |
 | **Total** | | **375** |
 
-Asta înseamnă aproximativ 19 luni-om. O echipă de 5 persoane ar avea nevoie de 5-6 luni.
+That is about 19 person-months. A team of 5 people would need 5-6 months.
 
-## Ce rămâne până la producție
+## What remains before production
 
-Codul din acest repository acoperă toate modulele. Lucrările de mai jos rămân înainte de lansare.
+The code in this repository covers all modules. The work below remains before launch.
 
-| Etapă | Activități | Zile-om |
+| Stage | Activities | Person-days |
 |---|---|--:|
-| 1. Validare pe dispozitive | Build Android și iOS, test pe telefoane reale, hărți, GPS, push, offline | 15 |
-| 2. Servicii externe | Conturi și teste reale pentru Sentinel, OpenWeatherMap, Claude API și Expo Push | 10 |
-| 3. Date APIA | Test cu fișiere LPIS reale și ajustarea câmpurilor | 5 |
-| 4. Validare agronomică | Revizuirea regulilor de rotație, a pragurilor și a pragurilor de sol de către un agronom | 8 |
-| 5. Securitate | Audit, test de penetrare, GDPR, politică de confidențialitate | 10 |
-| 6. Infrastructură | Mediu de producție, backup, monitorizare, alerte, CI/CD | 12 |
-| 7. Test de încărcare | Simulare pentru 1.000 de ferme și optimizări | 8 |
-| 8. Pilot | 5-10 ferme timp de un sezon de lucru, cu remedieri | 25 |
-| 9. Lansare | Google Play, App Store, documentație pentru utilizatori | 8 |
+| 1. Device validation | Android and iOS builds, tests on real phones, maps, GPS, push, offline | 15 |
+| 2. External services | Accounts and real tests for Sentinel, OpenWeatherMap, Claude API and Expo Push | 10 |
+| 3. APIA data | Tests with real LPIS files and field adjustments | 5 |
+| 4. Agronomic validation | Review of the rotation rules, thresholds and soil thresholds by an agronomist | 8 |
+| 5. Security | Audit, penetration test, GDPR, privacy policy | 10 |
+| 6. Infrastructure | Production environment, backup, monitoring, alerts, CI/CD | 12 |
+| 7. Load test | Simulation for 1,000 farms and optimizations | 8 |
+| 8. Pilot | 5-10 farms for one working season, with fixes | 25 |
+| 9. Launch | Google Play, App Store, user documentation | 8 |
 | **Total** | | **101** |
 
-O echipă de 3 persoane poate finaliza aceste etape în aproximativ 8-10 săptămâni, fără durata calendaristică a pilotului.
+A team of 3 people can complete these stages in about 8-10 weeks, not counting the calendar duration of the pilot.
 
-## Ordinea recomandată
+## Recommended order
 
-1. Validează pe telefoane reale fluxurile de bază: parcele, Work, To Do și Irigații.
-2. Activează serviciile externe, în ordinea valorii pentru fermier: alerte, satelit, AI.
-3. Rulează pilotul înainte de sezonul de primăvară, când lucrările sunt cele mai intense.
-4. Adaugă integrările hardware IoT doar după ce pilotul confirmă cerințele fermierilor.
+1. Validate the core flows on real phones: parcels, Work, To Do and Irrigation.
+2. Enable the external services, in order of value to the farmer: alerts, satellite, AI.
+3. Run the pilot before the spring season, when field work is most intense.
+4. Add IoT hardware integrations only after the pilot confirms the farmers' requirements.
 
-## Riscuri principale
+## Main risks
 
-| Risc | Impact | Măsură |
+| Risk | Impact | Mitigation |
 |---|---|---|
-| Licențele serviciilor meteo și satelitare | Costuri sau blocarea accesului | Contracte comerciale înainte de lansare |
-| Format LPIS diferit de cel presupus | Import incomplet | Test cu fișiere APIA reale |
-| Acoperire slabă în câmp | Date neactualizate | Testare offline în teren |
-| Reguli agronomice generale | Recomandări nepotrivite local | Validare cu agronomi din fiecare zonă |
-| Costuri AI necontrolate | Buget depășit | Limite pe fermă și monitorizarea consumului |
+| Weather and satellite service licences | Costs or blocked access | Commercial contracts before launch |
+| LPIS format different from the one assumed | Incomplete import | Tests with real APIA files |
+| Poor coverage in the field | Outdated data | Offline testing in the field |
+| General agronomic rules | Recommendations unsuited to local conditions | Validation with agronomists from each area |
+| Uncontrolled AI costs | Budget overrun | Per-farm limits and usage monitoring |

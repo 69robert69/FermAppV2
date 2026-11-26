@@ -12,7 +12,7 @@ export const serializeIrrigation = <T extends IrrigationRun>(run: T, now = new D
   progress: liveProgress(run, now),
 });
 
-/** Încheie irigarea o singură dată și anunță echipa. */
+/** Completes the irrigation only once and notifies the team. */
 export async function completeIrrigation(id: string, now = new Date()) {
   const run = await prisma.irrigationRun.findUnique({ where: { id }, include: irrigationInclude });
   if (!run || (run.status !== 'RUNNING' && run.status !== 'PAUSED')) return null;
@@ -29,8 +29,8 @@ export async function completeIrrigation(id: string, now = new Date()) {
   await notify({
     farmId: run.farmId,
     roles: ['ADMIN', 'FARM_MANAGER', 'OPERATOR'],
-    title: 'Irigare finalizată',
-    body: `Irigarea pe parcela ${run.parcel.name} s-a încheiat: ${progress.percent}% realizat.`,
+    title: 'Irrigation completed',
+    body: `Irrigation on parcel ${run.parcel.name} has ended: ${progress.percent}% done.`,
     data: { type: 'irrigation', id },
   });
   return completed;

@@ -50,7 +50,7 @@ export function initRealtime(server: HttpServer) {
     void socket.join([farmRoom(farmId), userRoom(userId)]);
   });
 
-  // Spațiu separat pentru senzori, autentificați cu cheia dispozitivului.
+  // Separate namespace for sensors, authenticated with the device key.
   const iot = io.of('/iot');
   iot.use(async (socket, next) => {
     const device = await authenticateDeviceKey(String(socket.handshake.auth.deviceKey ?? '')).catch(() => null);
@@ -72,7 +72,7 @@ export function initRealtime(server: HttpServer) {
         const accepted = await ingestTelemetry(socket.data.device, parsed.data);
         ack?.({ ok: true, accepted });
       } catch (error) {
-        logger.error('Telemetrie WebSocket eșuată', error);
+        logger.error('WebSocket telemetry failed', error);
         ack?.({ ok: false, error: 'INGEST_FAILED' });
       }
     });

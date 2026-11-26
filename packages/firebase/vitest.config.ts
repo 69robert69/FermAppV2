@@ -4,7 +4,7 @@ import { defineConfig } from 'vitest/config';
 const mobile = path.resolve(import.meta.dirname, '../../apps/mobile/src');
 const stub = (name: string) => path.resolve(import.meta.dirname, 'test/stubs', name);
 
-// Codul aplicației rulează în Node, cu modulele native înlocuite prin variante de test.
+// The app code runs in Node, with native modules replaced by test variants.
 export default defineConfig({
   resolve: {
     alias: [

@@ -6,7 +6,7 @@ import { prisma } from '../../lib/prisma';
 import { ApiRouter, ROLES } from '../../lib/route';
 import { email, hashPassword, password } from '../auth/auth.routes';
 
-export const teamRoutes = new ApiRouter('/team', 'Echipă');
+export const teamRoutes = new ApiRouter('/team', 'Team');
 
 const userParams = z.object({ userId: z.uuid() });
 
@@ -19,10 +19,10 @@ const member = (m: { role: Role; user: { id: string; fullName: string; email: st
 
 async function assertAnotherAdmin(farmId: string, userId: string) {
   const others = await prisma.farmMembership.count({ where: { farmId, role: 'ADMIN', userId: { not: userId } } });
-  if (others === 0) throw badRequest('Ferma trebuie să aibă cel puțin un administrator.');
+  if (others === 0) throw badRequest('The farm must have at least one administrator.');
 }
 
-teamRoutes.get('/', { summary: 'Listează membrii fermei', roles: ROLES.all }, async ({ auth }) => {
+teamRoutes.get('/', { summary: 'List farm members', roles: ROLES.all }, async ({ auth }) => {
   const members = await prisma.farmMembership.findMany({
     where: { farmId: auth.farmId },
     include: { user: { select: { id: true, fullName: true, email: true } } },
@@ -34,7 +34,7 @@ teamRoutes.get('/', { summary: 'Listează membrii fermei', roles: ROLES.all }, a
 teamRoutes.post(
   '/',
   {
-    summary: 'Adaugă un membru. Parola este necesară doar pentru conturile noi.',
+    summary: 'Add a member. A password is required only for new accounts.',
     roles: ROLES.admin,
     body: z.object({
       email,
@@ -46,7 +46,7 @@ teamRoutes.post(
   async ({ body, auth }) => {
     let user = await prisma.user.findUnique({ where: { email: body.email } });
     if (!user) {
-      if (!body.password) throw badRequest('Parola este necesară pentru un cont nou.');
+      if (!body.password) throw badRequest('A password is required for a new account.');
       user = await prisma.user.create({
         data: { email: body.email, fullName: body.fullName, passwordHash: await hashPassword(body.password) },
       });
@@ -54,7 +54,7 @@ teamRoutes.post(
     const existing = await prisma.farmMembership.findUnique({
       where: { farmId_userId: { farmId: auth.farmId, userId: user.id } },
     });
-    if (existing) throw conflict('Utilizatorul face deja parte din fermă.');
+    if (existing) throw conflict('The user is already part of the farm.');
     await prisma.farmMembership.create({ data: { farmId: auth.farmId, userId: user.id, role: body.role } });
     return { userId: user.id, fullName: user.fullName, email: user.email, role: body.role };
   },
@@ -63,7 +63,7 @@ teamRoutes.post(
 teamRoutes.patch(
   '/:userId',
   {
-    summary: 'Schimbă rolul unui membru',
+    summary: 'Change a member’s role',
     roles: ROLES.admin,
     params: userParams,
     body: z.object({ role: z.enum(Role) }),
@@ -82,7 +82,7 @@ teamRoutes.patch(
 
 teamRoutes.delete(
   '/:userId',
-  { summary: 'Elimină un membru din fermă', roles: ROLES.admin, params: userParams },
+  { summary: 'Remove a member from the farm', roles: ROLES.admin, params: userParams },
   async ({ params, auth }) => {
     const current = await requireMember(auth.farmId, params.userId);
     if (current.role === 'ADMIN') await assertAnotherAdmin(auth.farmId, params.userId);

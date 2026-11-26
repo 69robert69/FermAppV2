@@ -1,4 +1,4 @@
-import type { CropCode, PolygonGeometry } from '@fermapp/domain';
+import type { CropCode, PolygonGeometry, ReportTable, TillageHistoryEntry, TillageSystem } from '@fermapp/domain';
 
 export type Role = 'ADMIN' | 'FARM_MANAGER' | 'OPERATOR' | 'AGRONOMIST';
 export type RunStatus = 'RUNNING' | 'PAUSED' | 'COMPLETED' | 'CANCELLED';
@@ -18,6 +18,8 @@ export interface Parcel {
   county: string | null;
   notes: string | null;
   irrigatedAreaHa: number | null;
+  tillageSystem?: TillageSystem | null;
+  tillageHistory?: TillageHistoryEntry[] | null;
   archivedAt: string | null;
   seasons?: { crop: CropCode; year: number }[];
   soilProfile?: { status: string; label: string | null } | null;
@@ -84,6 +86,12 @@ export interface Task {
   parcel: { id: string; name: string } | null;
   assignee: { id: string; fullName: string } | null;
   planStepKey?: string | null;
+  source?: 'USER' | 'AI' | 'PLAN';
+  category?: string | null;
+  machine?: { id: string; name: string } | null;
+  windowStart?: string | null;
+  windowEnd?: string | null;
+  aiReason?: string | null;
 }
 
 export interface Machine {
@@ -98,6 +106,7 @@ export interface Machine {
   fuelConsumptionMax?: number | null;
   tankCapacity?: number | null;
   weight?: number | null;
+  tillageSystems?: TillageSystem[] | null;
   operator: { id: string; fullName: string } | null;
 }
 
@@ -128,10 +137,5 @@ export interface TeamMember {
   role: Role;
 }
 
-export interface ReportData {
-  title: string;
-  period: string;
-  columns: { key: string; label: string; numeric?: boolean }[];
-  rows: Record<string, string | number | null>[];
-  totals?: Record<string, string | number>;
-}
+/** The same report tables the domain builds on both backends. */
+export type ReportData = ReportTable;

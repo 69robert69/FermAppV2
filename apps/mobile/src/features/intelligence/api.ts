@@ -38,7 +38,7 @@ export interface SatellitePoint {
 
 export interface ParcelPhoto {
   id: string;
-  /** Imaginea salvată în Firebase. Pe serverul actual, poza se descarcă după identificator. */
+  /** The image saved in Firebase. On the current server, the photo is downloaded by its identifier. */
   imageUri?: string;
   notes: string | null;
   createdAt: string;
@@ -127,7 +127,7 @@ export interface ParcelIntelligence {
   activeIrrigation: ActiveIrrigation[];
   activeWork: ActiveWork[];
   nextAction: NextAction;
-  /** Hibridul ales și recomandările din catalog, disponibile pe Firebase. */
+  /** The chosen hybrid and the catalog recommendations, available on Firebase. */
   catalog?: {
     cropName: string | null;
     seasonId: string | null;

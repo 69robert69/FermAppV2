@@ -10,7 +10,7 @@ interface FetchOptions extends RequestInit {
 const RETRYABLE = new Set([408, 425, 429, 500, 502, 503, 504]);
 const wait = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
 
-/** Apel extern cu limită de timp și reîncercări; erorile devin un 502 clar pentru client. */
+/** External call with timeout and retries; errors become a clear 502 for the client. */
 export async function fetchUpstream(url: string, options: FetchOptions): Promise<Response> {
   const { service, timeoutMs = 15_000, retries = 2, ...init } = options;
   let lastProblem = 'necunoscut';
@@ -27,7 +27,7 @@ export async function fetchUpstream(url: string, options: FetchOptions): Promise
     }
   }
 
-  logger.warn(`${service}: apel eșuat`, lastProblem);
+  logger.warn(`${service}: call failed`, lastProblem);
   throw upstreamFailed(service);
 }
 
@@ -36,7 +36,7 @@ export async function fetchJson<T>(url: string, options: FetchOptions): Promise<
   return (await response.json()) as T;
 }
 
-/** Rulează sarcinile cu un număr limitat de apeluri simultane. */
+/** Runs tasks with a limited number of simultaneous calls. */
 export async function mapLimit<T>(items: readonly T[], limit: number, task: (item: T) => Promise<void>) {
   let next = 0;
   const worker = async () => {

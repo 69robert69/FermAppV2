@@ -34,7 +34,7 @@ export interface ImportProblem {
   reason: string;
 }
 
-/** Numele de câmpuri uzuale din exporturile GIS și din fișierele APIA/LPIS. */
+/** Common field names from GIS exports and APIA/LPIS files. */
 const FIELD_ALIASES = {
   name: ['name', 'nume', 'denumire', 'parcela', 'nume_parcela', 'nr_parcela', 'parcel', 'title'],
   code: ['code', 'cod', 'cod_parcela', 'bloc_fizic', 'blocfizic', 'bf', 'nr_bloc', 'id_parcela'],
@@ -52,12 +52,12 @@ function pick(properties: Record<string, unknown>, aliases: readonly string[]): 
   return undefined;
 }
 
-/** Elimină altitudinea și verifică structura fiecărui punct. */
+/** Drops altitude and checks the structure of each point. */
 function toPositions(ring: unknown): Position[] {
-  if (!Array.isArray(ring)) throw new Error('inel invalid');
+  if (!Array.isArray(ring)) throw new Error('invalid ring');
   return ring.map((point) => {
     if (!Array.isArray(point) || typeof point[0] !== 'number' || typeof point[1] !== 'number') {
-      throw new Error('coordonate invalide');
+      throw new Error('invalid coordinates');
     }
     return [point[0], point[1]] as Position;
   });
@@ -81,22 +81,22 @@ function polygonsOf(geometry: Feature['geometry']): PolygonGeometry[] {
 }
 
 export function featuresToParcels(features: Feature[]) {
-  if (features.length > MAX_FEATURES) throw badRequest(`Fișierul depășește limita de ${MAX_FEATURES} parcele.`);
+  if (features.length > MAX_FEATURES) throw badRequest(`The file exceeds the limit of ${MAX_FEATURES} parcels.`);
   const parcels: ImportedParcel[] = [];
   const problems: ImportProblem[] = [];
 
   features.forEach((feature, index) => {
     const properties = feature.properties ?? {};
-    const baseName = pick(properties, FIELD_ALIASES.name) ?? `Parcelă importată ${index + 1}`;
+    const baseName = pick(properties, FIELD_ALIASES.name) ?? `Imported parcel ${index + 1}`;
     let polygons: PolygonGeometry[];
     try {
       polygons = polygonsOf(feature.geometry);
     } catch (error) {
-      problems.push({ index, name: baseName, reason: `Geometrie invalidă: ${(error as Error).message}.` });
+      problems.push({ index, name: baseName, reason: `Invalid geometry: ${(error as Error).message}.` });
       return;
     }
     if (polygons.length === 0) {
-      problems.push({ index, name: baseName, reason: 'Elementul nu conține un poligon.' });
+      problems.push({ index, name: baseName, reason: 'The element does not contain a polygon.' });
       return;
     }
     polygons.forEach((geometry, part) => {
@@ -129,22 +129,22 @@ function asFeatures(data: unknown): Feature[] {
     if (item?.type === 'Polygon' || item?.type === 'MultiPolygon') {
       return [{ type: 'Feature', geometry: item, properties: {} }];
     }
-    throw badRequest('Fișierul nu conține date GeoJSON valide.');
+    throw badRequest('The file does not contain valid GeoJSON data.');
   });
 }
 
-/** Verifică arhiva înainte de dezarhivare, ca protecție împotriva arhivelor supradimensionate. */
+/** Checks the archive before extracting it, as protection against oversized archives. */
 async function openArchive(buffer: Buffer): Promise<JSZip> {
   let zip: JSZip;
   try {
     zip = await JSZip.loadAsync(buffer);
   } catch {
-    throw badRequest('Arhiva nu poate fi citită.');
+    throw badRequest('The archive cannot be read.');
   }
   const entries = Object.values(zip.files) as (JSZip.JSZipObject & { _data?: { uncompressedSize?: number } })[];
-  if (entries.length > MAX_ARCHIVE_ENTRIES) throw badRequest('Arhiva conține prea multe fișiere.');
+  if (entries.length > MAX_ARCHIVE_ENTRIES) throw badRequest('The archive contains too many files.');
   const total = entries.reduce((sum, entry) => sum + (entry._data?.uncompressedSize ?? 0), 0);
-  if (total > MAX_UNCOMPRESSED_BYTES) throw badRequest('Arhiva este prea mare după dezarhivare.');
+  if (total > MAX_UNCOMPRESSED_BYTES) throw badRequest('The archive is too large after extraction.');
   return zip;
 }
 
@@ -167,13 +167,13 @@ export async function parseGeoFile(format: GeoFormat, buffer: Buffer) {
       case 'kmz': {
         const zip = await openArchive(buffer);
         const entry = Object.values(zip.files).find((file) => file.name.toLowerCase().endsWith('.kml'));
-        if (!entry) throw badRequest('Arhiva KMZ nu conține un fișier KML.');
+        if (!entry) throw badRequest('The KMZ archive does not contain a KML file.');
         features = parseKml(await entry.async('string'));
         break;
       }
       case 'shp':
       case 'lpis': {
-        // Fișierele LPIS pot veni ca GeoJSON sau ca arhivă Shapefile (inclusiv Stereo 70, prin .prj).
+        // LPIS files can come as GeoJSON or as a Shapefile archive (including Stereo 70, via .prj).
         if (buffer[0] === 0x7b) {
           features = asFeatures(JSON.parse(buffer.toString('utf8')));
           break;
@@ -185,7 +185,7 @@ export async function parseGeoFile(format: GeoFormat, buffer: Buffer) {
     }
   } catch (error) {
     if ((error as { status?: number }).status) throw error;
-    throw badRequest(`Fișierul ${format.toUpperCase()} nu poate fi citit.`);
+    throw badRequest(`The ${format.toUpperCase()} file cannot be read.`);
   }
   return featuresToParcels(features);
 }
@@ -235,7 +235,7 @@ export function toKml(parcels: ExportParcel[]): string {
     const inner = holes
       .map((hole) => `<innerBoundaryIs><LinearRing><coordinates>${ring(hole)}</coordinates></LinearRing></innerBoundaryIs>`)
       .join('');
-    return `<Placemark><name>${xml(parcel.name)}</name><description>${xml(`${parcel.code}, ${parcel.areaHa} ha`)}</description><ExtendedData><Data name="code"><value>${xml(parcel.code)}</value></Data><Data name="localitate"><value>${xml(parcel.locality ?? '')}</value></Data><Data name="judet"><value>${xml(parcel.county ?? '')}</value></Data></ExtendedData><Polygon><outerBoundaryIs><LinearRing><coordinates>${ring(outer!)}</coordinates></LinearRing></outerBoundaryIs>${inner}</Polygon></Placemark>`;
+    return `<Placemark><name>${xml(parcel.name)}</name><description>${xml(`${parcel.code}, ${parcel.areaHa} ha`)}</description><ExtendedData><Data name="code"><value>${xml(parcel.code)}</value></Data><Data name="locality"><value>${xml(parcel.locality ?? '')}</value></Data><Data name="county"><value>${xml(parcel.county ?? '')}</value></Data></ExtendedData><Polygon><outerBoundaryIs><LinearRing><coordinates>${ring(outer!)}</coordinates></LinearRing></outerBoundaryIs>${inner}</Polygon></Placemark>`;
   });
   return `<?xml version="1.0" encoding="UTF-8"?><kml xmlns="http://www.opengis.net/kml/2.2"><Document><name>FermApp</name>${placemarks.join('')}</Document></kml>`;
 }
@@ -244,12 +244,12 @@ async function toShapefile(collection: unknown): Promise<Buffer> {
   const result = await shpwrite.zip(collection, {
     outputType: 'nodebuffer',
     compression: 'DEFLATE',
-    types: { polygon: 'parcele' },
+    types: { polygon: 'parcels' },
   });
   return result as Buffer;
 }
 
-/** Export pentru verificarea în GIS, cu câmpurile de identificare folosite la import. */
+/** Export for checking in GIS, with the identification fields used on import. */
 function toLpisCollection(parcels: ExportParcel[]) {
   return {
     type: 'FeatureCollection' as const,

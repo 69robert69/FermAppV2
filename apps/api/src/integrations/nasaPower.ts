@@ -69,7 +69,7 @@ const isSeason = (date: string) => {
   return month >= 4 && month <= 9;
 };
 
-/** Agregă pe ani calendaristici; sezonul de vegetație este aprilie-septembrie. */
+/** Aggregates by calendar year; the growing season is April-September. */
 export function summarizeClimateYears(days: readonly PowerDay[]): ClimateYear[] {
   const byYear = new Map<number, PowerDay[]>();
   for (const day of days) {
@@ -95,7 +95,7 @@ export function summarizeClimateYears(days: readonly PowerDay[]): ClimateYear[] 
     });
 }
 
-/** Media ultimilor ani compleți, folosită la recomandarea culturilor. */
+/** Average of the last complete years, used for crop recommendations. */
 export async function getClimateNormals(lat: number, lng: number, years = 5) {
   const lastYear = new Date().getUTCFullYear() - 1;
   const days = await getPowerDaily(lat, lng, `${lastYear - years + 1}-01-01`, `${lastYear}-12-31`);

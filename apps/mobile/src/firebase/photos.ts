@@ -6,7 +6,7 @@ import { pendingSnapshot, queueWrites, readSnapshot, writeSnapshot } from './out
 import { farmFields, newId, session } from './services';
 import type { PhotoDoc } from './types';
 
-/** Un document Firestore are maximum 1 MB, iar imaginea codată trebuie să încapă în el. */
+/** A Firestore document has at most 1 MB, and the encoded image must fit in it. */
 const MAX_ENCODED_LENGTH = 700_000;
 const ATTEMPTS = [
   { width: 1280, compress: 0.6 },
@@ -17,8 +17,8 @@ const SHOWN_PHOTOS = 12;
 const READ_TIMEOUT_MS = 8000;
 
 /**
- * Planul gratuit Firebase nu include Storage, deci poza se micșorează și se salvează în Firestore.
- * Așa o vede toată echipa, iar fără conexiune așteaptă în coada de sincronizare.
+ * The free Firebase plan does not include Storage, so the photo is shrunk and saved in Firestore.
+ * This way the whole team sees it, and without a connection it waits in the sync queue.
  */
 export async function addPhoto(parcelId: string, sourceUri: string, notes?: string) {
   for (const { width, compress } of ATTEMPTS) {
@@ -35,10 +35,10 @@ export async function addPhoto(parcelId: string, sourceUri: string, notes?: stri
     ]);
     return { id };
   }
-  throw new ApiError(400, 'PHOTO_TOO_LARGE', 'Fotografia este prea mare. Alege altă imagine.');
+  throw new ApiError(400, 'PHOTO_TOO_LARGE', 'The photo is too large. Choose another image.');
 }
 
-/** Pozele se citesc doar când se deschide parcela, ca să nu consume cota gratuită. */
+/** Photos are read only when the parcel is opened, so they do not consume the free quota. */
 export async function parcelPhotos(parcelId: string) {
   const { farmId } = session();
   const key = `photos:${parcelId}`;

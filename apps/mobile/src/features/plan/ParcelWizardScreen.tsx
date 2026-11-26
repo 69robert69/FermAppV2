@@ -1,3 +1,4 @@
+import type { TillageSystem } from '@fermapp/domain';
 import {
   CROP_CODES,
   CROPS,
@@ -30,30 +31,31 @@ export interface ParcelDraft {
   county?: string;
   notes?: string;
   irrigatedAreaHa?: number | null;
+  tillageSystem?: TillageSystem | null;
 }
 
 type Props = NativeStackScreenProps<RootStackParams, 'ParcelWizard'>;
 
 const TOTAL_STEPS = 6;
 const SHOWN_RECOMMENDATIONS = 5;
-const cropLabel = (code: CropCode) => (code === 'BEET' ? 'Sfeclă de zahăr' : CROPS[code].name);
+const cropLabel = (code: CropCode) => (code === 'BEET' ? 'Sugar beet' : CROPS[code].name);
 
 const LAST_CROPS: { value: LastCrop; label: string }[] = [
   ...(['WHEAT', 'CORN', 'SUNFLOWER', 'SOY', 'RAPESEED', 'BARLEY', 'ALFALFA', 'POTATO', 'BEET'] as const).map((value) => ({
     value,
     label: cropLabel(value),
   })),
-  { value: OTHER_CROP, label: 'Altă cultură' },
+  { value: OTHER_CROP, label: 'Other crop' },
 ];
 const PLANNED_CROPS = CROP_CODES.map((value) => ({ value, label: cropLabel(value) }));
 
 const TITLES = [
-  'Care a fost ultima cultură cultivată pe această parcelă?',
-  'Ce cultură dorești să plantezi în următorul sezon?',
-  'Culturi recomandate',
-  'Plan tehnologic',
-  'Calendar agricol',
-  'Raportul parcelei',
+  'What was the last crop grown on this parcel?',
+  'Which crop do you want to plant next season?',
+  'Recommended crops',
+  'Technology plan',
+  'Farm calendar',
+  'Parcel report',
 ];
 
 function OptionList<T extends string>({
@@ -106,7 +108,7 @@ function Recommendations({
   const shown = chosen && !top.includes(chosen) ? [...top, chosen] : top;
   return (
     <View style={{ gap: space.md }}>
-      <Txt variant="small">Scorul combină solul, clima, precipitațiile și rotația. Atinge o cultură pentru a o alege.</Txt>
+      <Txt variant="small">The score combines soil, climate, rainfall and rotation. Tap a crop to choose it.</Txt>
       {shown.map((item) => {
         const active = item.crop === selected;
         return (
@@ -183,7 +185,7 @@ export function ParcelWizardScreen({ route, navigation }: Props) {
     finish,
   );
 
-  // Fără conexiune, parcela desenată rămâne salvată în coada offline.
+  // Without a connection, the drawn parcel stays saved in the offline queue.
   const saveWithoutPlan = useAction<void>(
     async () => {
       await apiSend('POST', '/parcels', draft);
@@ -203,7 +205,7 @@ export function ParcelWizardScreen({ route, navigation }: Props) {
   return (
     <View style={{ flex: 1 }}>
       <View style={styles.progress}>
-        <Txt variant="small">{`Pasul ${step} din ${TOTAL_STEPS}`}</Txt>
+        <Txt variant="small">{`Step ${step} of ${TOTAL_STEPS}`}</Txt>
         <ProgressTrack percent={(step / TOTAL_STEPS) * 100} />
       </View>
 
@@ -213,7 +215,7 @@ export function ParcelWizardScreen({ route, navigation }: Props) {
         {step === 1 ? (
           <>
             <OptionList options={LAST_CROPS} value={lastCrop} onChange={setLastCrop} />
-            {lastCrop === OTHER_CROP ? <Field label="Denumirea culturii (opțional)" value={lastCropName} onChangeText={setLastCropName} /> : null}
+            {lastCrop === OTHER_CROP ? <Field label="Crop name (optional)" value={lastCropName} onChangeText={setLastCropName} /> : null}
           </>
         ) : null}
 
@@ -226,7 +228,7 @@ export function ParcelWizardScreen({ route, navigation }: Props) {
 
         {step >= 3 ? (
           <>
-            {analysis.isFetching ? <Txt variant="small">Analizăm solul, clima și rotația culturilor.</Txt> : null}
+            {analysis.isFetching ? <Txt variant="small">Analysing soil, climate and crop rotation.</Txt> : null}
             <QueryState query={analysis}>
               {(plan) => (
                 <>
@@ -241,7 +243,7 @@ export function ParcelWizardScreen({ route, navigation }: Props) {
                     <Panel>
                       <Txt variant="subtitle">{cropLabel(plan.crop)}</Txt>
                       <CalendarList entries={stepsToCalendar(plan.steps)} />
-                      <Txt variant="small">Activitățile se adaugă automat în To Do, în calendar și în panoul parcelei.</Txt>
+                      <Txt variant="small">Activities are added automatically to To Do, the calendar and the parcel panel.</Txt>
                     </Panel>
                   ) : null}
                   {step === 6 ? <PlanReport report={plan.report} /> : null}
@@ -250,7 +252,7 @@ export function ParcelWizardScreen({ route, navigation }: Props) {
             </QueryState>
             {analysis.isError && draft ? (
               <Button mode="outlined" loading={saveWithoutPlan.isPending} disabled={saveWithoutPlan.isPending} onPress={() => saveWithoutPlan.mutate()}>
-                Salvează parcela fără plan
+                Save parcel without a plan
               </Button>
             ) : null}
           </>
@@ -259,15 +261,15 @@ export function ParcelWizardScreen({ route, navigation }: Props) {
 
       <View style={[styles.footer, { paddingBottom: insets.bottom + space.md }]}>
         <Button style={{ flex: 1 }} mode="outlined" onPress={() => (step === 1 ? navigation.goBack() : go(step - 1))}>
-          Înapoi
+          Back
         </Button>
         {step < TOTAL_STEPS ? (
           <Button style={{ flex: 1 }} mode="contained" disabled={!canContinue} onPress={() => go(step + 1)}>
-            Continuă
+            Continue
           </Button>
         ) : (
           <Button style={{ flex: 1 }} mode="contained" loading={save.isPending} disabled={!canContinue || save.isPending} onPress={() => save.mutate()}>
-            {parcelId ? 'Salvează planul' : 'Salvează parcela'}
+            {parcelId ? 'Save plan' : 'Save parcel'}
           </Button>
         )}
       </View>

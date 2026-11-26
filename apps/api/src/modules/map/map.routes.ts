@@ -4,14 +4,14 @@ import { ApiRouter, ROLES } from '../../lib/route';
 import { irrigationInclude, serializeIrrigation } from '../irrigation/irrigation.service';
 import { serializeWork, workInclude } from '../work/work.service';
 
-export const mapRoutes = new ApiRouter('/map', 'Hartă');
+export const mapRoutes = new ApiRouter('/map', 'Map');
 
-const SYSTEM_LABELS = { REEL: 'Tambur', PIVOT: 'Pivot', LINEAR: 'Liniar' } as const;
+const SYSTEM_LABELS = { REEL: 'Hose reel', PIVOT: 'Pivot', LINEAR: 'Linear' } as const;
 const ACTIVE = ['RUNNING', 'PAUSED'] as const;
 
 mapRoutes.get(
   '/overview',
-  { summary: 'Situația live a tuturor parcelelor, pentru afișarea pe hartă', roles: ROLES.all },
+  { summary: 'Live status of all parcels, for display on the map', roles: ROLES.all },
   async ({ auth }) => {
     const now = new Date();
     const year = now.getFullYear();
@@ -47,7 +47,7 @@ mapRoutes.get(
     return parcels.map((parcel) => {
       const planned = parcel.plans[0];
       const recorded = parcel.seasons[0];
-      // Ultima cultură declarată în wizard nu este cultura din câmp când planul începe într-un an viitor.
+      // The last crop declared in the wizard is not the crop in the field when the plan starts in a future year.
       const season = recorded && planned && planned.year > year && !recorded.sowingDate ? undefined : recorded;
       const code = season?.crop ?? planned?.crop ?? null;
       const progress = season

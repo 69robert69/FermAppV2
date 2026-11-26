@@ -1,4 +1,4 @@
-/** Fișiere păstrate în memorie, ca testele să poată verifica ce generează aplicația. */
+/** Files kept in memory, so tests can check what the app generates. */
 export const files = new Map<string, Uint8Array | string>();
 
 export const Paths = { document: 'document', cache: 'cache' };

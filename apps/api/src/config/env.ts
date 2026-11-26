@@ -11,7 +11,7 @@ const schema = z.object({
   CORS_ORIGINS: z.string().default('http://localhost:8081'),
   DATABASE_URL: z.string().min(1),
   REDIS_URL: optional,
-  JWT_ACCESS_SECRET: z.string().min(32, 'JWT_ACCESS_SECRET trebuie să aibă minimum 32 de caractere.'),
+  JWT_ACCESS_SECRET: z.string().min(32, 'JWT_ACCESS_SECRET must be at least 32 characters long.'),
   JWT_ACCESS_TTL_SECONDS: z.coerce.number().int().positive().default(900),
   REFRESH_TOKEN_TTL_DAYS: z.coerce.number().int().positive().default(30),
   OPENWEATHER_API_KEY: optional,
@@ -38,7 +38,7 @@ const schema = z.object({
 const parsed = schema.safeParse(process.env);
 if (!parsed.success) {
   const details = parsed.error.issues.map((i) => `${i.path.join('.')}: ${i.message}`).join('\n');
-  throw new Error(`Configurație invalidă:\n${details}`);
+  throw new Error(`Invalid configuration:\n${details}`);
 }
 
 export const env = parsed.data;

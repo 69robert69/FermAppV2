@@ -13,12 +13,12 @@ Notifications.setNotificationHandler({
   }),
 });
 
-/** Înregistrează telefonul pentru notificări. Lipsa permisiunii nu blochează aplicația. */
+/** Registers the phone for notifications. Missing permission does not block the app. */
 export async function registerForPush() {
   if (!Device.isDevice) return;
   if (Platform.OS === 'android') {
     await Notifications.setNotificationChannelAsync('default', {
-      name: 'Ferma',
+      name: 'Farm',
       importance: Notifications.AndroidImportance.HIGH,
     });
   }

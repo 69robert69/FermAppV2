@@ -15,7 +15,7 @@ interface OwmEntry {
 
 const HOUR_S = 3600;
 
-/** Coduri OpenWeatherMap: grupa 2xx este furtună, 202/212/232 sunt cele mai intense. */
+/** OpenWeatherMap codes: group 2xx is thunderstorm, 202/212/232 are the most intense. */
 function toWmoCode(id: number | undefined): number | null {
   if (id === undefined) return null;
   if (id === 906) return 96;
@@ -23,7 +23,7 @@ function toWmoCode(id: number | undefined): number | null {
   return null;
 }
 
-/** Transformă pașii de 3 ore în ore, începând cu ora curentă, ca mesajul „în N ore” să fie exact. */
+/** Converts the 3-hour steps into hours, starting from the current hour, so the "in N hours" message is exact. */
 export function expandOwmForecast(list: OwmEntry[], timezoneOffsetS: number, nowMs = Date.now()): ForecastHour[] {
   const hours: ForecastHour[] = [];
   const currentHourS = Math.floor(nowMs / 1000 / HOUR_S) * HOUR_S;
@@ -45,7 +45,7 @@ export function expandOwmForecast(list: OwmEntry[], timezoneOffsetS: number, now
     }
   }
 
-  // Primul pas poate începe în viitor, iar orele lipsă se completează fără ploaie.
+  // The first step may start in the future, and missing hours are filled in without rain.
   const first = list[0];
   if (first && first.dt > currentHourS) {
     const missing = Math.round((first.dt - currentHourS) / HOUR_S);

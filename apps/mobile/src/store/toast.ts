@@ -6,7 +6,7 @@ interface ToastState {
   hide: () => void;
 }
 
-/** Mesaj scurt afișat peste orice ecran, de exemplu la finalizarea unei lucrări. */
+/** Short message shown over any screen, for example when an operation completes. */
 export const useToast = create<ToastState>((set) => ({
   message: null,
   show: (message) => set({ message }),

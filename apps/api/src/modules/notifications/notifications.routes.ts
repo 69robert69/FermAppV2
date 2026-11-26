@@ -2,12 +2,12 @@ import { z } from 'zod';
 import { prisma } from '../../lib/prisma';
 import { ApiRouter, idParams, ROLES } from '../../lib/route';
 
-export const notificationRoutes = new ApiRouter('/notifications', 'Notificări');
+export const notificationRoutes = new ApiRouter('/notifications', 'Notifications');
 
 notificationRoutes.get(
   '/',
   {
-    summary: 'Ultimele notificări ale utilizatorului',
+    summary: 'Latest notifications of the user',
     roles: ROLES.all,
     query: z.object({ limit: z.coerce.number().int().min(1).max(100).default(50) }),
   },
@@ -21,7 +21,7 @@ notificationRoutes.get(
 
 notificationRoutes.post(
   '/:id/read',
-  { summary: 'Marchează notificarea drept citită', roles: ROLES.all, status: 204, params: idParams },
+  { summary: 'Mark the notification as read', roles: ROLES.all, status: 204, params: idParams },
   async ({ auth, params }) => {
     await prisma.notification.updateMany({
       where: { id: params.id, userId: auth.userId, readAt: null },

@@ -2,7 +2,7 @@ import { CROPS, type CropCode } from './crops';
 
 export interface CropHistoryEntry {
   crop: CropCode;
-  /** Anul agricol al recoltei. */
+  /** Agricultural year of the harvest. */
   year: number;
 }
 
@@ -27,22 +27,22 @@ export interface RotationResult {
 export const ROTATION_THRESHOLDS = { recommended: 70, acceptable: 40 } as const;
 
 export const VERDICT_LABELS: Record<RotationVerdict, string> = {
-  RECOMMENDED: '✅ Recomandat',
-  ACCEPTABLE: '⚠️ Acceptabil',
-  NOT_RECOMMENDED: '❌ Nerecomandat',
+  RECOMMENDED: '✅ Recommended',
+  ACCEPTABLE: '⚠️ Acceptable',
+  NOT_RECOMMENDED: '❌ Not recommended',
 };
 
 const BASE_SCORE = 75;
 
-const yearsWord = (n: number) => (n === 1 ? 'un an' : n === 2 ? 'doi ani' : `${n} ani`);
-const agoPhrase = (n: number) => (n === 0 ? 'în acest an' : n === 1 ? 'anul trecut' : `acum ${n} ani`);
+const yearsWord = (n: number) => (n === 1 ? 'one year' : n === 2 ? 'two years' : `${n} years`);
+const agoPhrase = (n: number) => (n === 0 ? 'this year' : n === 1 ? 'last year' : `${n} years ago`);
 
-/** Bolile comune (Sclerotinia) fac aceste culturi predecesoare riscante una pentru alta. */
+/** Common diseases (Sclerotinia) make these preceding crops risky for one another. */
 const SCLEROTINIA_HOSTS: readonly CropCode[] = ['SUNFLOWER', 'RAPESEED', 'SOY'];
 
 /**
- * Evaluează cultura propusă pe baza istoricului parcelei.
- * Pauza se măsoară în ani întregi fără cultură: 2022 și 2027 înseamnă o pauză de 4 ani.
+ * Evaluates the proposed crop based on the parcel's history.
+ * The break is measured in full years without the crop: 2022 and 2027 mean a 4-year break.
  */
 export function evaluateRotation(
   proposed: CropCode,
@@ -70,12 +70,12 @@ export function evaluateRotation(
       add(
         'MIN_BREAK',
         -(35 + missing * 10),
-        `${profile.name} a fost cultivată ${agoPhrase(yearsAgo)} pe această parcelă. ` +
-          `Se recomandă o pauză minimă de ${yearsWord(profile.minBreakYears)}. ` +
-          'Riscul de boli și scăderea producției este ridicat.',
+        `${profile.name} was grown ${agoPhrase(yearsAgo)} on this parcel. ` +
+          `A minimum break of ${yearsWord(profile.minBreakYears)} is recommended. ` +
+          'The risk of disease and yield loss is high.',
       );
     } else {
-      add('BREAK_OK', 5, `Pauza de ${yearsWord(breakYears)} față de ultima cultură de ${profile.name.toLowerCase()} este respectată.`);
+      add('BREAK_OK', 5, `The ${yearsWord(breakYears)} break since the last ${profile.name.toLowerCase()} crop is respected.`);
     }
   }
 
@@ -83,16 +83,16 @@ export function evaluateRotation(
     const previousProfile = CROPS[previous.crop];
 
     if (previousProfile.family === profile.family && profile.family !== 'VEGETABLE') {
-      add('SAME_FAMILY', -15, `${previousProfile.name} și ${profile.name.toLowerCase()} fac parte din aceeași familie și au boli și dăunători comuni.`);
+      add('SAME_FAMILY', -15, `${previousProfile.name} and ${profile.name.toLowerCase()} belong to the same family and share diseases and pests.`);
     }
     if (proposed === 'CORN' && previousProfile.family === 'LEGUME') {
-      add('CORN_AFTER_LEGUME', 15, `Porumbul valorifică azotul lăsat în sol de ${previousProfile.name.toLowerCase()}.`);
+      add('CORN_AFTER_LEGUME', 15, `Corn uses the nitrogen left in the soil by ${previousProfile.name.toLowerCase()}.`);
     }
     if (proposed === 'SOY' && previousProfile.family === 'CEREAL') {
-      add('SOY_AFTER_CEREAL', 15, `Soia este recomandată după cereale, iar ${previousProfile.name.toLowerCase()} este o premergătoare bună.`);
+      add('SOY_AFTER_CEREAL', 15, `Soybean is recommended after cereals, and ${previousProfile.name.toLowerCase()} is a good preceding crop.`);
     }
     if (previous.crop === 'ALFALFA' && proposed !== 'CORN') {
-      add('ALFALFA_NITROGEN', 15, 'Lucerna a îmbunătățit rezerva de azot din sol.');
+      add('ALFALFA_NITROGEN', 15, 'Alfalfa has improved the soil nitrogen reserve.');
     }
     if (
       proposed !== 'CORN' &&
@@ -100,21 +100,21 @@ export function evaluateRotation(
       profile.family === 'CEREAL' &&
       previousProfile.family === 'LEGUME'
     ) {
-      add('CEREAL_AFTER_LEGUME', 10, `Cerealele beneficiază de azotul fixat de ${previousProfile.name.toLowerCase()}.`);
+      add('CEREAL_AFTER_LEGUME', 10, `Cereals benefit from the nitrogen fixed by ${previousProfile.name.toLowerCase()}.`);
     }
     if (SCLEROTINIA_HOSTS.includes(proposed) && SCLEROTINIA_HOSTS.includes(previous.crop)) {
-      add('SCLEROTINIA', -20, `${previousProfile.name} și ${profile.name.toLowerCase()} sunt gazde pentru putregaiul alb (Sclerotinia).`);
+      add('SCLEROTINIA', -20, `${previousProfile.name} and ${profile.name.toLowerCase()} are both hosts of white mould (Sclerotinia).`);
     }
   }
 
   const lastDecade = past.filter((entry) => entry.year >= proposedYear - 10);
   const sameCount = lastDecade.filter((entry) => entry.crop === proposed).length;
   if (lastDecade.length >= 4 && sameCount / lastDecade.length > 0.4) {
-    add('HIGH_FREQUENCY', -10, `${profile.name} a ocupat parcela în ${sameCount} din ultimii ${lastDecade.length} ani înregistrați.`);
+    add('HIGH_FREQUENCY', -10, `${profile.name} occupied the parcel in ${sameCount} of the last ${lastDecade.length} recorded years.`);
   }
 
   if (past.length === 0) {
-    add('NO_HISTORY', -5, 'Parcela nu are istoric de culturi, deci evaluarea este orientativă.');
+    add('NO_HISTORY', -5, 'The parcel has no crop history, so the assessment is indicative.');
   }
 
   const raw = factors.reduce((score, factor) => score + factor.impact, BASE_SCORE);
@@ -135,7 +135,7 @@ export function evaluateRotation(
     verdict,
     label: VERDICT_LABELS[verdict],
     explanation:
-      ordered[0]?.message ?? `${profile.name} nu are restricții de rotație pe această parcelă.`,
+      ordered[0]?.message ?? `${profile.name} has no rotation restrictions on this parcel.`,
     factors: ordered,
   };
 }

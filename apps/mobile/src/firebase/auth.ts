@@ -26,19 +26,19 @@ interface FirebaseSession {
 export const useFirebaseSession = create<FirebaseSession>(() => ({ status: 'loading', user: null, profile: null }));
 
 const MESSAGES: Record<string, string> = {
-  'auth/email-already-in-use': 'Există deja un cont cu acest email.',
-  'auth/invalid-email': 'Adresa de email nu este validă.',
-  'auth/weak-password': 'Parola trebuie să aibă minimum 6 caractere.',
-  'auth/invalid-credential': 'Emailul sau parola nu sunt corecte.',
-  'auth/too-many-requests': 'Prea multe încercări. Reîncearcă în câteva minute.',
-  'auth/network-request-failed': 'Autentificarea are nevoie de conexiune la internet.',
-  'permission-denied': 'Contul tău nu are acces la această acțiune.',
+  'auth/email-already-in-use': 'An account with this email already exists.',
+  'auth/invalid-email': 'The email address is not valid.',
+  'auth/weak-password': 'The password must be at least 6 characters long.',
+  'auth/invalid-credential': 'The email or password is incorrect.',
+  'auth/too-many-requests': 'Too many attempts. Try again in a few minutes.',
+  'auth/network-request-failed': 'Signing in needs an internet connection.',
+  'permission-denied': 'Your account does not have access to this action.',
 };
 
 export const authErrorMessage = (error: unknown) =>
-  (error instanceof FirebaseError ? MESSAGES[error.code] : undefined) ?? 'Autentificarea nu a reușit. Încearcă din nou.';
+  (error instanceof FirebaseError ? MESSAGES[error.code] : undefined) ?? 'Sign-in failed. Try again.';
 
-/** Pornește urmărirea sesiunii. Fără conexiune se folosește ultimul profil salvat. */
+/** Starts session tracking. Without a connection, the last saved profile is used. */
 export function startAuthListener() {
   let stopProfile: (() => void) | null = null;
   const stopAuth = onAuthStateChanged(auth, (user) => {
@@ -56,7 +56,7 @@ export function startAuthListener() {
     });
     stopProfile = onSnapshot(doc(firestore, 'users', user.uid), (snapshot) => {
       if (!snapshot.exists()) {
-        // Fără conexiune nu se poate ști dacă profilul există, deci rămâne cel salvat pe telefon.
+        // Without a connection there is no way to know whether the profile exists, so the one saved on the phone remains.
         if (snapshot.metadata.fromCache) return;
         useFirebaseSession.setState({ status: 'needsFarm', profile: null });
         return;
@@ -72,7 +72,7 @@ export function startAuthListener() {
   };
 }
 
-/** Creează contul, ferma și profilul de administrator. */
+/** Creates the account, the farm and the administrator profile. */
 export async function registerFarm(input: { name: string; email: string; password: string; farmName: string }) {
   const { user } = await createUserWithEmailAndPassword(auth, input.email.trim(), input.password);
   await updateProfile(user, { displayName: input.name });
@@ -90,22 +90,22 @@ export async function registerFarm(input: { name: string; email: string; passwor
   await setDoc(doc(firestore, 'users', user.uid), profile);
 }
 
-/** Contul unui membru invitat. Intrarea în fermă cere confirmarea adresei de email. */
+/** Account of an invited member. Joining the farm requires confirming the email address. */
 export async function registerInvited(input: { name: string; email: string; password: string }) {
   const { user } = await createUserWithEmailAndPassword(auth, input.email.trim(), input.password);
   await updateProfile(user, { displayName: input.name });
   await sendEmailVerification(user);
 }
 
-/** Se apelează după ce utilizatorul a confirmat emailul. */
+/** Called after the user has confirmed the email. */
 export async function joinInvitedFarm() {
   const user = auth.currentUser;
-  if (!user?.email) throw new Error('Autentifică-te înainte de a accepta invitația.');
+  if (!user?.email) throw new Error('Sign in before accepting the invitation.');
   await user.reload();
   await user.getIdToken(true);
   const inviteRef = doc(firestore, 'invites', user.email.toLowerCase());
   const invite = await getDoc(inviteRef);
-  if (!invite.exists()) throw new Error('Nu există o invitație pentru această adresă.');
+  if (!invite.exists()) throw new Error('There is no invitation for this address.');
   const { farmId, farmName, role } = invite.data() as { farmId: string; farmName: string; role: FarmRole };
   const profile: UserProfile = {
     uid: user.uid,
@@ -122,7 +122,7 @@ export async function joinInvitedFarm() {
 
 export async function inviteMember(email: string, role: FarmRole) {
   const profile = useFirebaseSession.getState().profile;
-  if (!profile) throw new Error('Sesiunea nu este activă.');
+  if (!profile) throw new Error('The session is not active.');
   await setDoc(doc(firestore, 'invites', email.trim().toLowerCase()), {
     farmId: profile.farmId,
     farmName: profile.farmName,

@@ -31,7 +31,7 @@ export async function authenticateDeviceKey(key: string) {
   return prisma.iotDevice.findUnique({ where: { keyHash: sha256(key) } });
 }
 
-/** Punctul comun pentru REST, MQTT și WebSocket; citirile retrimise se ignoră. */
+/** Common entry point for REST, MQTT and WebSocket; resent readings are ignored. */
 export async function ingestTelemetry(device: Pick<IotDevice, 'id' | 'farmId'>, telemetry: Telemetry) {
   const now = new Date();
   const rows = telemetry.readings.map((reading) => ({

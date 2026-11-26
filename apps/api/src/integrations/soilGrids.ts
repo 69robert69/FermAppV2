@@ -10,7 +10,7 @@ interface SoilGridsResponse {
   };
 }
 
-/** Grosimea straturilor analizate, în cm. */
+/** Thickness of the analysed layers, in cm. */
 const DEPTH_WEIGHTS: Record<string, number> = { '0-5cm': 5, '5-15cm': 10, '15-30cm': 15 };
 
 export interface SoilGridsValues {
@@ -41,7 +41,7 @@ export function parseSoilGrids(data: SoilGridsResponse): SoilGridsValues | null 
   const clayPct = layerMean('clay');
   const sandPct = layerMean('sand');
   const organicCarbonGKg = layerMean('soc');
-  // Punctele fără date (ape, zone urbane) nu pot fi clasificate.
+  // Points without data (water, urban areas) cannot be classified.
   if (ph === null || clayPct === null || sandPct === null || organicCarbonGKg === null) return null;
   return {
     ph,

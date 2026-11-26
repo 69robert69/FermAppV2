@@ -32,7 +32,7 @@ export function verifyAccessToken(token: string): AuthContext {
     }) as jwt.JwtPayload;
     return { userId: payload.sub!, farmId: payload.farmId as string, role: payload.role as Role };
   } catch {
-    throw unauthorized('Sesiunea a expirat. Autentifică-te din nou.');
+    throw unauthorized('Your session has expired. Please sign in again.');
   }
 }
 

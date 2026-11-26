@@ -15,7 +15,7 @@ const config: ExpoConfig = {
     supportsTablet: true,
     config: { googleMapsApiKey: googleMapsKey },
     infoPlist: {
-      NSLocationWhenInUseUsageDescription: 'Locația te ajută să găsești și să desenezi parcelele pe hartă.',
+      NSLocationWhenInUseUsageDescription: 'Location helps you find and draw parcels on the map.',
       UIBackgroundModes: ['fetch', 'remote-notification'],
     },
   },
@@ -29,10 +29,10 @@ const config: ExpoConfig = {
     'expo-secure-store',
     'expo-sqlite',
     'expo-background-task',
-    ['expo-image-picker', { cameraPermission: 'Camera este folosită pentru fotografiile din teren.', photosPermission: 'Galeria este folosită pentru a atașa fotografii la parcele.' }],
+    ['expo-image-picker', { cameraPermission: 'The camera is used for field photos.', photosPermission: 'The gallery is used to attach photos to parcels.' }],
     ['expo-splash-screen', { backgroundColor: '#181B13' }],
     ['expo-notifications', { color: '#E2B23D' }],
-    ['expo-location', { locationWhenInUsePermission: 'Locația te ajută să găsești și să desenezi parcelele pe hartă.' }],
+    ['expo-location', { locationWhenInUsePermission: 'Location helps you find and draw parcels on the map.' }],
   ],
   extra: {
     eas: { projectId: process.env.EAS_PROJECT_ID },

@@ -1,4 +1,4 @@
-// Pornește o bază de date PostgreSQL locală, aplică migrările, încarcă datele demo și pornește API-ul.
+// Starts a local PostgreSQL database, applies migrations, loads demo data and starts the API.
 import { execSync, spawn } from 'node:child_process';
 import { existsSync } from 'node:fs';
 import path from 'node:path';
@@ -21,17 +21,17 @@ const postgres = new EmbeddedPostgres({
 
 const run = (command: string) => execSync(command, { cwd: apiRoot, stdio: 'inherit', env: process.env });
 
-console.log('Pornesc baza de date...');
+console.log('Starting the database...');
 if (firstRun) await postgres.initialise();
 await postgres.start();
 if (firstRun) await postgres.createDatabase('fermapp');
 
-console.log('Pregătesc datele...');
+console.log('Preparing the data...');
 run('npx prisma generate');
 run('npx prisma migrate deploy');
 run('npx tsx --env-file=.env prisma/seed.ts');
 
-console.log('Pornesc serverul...');
+console.log('Starting the server...');
 const server = spawn('npx tsx --env-file=.env src/server.ts', { cwd: apiRoot, stdio: 'inherit', shell: true });
 
 let stopping = false;

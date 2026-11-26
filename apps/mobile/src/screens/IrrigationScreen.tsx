@@ -16,7 +16,7 @@ import { colors, space } from '../theme';
 
 const systems = Object.entries(IRRIGATION_TYPES).map(([value, label]) => ({ value, label }));
 
-/** Sistemul de irigare ales de pe hartă. */
+/** The irrigation system chosen on the map. */
 function FocusedRun({ run, label }: { run: IrrigationRun; label: string }) {
   const progress = useLiveProgress(run);
   const paused = run.status === 'PAUSED';
@@ -30,11 +30,11 @@ function FocusedRun({ run, label }: { run: IrrigationRun; label: string }) {
         <Txt variant="figure" color={colors.water}>{`${Math.floor(progress.percent)}%`}</Txt>
       </View>
       <ProgressTrack percent={progress.percent} color={paused ? colors.straw : colors.water} />
-      <Row label="Tip echipament" value={IRRIGATION_TYPES[run.systemType]} />
-      <Row label="Acoperire" value={`${Math.floor(progress.percent)}%`} />
-      <Row label="Viteză de deplasare" value={`${number(run.speedMPerH, 0)} m/oră`} />
-      <Row label="Timp rămas" value={hoursMinutes(progress.remainingSeconds)} />
-      <Row label="ETA finalizare" value={paused ? 'În pauză' : progress.eta ? clock(progress.eta) : '-'} />
+      <Row label="Equipment type" value={IRRIGATION_TYPES[run.systemType]} />
+      <Row label="Coverage" value={`${Math.floor(progress.percent)}%`} />
+      <Row label="Travel speed" value={`${number(run.speedMPerH, 0)} m/hour`} />
+      <Row label="Time left" value={hoursMinutes(progress.remainingSeconds)} />
+      <Row label="Completion ETA" value={paused ? 'Paused' : progress.eta ? clock(progress.eta) : '-'} />
     </Panel>
   );
 }
@@ -91,19 +91,19 @@ export function IrrigationScreen() {
   const focused = active.find((run) => run.id === routeParams?.runId);
 
   return (
-    <Screen title="Irigații" onRefresh={() => void runs.refetch()} refreshing={runs.isRefetching}>
+    <Screen title="Irrigation" onRefresh={() => void runs.refetch()} refreshing={runs.isRefetching}>
       {focused ? <FocusedRun run={focused} label={routeParams?.label ?? IRRIGATION_TYPES[focused.systemType]!} /> : null}
       <QueryState query={runs}>
         {() =>
           active.length > 0 ? (
-            <Section title="Irigări active">
+            <Section title="Active irrigations">
               {active.map((run) => (
                 <RunCard
                   key={run.id}
                   run={run}
                   color={colors.water}
                   title={run.parcel.name}
-                  subtitle={`${IRRIGATION_TYPES[run.systemType]}, ${number(run.routeLengthM, 0)} m la ${number(run.speedMPerH, 0)} m/oră`}
+                  subtitle={`${IRRIGATION_TYPES[run.systemType]}, ${number(run.routeLengthM, 0)} m at ${number(run.speedMPerH, 0)} m/hour`}
                   canControl={canOperate(role)}
                   busy={control.isPending}
                   onAction={(action) => control.mutate({ id: run.id, action })}
@@ -115,38 +115,38 @@ export function IrrigationScreen() {
       </QueryState>
 
       {canOperate(role) ? (
-        <Section title="Pornește o irigare">
+        <Section title="Start an irrigation">
           <Panel>
             <ParcelPicker value={parcelId} onChange={setParcelId} />
-            <Choice label="Sistem" options={systems} value={system} onChange={setSystem} />
+            <Choice label="System" options={systems} value={system} onChange={setSystem} />
             <View style={{ flexDirection: 'row', gap: space.sm }}>
-              <Field style={{ flex: 1 }} label="Traseu (m)" value={length} onChangeText={setLength} keyboardType="decimal-pad" />
-              <Field style={{ flex: 1 }} label="Viteză (m/oră)" value={speed} onChangeText={setSpeed} keyboardType="decimal-pad" />
+              <Field style={{ flex: 1 }} label="Route (m)" value={length} onChangeText={setLength} keyboardType="decimal-pad" />
+              <Field style={{ flex: 1 }} label="Speed (m/hour)" value={speed} onChangeText={setSpeed} keyboardType="decimal-pad" />
             </View>
-            <Field label="Doză aplicată (mm, opțional)" value={dose} onChangeText={setDose} keyboardType="decimal-pad" />
+            <Field label="Applied dose (mm, optional)" value={dose} onChangeText={setDose} keyboardType="decimal-pad" />
             {estimate ? (
               <View style={{ flexDirection: 'row' }}>
-                <Stat value={number(estimate.durationHours)} unit="ore" label="Durată totală" color={colors.water} />
+                <Stat value={number(estimate.durationHours)} unit="hours" label="Total duration" color={colors.water} />
                 <Stat value={clock(estimate.eta)} label={`ETA, ${shortDate(estimate.eta)}`} />
               </View>
             ) : null}
             <Button mode="contained" disabled={!parcelId || !system || !valid || start.isPending} loading={start.isPending} onPress={() => start.mutate()}>
-              Pornește irigarea
+              Start irrigation
             </Button>
           </Panel>
         </Section>
       ) : null}
 
-      <Section title="Istoric">
+      <Section title="History">
         {history.length === 0 ? (
-          <Empty icon="water-off-outline" title="Nicio irigare încheiată" />
+          <Empty icon="water-off-outline" title="No completed irrigations" />
         ) : (
           <Panel>
             {history.map((run) => (
               <Row
                 key={run.id}
                 label={`${shortDate(run.startedAt)}, ${run.parcel.name}`}
-                value={run.status === 'CANCELLED' ? 'Anulată' : `${Math.round(run.progressPct)}%`}
+                value={run.status === 'CANCELLED' ? 'Cancelled' : `${Math.round(run.progressPct)}%`}
               />
             ))}
           </Panel>

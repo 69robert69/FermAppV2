@@ -3,7 +3,7 @@ import { Choice, Panel, Row, Txt } from '../../components/ui';
 import { number } from '../../lib/format';
 import { useCatalogTractors, type CatalogTractor } from './api';
 
-/** Alege marca și modelul, iar datele tehnice se completează automat. */
+/** Choose the brand and model, and the technical data is filled in automatically. */
 export function TractorWizard({ onSelect }: { onSelect: (tractor: CatalogTractor) => void }) {
   const tractors = useCatalogTractors();
   const [brand, setBrand] = useState<string | null>(null);
@@ -13,9 +13,9 @@ export function TractorWizard({ onSelect }: { onSelect: (tractor: CatalogTractor
 
   return (
     <Panel>
-      <Txt variant="subtitle">Alege din catalog</Txt>
+      <Txt variant="subtitle">Choose from catalog</Txt>
       <Choice
-        label="Marcă"
+        label="Brand"
         options={brands.map((value) => ({ value, label: value }))}
         value={brand}
         onChange={(value) => {
@@ -38,11 +38,11 @@ export function TractorWizard({ onSelect }: { onSelect: (tractor: CatalogTractor
       ) : null}
       {selected ? (
         <>
-          <Row label="Putere" value={`${selected.horsePower} CP`} />
-          <Row label="Consum" value={`${number(selected.fuelConsumptionMin)}-${number(selected.fuelConsumptionMax)} l/oră${selected.fuelEstimated ? ' (estimat)' : ''}`} />
-          <Row label="Rezervor" value={selected.tankCapacity ? `${selected.tankCapacity} l` : 'Necompletat'} />
-          <Row label="Greutate" value={selected.weight ? `${selected.weight} kg` : 'Necompletat'} />
-          <Row label="Categorie" value={selected.category} />
+          <Row label="Power" value={`${selected.horsePower} HP`} />
+          <Row label="Consumption" value={`${number(selected.fuelConsumptionMin)}-${number(selected.fuelConsumptionMax)} l/hour${selected.fuelEstimated ? ' (estimated)' : ''}`} />
+          <Row label="Tank" value={selected.tankCapacity ? `${selected.tankCapacity} l` : 'Not filled in'} />
+          <Row label="Weight" value={selected.weight ? `${selected.weight} kg` : 'Not filled in'} />
+          <Row label="Category" value={selected.category} />
         </>
       ) : null}
     </Panel>

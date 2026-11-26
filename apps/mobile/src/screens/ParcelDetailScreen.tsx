@@ -1,4 +1,4 @@
-import { CROP_CODES, CROPS, type CropCode, type RotationResult } from '@fermapp/domain';
+import { CROP_CODES, CROPS, type CropCode, type RotationResult, formatEuro } from '@fermapp/domain';
 import type { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { useQuery } from '@tanstack/react-query';
 import { useLayoutEffect, useState } from 'react';
@@ -12,21 +12,26 @@ import { SeedPicker } from '../features/catalog/SeedPicker';
 import { fullDate, ha, isPositive, number, parseNumber, parseRoDate, shortDate } from '../lib/format';
 import { useAction } from '../lib/hooks';
 import type { RootStackParams } from '../navigation/RootNavigator';
+import { ParcelEconomicsTab } from '../features/economics';
+import { CompletionScore, FieldStatusBadge, useFieldStatus } from '../features/fieldStatus';
+import { TillageBadge, TillageSection, useParcelById } from '../features/tillage';
 import { canManage, canPlan, useAuth } from '../store/auth';
 import { colors, healthColor, space } from '../theme';
 
 type Props = NativeStackScreenProps<RootStackParams, 'ParcelDetail'>;
-type Tab = 'culturi' | 'rotatie' | 'sol' | 'meteo' | 'ferestre' | 'apa' | 'satelit' | 'costuri';
+type Tab = 'crops' | 'economics' | 'tillage' | 'rotation' | 'soil' | 'weather' | 'windows' | 'water' | 'satellite' | 'costs';
 
 const TABS: { value: Tab; label: string }[] = [
-  { value: 'culturi', label: 'Culturi' },
-  { value: 'rotatie', label: 'Rotație' },
-  { value: 'sol', label: 'Sol' },
-  { value: 'meteo', label: 'Meteo' },
-  { value: 'ferestre', label: 'Ferestre de lucru' },
-  { value: 'apa', label: 'Apă' },
-  { value: 'satelit', label: 'Satelit' },
-  { value: 'costuri', label: 'Costuri' },
+  { value: 'crops', label: 'Crops' },
+  { value: 'economics', label: 'Economic analysis' },
+  { value: 'tillage', label: 'Tillage' },
+  { value: 'rotation', label: 'Rotation' },
+  { value: 'soil', label: 'Soil' },
+  { value: 'weather', label: 'Weather' },
+  { value: 'windows', label: 'Work windows' },
+  { value: 'water', label: 'Water' },
+  { value: 'satellite', label: 'Satellite' },
+  { value: 'costs', label: 'Expenses' },
 ];
 
 const cropOptions = CROP_CODES.map((code) => ({ value: code, label: CROPS[code].name }));
@@ -75,7 +80,7 @@ function SeasonsTab({ parcelId, editable }: { parcelId: string; editable: boolea
       <QueryState query={seasons}>
         {(items) =>
           items.length === 0 ? (
-            <Empty icon="sprout-outline" title="Niciun istoric de culturi" hint="Adaugă culturile din ultimii ani pentru a primi recomandări de rotație." />
+            <Empty icon="sprout-outline" title="No crop history" hint="Add the crops from recent years to get rotation recommendations." />
           ) : (
             <Panel>
               {items.map((season) => (
@@ -84,10 +89,10 @@ function SeasonsTab({ parcelId, editable }: { parcelId: string; editable: boolea
                   {season.yieldT != null || season.sowingDate ? (
                     <Txt variant="small">
                       {[
-                        season.sowingDate ? `Semănat ${shortDate(season.sowingDate)}` : null,
-                        season.harvestDate ? `Recoltat ${shortDate(season.harvestDate)}` : null,
+                        season.sowingDate ? `Sown ${shortDate(season.sowingDate)}` : null,
+                        season.harvestDate ? `Harvested ${shortDate(season.harvestDate)}` : null,
                         season.yieldT != null ? `${season.yieldT} t` : null,
-                        season.harvestMoisture != null ? `umiditate ${season.harvestMoisture}%` : null,
+                        season.harvestMoisture != null ? `moisture ${season.harvestMoisture}%` : null,
                       ].filter(Boolean).join(', ')}
                     </Txt>
                   ) : null}
@@ -98,10 +103,10 @@ function SeasonsTab({ parcelId, editable }: { parcelId: string; editable: boolea
         }
       </QueryState>
       {editable ? (
-        <Section title="Adaugă o cultură">
+        <Section title="Add a crop">
           <Panel>
             <Choice
-              label="Cultură"
+              label="Crop"
               options={cropOptions}
               value={crop}
               onChange={(value) => {
@@ -110,14 +115,14 @@ function SeasonsTab({ parcelId, editable }: { parcelId: string; editable: boolea
               }}
             />
             <SeedPicker crop={crop} parcelId={parcelId} value={seed?.id ?? null} onChange={setSeed} />
-            <Field label="An" value={year} onChangeText={setYear} keyboardType="number-pad" />
-            <Field label="Dată semănat (ZZ.LL.AAAA)" value={sowing} onChangeText={setSowing} />
-            <Field label="Dată recoltare (ZZ.LL.AAAA)" value={harvest} onChangeText={setHarvest} />
-            <Field label="Producție (tone)" value={yieldT} onChangeText={setYieldT} keyboardType="decimal-pad" />
-            <Field label="Umiditate recoltă (%)" value={moisture} onChangeText={setMoisture} keyboardType="decimal-pad" />
-            <Field label="Observații" value={notes} onChangeText={setNotes} multiline />
+            <Field label="Year" value={year} onChangeText={setYear} keyboardType="number-pad" />
+            <Field label="Sowing date (DD.MM.YYYY)" value={sowing} onChangeText={setSowing} />
+            <Field label="Harvest date (DD.MM.YYYY)" value={harvest} onChangeText={setHarvest} />
+            <Field label="Yield (tonnes)" value={yieldT} onChangeText={setYieldT} keyboardType="decimal-pad" />
+            <Field label="Harvest moisture (%)" value={moisture} onChangeText={setMoisture} keyboardType="decimal-pad" />
+            <Field label="Notes" value={notes} onChangeText={setNotes} multiline />
             <Button mode="contained" disabled={!crop || !/^\d{4}$/.test(year) || !validDates || add.isPending} loading={add.isPending} onPress={() => add.mutate()}>
-              Salvează cultura
+              Save crop
             </Button>
           </Panel>
         </Section>
@@ -142,7 +147,7 @@ function RotationTab({ parcelId }: { parcelId: string }) {
   });
   return (
     <>
-      <Section title={`Rotație pentru ${year}`}>
+      <Section title={`Rotation for ${year}`}>
         <QueryState query={options}>
           {(items) => (
             <>
@@ -160,7 +165,7 @@ function RotationTab({ parcelId }: { parcelId: string }) {
           )}
         </QueryState>
       </Section>
-      <Section title="Potrivire după sol și climă">
+      <Section title="Fit by soil and climate">
         <QueryState query={recommendations}>
           {(data) => (
             <Panel>
@@ -169,7 +174,7 @@ function RotationTab({ parcelId }: { parcelId: string }) {
                   <Row label={item.name} value={`${item.score}%`} />
                   <ProgressTrack percent={item.score} color={colors.leaf} />
                   <Txt variant="small">{item.reasons.slice(1, 3).join(' ')}</Txt>
-                  {item.missingData.length ? <Txt variant="small">{`Date lipsă: ${item.missingData.join(', ')}.`}</Txt> : null}
+                  {item.missingData.length ? <Txt variant="small">{`Missing data: ${item.missingData.join(', ')}.`}</Txt> : null}
                 </View>
               ))}
             </Panel>
@@ -208,21 +213,21 @@ function SoilTab({ parcelId, editable }: { parcelId: string; editable: boolean }
         data.status === 'READY' ? (
           <Panel>
             <Txt variant="title">{data.label}</Txt>
-            <Txt variant="small">Clasificare orientativă pe baza hărților SoilGrids.</Txt>
+            <Txt variant="small">Indicative classification based on SoilGrids maps.</Txt>
             <Row label="pH" value={data.ph} />
-            <Row label="Argilă" value={`${data.clayPct}%`} />
-            <Row label="Nisip" value={`${data.sandPct}%`} />
-            <Row label="Praf" value={`${data.siltPct}%`} />
-            <Row label="Materie organică" value={`${data.organicMatterPct}%`} />
-            <Row label="Carbon organic" value={`${data.organicCarbonGKg} g/kg`} />
-            <Row label="Retenție apă" value={`${data.waterHoldingMmPerM} mm/m`} />
+            <Row label="Clay" value={`${data.clayPct}%`} />
+            <Row label="Sand" value={`${data.sandPct}%`} />
+            <Row label="Silt" value={`${data.siltPct}%`} />
+            <Row label="Organic matter" value={`${data.organicMatterPct}%`} />
+            <Row label="Organic carbon" value={`${data.organicCarbonGKg} g/kg`} />
+            <Row label="Water retention" value={`${data.waterHoldingMmPerM} mm/m`} />
           </Panel>
         ) : (
           <Empty
             icon="layers-outline"
-            title={data.status === 'PENDING' ? 'Se analizează solul' : 'Profilul de sol nu este disponibil'}
+            title={data.status === 'PENDING' ? 'Analysing the soil' : 'The soil profile is not available'}
             hint={data.errorMessage}
-            action={data.status === 'FAILED' && editable ? <Button loading={refresh.isPending} onPress={() => refresh.mutate()}>Încearcă din nou</Button> : undefined}
+            action={data.status === 'FAILED' && editable ? <Button loading={refresh.isPending} onPress={() => refresh.mutate()}>Try again</Button> : undefined}
           />
         )
       }
@@ -266,11 +271,11 @@ function WeatherTab({ parcelId }: { parcelId: string }) {
     <>
       <Choice
         options={[
-          { value: '24h', label: '24 ore' },
-          { value: '7d', label: '7 zile' },
-          { value: '14d', label: '14 zile' },
-          { value: '30d', label: 'Ultimele 30 zile' },
-          { value: '12m', label: 'Ultimele 12 luni' },
+          { value: '24h', label: '24 hours' },
+          { value: '7d', label: '7 days' },
+          { value: '14d', label: '14 days' },
+          { value: '30d', label: 'Last 30 days' },
+          { value: '12m', label: 'Last 12 months' },
         ]}
         value={range}
         onChange={setRange}
@@ -279,8 +284,8 @@ function WeatherTab({ parcelId }: { parcelId: string }) {
         <QueryState query={history}>
           {(data) => (
             <Panel style={{ flexDirection: 'row' }}>
-              <Stat value={number(data.totals.precipitationMm)} unit="mm" label="Precipitații" color={colors.water} />
-              <Stat value={number(data.totals.et0Mm)} unit="mm" label="Evapotranspirație" />
+              <Stat value={number(data.totals.precipitationMm)} unit="mm" label="Rainfall" color={colors.water} />
+              <Stat value={number(data.totals.et0Mm)} unit="mm" label="Evapotranspiration" />
             </Panel>
           )}
         </QueryState>
@@ -289,13 +294,13 @@ function WeatherTab({ parcelId }: { parcelId: string }) {
           {(data) => (
             <Panel>
               {data.hours.map((hour) => (
-                <Row key={hour.time} label={hour.time.slice(11, 16)} value={`${Math.round(hour.temperatureC)}°, ${hour.precipitationMm} mm, vânt ${Math.round(hour.windKmh)} km/h`} />
+                <Row key={hour.time} label={hour.time.slice(11, 16)} value={`${Math.round(hour.temperatureC)}°, ${hour.precipitationMm} mm, wind ${Math.round(hour.windKmh)} km/h`} />
               ))}
               {data.days.map((day) => (
                 <View key={day.date} style={{ paddingVertical: space.xs }}>
                   <Row label={shortDate(day.date)} value={`${Math.round(day.tMinC)}° / ${Math.round(day.tMaxC)}°, ${day.precipitationMm} mm`} />
                   <Txt variant="small">
-                    {`Vânt ${Math.round(day.windMaxKmh ?? 0)} km/h, umiditate ${Math.round(day.humidityPct ?? 0)}%, ET₀ ${day.et0Mm ?? 0} mm, radiație ${day.radiationMjM2 ?? 0} MJ/m²`}
+                    {`Wind ${Math.round(day.windMaxKmh ?? 0)} km/h, humidity ${Math.round(day.humidityPct ?? 0)}%, ET₀ ${day.et0Mm ?? 0} mm, radiation ${day.radiationMjM2 ?? 0} MJ/m²`}
                   </Txt>
                 </View>
               ))}
@@ -321,7 +326,7 @@ function WindowsTab({ parcelId }: { parcelId: string }) {
             <Panel key={item.operation}>
               <Txt variant="subtitle">{item.message}</Txt>
               {item.windows.slice(1, 4).map((window) => (
-                <Row key={window.label} label={window.label} value={`${window.hours} ore`} />
+                <Row key={window.label} label={window.label} value={`${window.hours} hours`} />
               ))}
             </Panel>
           ))}
@@ -345,12 +350,12 @@ function WaterTab({ parcelId }: { parcelId: string }) {
           <Txt variant="title">{data.cropName}</Txt>
           <ProgressTrack percent={data.coveragePct} color={colors.water} />
           <View style={{ flexDirection: 'row' }}>
-            <Stat value={number(data.precipitationMm + data.irrigationMm, 0)} unit="mm" label="Apă primită" color={colors.water} />
+            <Stat value={number(data.precipitationMm + data.irrigationMm, 0)} unit="mm" label="Water received" color={colors.water} />
             <Stat value={number(data.deficitMm, 0)} unit="mm" label="Deficit" color={data.deficitMm ? colors.rust : colors.leaf} />
           </View>
-          <Row label="Necesar sezon" value={`${data.requiredMinMm}-${data.requiredMaxMm} mm`} />
-          <Row label="Precipitații" value={`${data.precipitationMm} mm`} />
-          <Row label="Irigații" value={`${data.irrigationMm} mm`} />
+          <Row label="Seasonal requirement" value={`${data.requiredMinMm}-${data.requiredMaxMm} mm`} />
+          <Row label="Rainfall" value={`${data.precipitationMm} mm`} />
+          <Row label="Irrigation" value={`${data.irrigationMm} mm`} />
           <Txt>{data.suggestion}</Txt>
         </Panel>
       )}
@@ -393,14 +398,14 @@ function SatelliteTab({ parcelId, editable }: { parcelId: string; editable: bool
         return (
           <>
             {!configured ? (
-              <Empty icon="satellite-variant" title="Imaginile satelitare nu sunt activate" hint="Administratorul trebuie să adauge contul Copernicus Sentinel pe server." />
+              <Empty icon="satellite-variant" title="Satellite imagery is not enabled" hint="The administrator must add the Copernicus Sentinel account on the server." />
             ) : editable ? (
-              <Button mode="outlined" loading={refresh.isPending} onPress={() => refresh.mutate()}>Descarcă ultimele imagini</Button>
+              <Button mode="outlined" loading={refresh.isPending} onPress={() => refresh.mutate()}>Download latest images</Button>
             ) : null}
             {latest ? (
               <Panel>
                 <Image
-                  accessibilityLabel={`Harta NDVI din ${fullDate(latest.date)}`}
+                  accessibilityLabel={`NDVI map from ${fullDate(latest.date)}`}
                   source={{
                     uri: `${API_URL}/parcels/${parcelId}/satellite/image?date=${latest.date.slice(0, 10)}&index=NDVI`,
                     headers: token ? { Authorization: `Bearer ${token}` } : undefined,
@@ -416,16 +421,16 @@ function SatelliteTab({ parcelId, editable }: { parcelId: string; editable: bool
                 </View>
               </Panel>
             ) : configured ? (
-              <Empty icon="image-off-outline" title="Nicio imagine fără nori" hint="Descarcă imaginile pentru ultimele 90 de zile." />
+              <Empty icon="image-off-outline" title="No cloud-free image" hint="Download the images for the last 90 days." />
             ) : null}
             {dates.length > 1 ? (
-              <Section title="Compară două date">
+              <Section title="Compare two dates">
                 <Panel>
-                  <Choice label="De la" options={dates} value={from} onChange={setFrom} />
-                  <Choice label="Până la" options={dates} value={to} onChange={setTo} />
+                  <Choice label="From" options={dates} value={from} onChange={setFrom} />
+                  <Choice label="To" options={dates} value={to} onChange={setTo} />
                   {compare.data ? (
                     <View style={{ flexDirection: 'row' }}>
-                      <Stat value={`${compare.data.change.ndvi > 0 ? '+' : ''}${compare.data.change.ndvi}`} label="Schimbare NDVI" color={compare.data.change.ndvi >= 0 ? colors.leaf : colors.rust} />
+                      <Stat value={`${compare.data.change.ndvi > 0 ? '+' : ''}${compare.data.change.ndvi}`} label="NDVI change" color={compare.data.change.ndvi >= 0 ? colors.leaf : colors.rust} />
                       <Stat value={`${compare.data.change.healthIndex > 0 ? '+' : ''}${compare.data.change.healthIndex}`} label="Health Index" />
                     </View>
                   ) : null}
@@ -433,7 +438,7 @@ function SatelliteTab({ parcelId, editable }: { parcelId: string; editable: bool
               </Section>
             ) : null}
             {observations.length > 0 ? (
-              <Section title="Istoric">
+              <Section title="History">
                 <Panel>
                   {observations.map((item) => (
                     <Row key={item.id} label={fullDate(item.date)} value={<Txt color={healthColor(item.healthClass)}>{`NDVI ${item.ndvi}`}</Txt>} />
@@ -448,7 +453,7 @@ function SatelliteTab({ parcelId, editable }: { parcelId: string; editable: bool
   );
 }
 
-const COST_LABELS = { SEED: 'Semințe', FERTILIZER: 'Îngrășăminte', PESTICIDE: 'Pesticide', FUEL: 'Combustibil', LABOR: 'Manoperă', IRRIGATION: 'Irigații', OTHER: 'Altele' } as const;
+const COST_LABELS = { SEED: 'Seeds', FERTILIZER: 'Fertilizers', PESTICIDE: 'Pesticides', FUEL: 'Fuel', LABOR: 'Labour', IRRIGATION: 'Irrigation', OTHER: 'Other' } as const;
 type CostCategory = keyof typeof COST_LABELS;
 
 function CostsTab({ parcelId, editable }: { parcelId: string; editable: boolean }) {
@@ -464,10 +469,10 @@ function CostsTab({ parcelId, editable }: { parcelId: string; editable: boolean 
     async () => {
       await apiSend('POST', '/costs', { parcelId, year, category, amount: parseNumber(amount) });
     },
-    [['costs', parcelId, year]],
+    [['costs', parcelId, year], ['economics']],
     () => setAmount(''),
   );
-  const money = (value: number | null) => (value === null ? 'Date insuficiente' : `${number(value, 2)} lei`);
+  const money = (value: number | null) => (value === null ? 'Insufficient data' : formatEuro(value, 2));
 
   return (
     <>
@@ -475,23 +480,23 @@ function CostsTab({ parcelId, editable }: { parcelId: string; editable: boolean 
         {(data) => (
           <Panel>
             <View style={{ flexDirection: 'row' }}>
-              <Stat value={number(data.totalCost, 0)} unit="lei" label={`Cost total ${year}`} />
-              <Stat value={number(data.costPerHa, 0)} unit="lei/ha" label="Cost pe hectar" />
+              <Stat value={formatEuro(data.totalCost, 0)} label={`Recorded expenses ${year}`} />
+              <Stat value={formatEuro(data.costPerHa, 2)} unit="/ha" label="Per hectare" />
             </View>
             {(Object.keys(COST_LABELS) as CostCategory[]).map((key) => (
-              <Row key={key} label={COST_LABELS[key]} value={`${number(data.byCategory[key], 2)} lei`} />
+              <Row key={key} label={COST_LABELS[key]} value={formatEuro(data.byCategory[key], 2)} />
             ))}
-            <Row label="Profit estimat" value={money(data.estimatedProfit)} />
-            <Row label="Profit real" value={money(data.actualProfit)} />
+            <Row label="Estimated profit" value={money(data.estimatedProfit)} />
+            <Row label="Actual profit" value={money(data.actualProfit)} />
           </Panel>
         )}
       </QueryState>
       {editable ? (
-        <Section title="Adaugă un cost">
+        <Section title="Add a cost">
           <Panel>
             <Choice options={(Object.keys(COST_LABELS) as CostCategory[]).map((value) => ({ value, label: COST_LABELS[value] }))} value={category} onChange={setCategory} />
-            <Field label="Sumă (lei)" value={amount} onChangeText={setAmount} keyboardType="decimal-pad" />
-            <Button mode="contained" disabled={!isPositive(amount) || add.isPending} loading={add.isPending} onPress={() => add.mutate()}>Salvează costul</Button>
+            <Field label="Amount (€)" value={amount} onChangeText={setAmount} keyboardType="decimal-pad" />
+            <Button mode="contained" disabled={!isPositive(amount) || add.isPending} loading={add.isPending} onPress={() => add.mutate()}>Save cost</Button>
           </Panel>
         </Section>
       ) : null}
@@ -502,14 +507,17 @@ function CostsTab({ parcelId, editable }: { parcelId: string; editable: boolean 
 export function ParcelDetailScreen({ route, navigation }: Props) {
   const { parcelId } = route.params;
   const role = useAuth((state) => state.role);
-  const [tab, setTab] = useState<Tab>('culturi');
+  const [tab, setTab] = useState<Tab>('crops');
   const parcel = useQuery({ queryKey: ['parcel', parcelId], queryFn: () => apiGet<Parcel>(`/parcels/${parcelId}`) });
-  const visibleTabs = role === 'OPERATOR' ? TABS.filter((item) => item.value !== 'costuri') : TABS;
+  // The farm list carries the same parcel with its current-season crop; it is kept fresh by the map.
+  const listed = useParcelById(parcelId);
+  const fieldState = useFieldStatus(parcelId);
+  const visibleTabs = role === 'OPERATOR' ? TABS.filter((item) => item.value !== 'costs' && item.value !== 'economics') : TABS;
 
   useLayoutEffect(() => {
     navigation.setOptions({
       headerRight: canManage(role)
-        ? () => <IconButton icon="pencil-outline" label="Modifică parcela" onPress={() => navigation.navigate('ParcelEditor', { parcelId })} />
+        ? () => <IconButton icon="pencil-outline" label="Edit parcel" onPress={() => navigation.navigate('ParcelEditor', { parcelId })} />
         : undefined,
     });
   }, [navigation, parcelId, role]);
@@ -522,21 +530,32 @@ export function ParcelDetailScreen({ route, navigation }: Props) {
             <ParcelShape geometry={data.geometry} size={72} />
             <View style={{ flex: 1 }}>
               <Txt variant="title">{ha(data.areaHa)}</Txt>
-              <Txt variant="small">{`${data.code}, perimetru ${number(data.perimeterM, 0)} m`}</Txt>
+              <Txt variant="small">{`${data.code}, perimeter ${number(data.perimeterM, 0)} m`}</Txt>
               {data.locality || data.county ? <Txt variant="small">{[data.locality, data.county].filter(Boolean).join(', ')}</Txt> : null}
             </View>
+            <TillageBadge system={(listed ?? data).tillageSystem} />
           </View>
         )}
       </QueryState>
+      {fieldState ? (
+        <View style={{ gap: space.sm }}>
+          <FieldStatusBadge status={fieldState} />
+          <CompletionScore status={fieldState} />
+        </View>
+      ) : null}
       <Choice options={visibleTabs} value={tab} onChange={setTab} />
-      {tab === 'culturi' ? <SeasonsTab parcelId={parcelId} editable={canPlan(role)} /> : null}
-      {tab === 'rotatie' ? <RotationTab parcelId={parcelId} /> : null}
-      {tab === 'sol' ? <SoilTab parcelId={parcelId} editable={canPlan(role)} /> : null}
-      {tab === 'meteo' ? <WeatherTab parcelId={parcelId} /> : null}
-      {tab === 'ferestre' ? <WindowsTab parcelId={parcelId} /> : null}
-      {tab === 'apa' ? <WaterTab parcelId={parcelId} /> : null}
-      {tab === 'satelit' ? <SatelliteTab parcelId={parcelId} editable={canPlan(role)} /> : null}
-      {tab === 'costuri' ? <CostsTab parcelId={parcelId} editable={canManage(role)} /> : null}
+      {tab === 'crops' ? <SeasonsTab parcelId={parcelId} editable={canPlan(role)} /> : null}
+      {tab === 'economics' ? <ParcelEconomicsTab parcelId={parcelId} /> : null}
+      {tab === 'tillage' && (listed ?? parcel.data) ? (
+        <TillageSection parcel={(listed ?? parcel.data)!} canEdit={canManage(role)} crop={(listed ?? parcel.data)?.seasons?.find((season) => season.year === new Date().getFullYear())?.crop} />
+      ) : null}
+      {tab === 'rotation' ? <RotationTab parcelId={parcelId} /> : null}
+      {tab === 'soil' ? <SoilTab parcelId={parcelId} editable={canPlan(role)} /> : null}
+      {tab === 'weather' ? <WeatherTab parcelId={parcelId} /> : null}
+      {tab === 'windows' ? <WindowsTab parcelId={parcelId} /> : null}
+      {tab === 'water' ? <WaterTab parcelId={parcelId} /> : null}
+      {tab === 'satellite' ? <SatelliteTab parcelId={parcelId} editable={canPlan(role)} /> : null}
+      {tab === 'costs' ? <CostsTab parcelId={parcelId} editable={canManage(role)} /> : null}
     </Screen>
   );
 }

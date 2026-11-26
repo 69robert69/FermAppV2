@@ -1,4 +1,4 @@
-/** Poziție GeoJSON: [longitudine, latitudine]. */
+/** GeoJSON position: [longitude, latitude]. */
 export type Position = [lng: number, lat: number];
 
 export interface PolygonGeometry {
@@ -21,7 +21,7 @@ const round = (value: number, digits: number) => {
 
 const samePoint = (a: Position, b: Position) => a[0] === b[0] && a[1] === b[1];
 
-/** Închide inelul dacă ultimul punct diferă de primul. */
+/** Closes the ring if the last point differs from the first. */
 export function closeRing(ring: Position[]): Position[] {
   const first = ring[0];
   const last = ring[ring.length - 1];
@@ -42,7 +42,7 @@ export function haversineM(a: Position, b: Position): number {
   return 2 * EARTH_RADIUS_M * Math.asin(Math.min(1, Math.sqrt(h)));
 }
 
-/** Aria pe sferă a unui inel, în m² (metoda Chamberlain-Duquette). */
+/** Area of a ring on the sphere, in m² (Chamberlain-Duquette method). */
 function ringAreaM2(ring: Position[]): number {
   const n = ring.length - 1;
   if (n < 3) return 0;
@@ -84,10 +84,10 @@ function ringCentroid(ring: Position[]): { lat: number; lng: number } {
   };
 }
 
-/** Hectare, perimetru exterior și centrul GPS. Golurile se scad din suprafață. */
+/** Hectares, outer perimeter and GPS centre. Holes are subtracted from the area. */
 export function computeGeoMetrics(polygon: PolygonGeometry): GeoMetrics {
   const [outer, ...holes] = polygon.coordinates.map(closeRing);
-  if (!outer || outer.length < 4) throw new Error('Poligonul are nevoie de minimum 3 puncte.');
+  if (!outer || outer.length < 4) throw new Error('The polygon needs at least 3 points.');
   const areaM2 = holes.reduce((area, hole) => area - ringAreaM2(hole), ringAreaM2(outer));
   const center = ringCentroid(outer);
   return {
@@ -139,20 +139,20 @@ export function isSelfIntersecting(ring: Position[]): boolean {
   return false;
 }
 
-/** Returnează motivul pentru care poligonul e invalid sau null dacă e valid. */
+/** Returns the reason the polygon is invalid, or null if it is valid. */
 export function validatePolygon(polygon: PolygonGeometry): string | null {
   const outer = polygon.coordinates[0];
-  if (!outer) return 'Poligonul nu are contur.';
+  if (!outer) return 'The polygon has no outline.';
   const closed = closeRing(outer);
-  if (closed.length < 4) return 'Conturul are nevoie de minimum 3 puncte distincte.';
+  if (closed.length < 4) return 'The outline needs at least 3 distinct points.';
   for (const ring of polygon.coordinates) {
     for (const [lng, lat] of ring) {
       if (!Number.isFinite(lng) || !Number.isFinite(lat) || Math.abs(lng) > 180 || Math.abs(lat) > 90) {
-        return 'Coordonatele trebuie să fie longitudine și latitudine valide.';
+        return 'Coordinates must be valid longitude and latitude values.';
       }
     }
   }
-  if (isSelfIntersecting(closed)) return 'Conturul parcelei se intersectează cu el însuși.';
-  if (computeGeoMetrics(polygon).areaHa <= 0) return 'Suprafața parcelei trebuie să fie mai mare ca zero.';
+  if (isSelfIntersecting(closed)) return 'The parcel outline intersects itself.';
+  if (computeGeoMetrics(polygon).areaHa <= 0) return 'The parcel area must be greater than zero.';
   return null;
 }

@@ -5,15 +5,15 @@ import { fetchJson, fetchUpstream } from '../lib/http';
 
 const SERVICE = 'Sentinel Hub';
 const CRS84 = 'http://www.opengis.net/def/crs/OGC/1.3/CRS84';
-/** Aproximativ 10 m, rezoluția benzilor folosite pentru NDVI. */
+/** About 10 m, the resolution of the bands used for NDVI. */
 const RESOLUTION_DEG = 0.0001;
-/** Observațiile cu mai mult de 60% din pixeli acoperiți de nori se ignoră. */
+/** Observations with more than 60% of pixels covered by clouds are ignored. */
 const MAX_CLOUD_RATIO = 0.6;
 
 export const isSentinelConfigured = () => Boolean(env.SENTINEL_CLIENT_ID && env.SENTINEL_CLIENT_SECRET);
 
 async function getToken(): Promise<string> {
-  if (!isSentinelConfigured()) throw notConfigured('Serviciul de imagini satelitare');
+  if (!isSentinelConfigured()) throw notConfigured('The satellite imagery service');
   return cached('sentinel:token', 240, async () => {
     const data = await fetchJson<{ access_token: string }>(env.SENTINEL_TOKEN_URL, {
       service: SERVICE,

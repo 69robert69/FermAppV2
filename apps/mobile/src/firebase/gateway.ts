@@ -1,9 +1,13 @@
 import {
+  askCopilot,
   CROP_CODES,
+  EMPTY_MEMORY,
   CROPS,
   computeGeoMetrics,
   cropProgress,
   evaluateRotation,
+  isTillageSystem,
+  parseTillageHistory,
   nextRecommendedAction,
   nextSeasonYear,
   parcelEconomics,
@@ -32,7 +36,6 @@ import { firestore, auth } from './app';
 import { authErrorMessage, inviteMember, joinInvitedFarm, registerFarm, registerInvited, signInWithEmail, signOutFirebase } from './auth';
 import { liveItems } from './liveStore';
 import { queueWrites, type PendingWrite } from './outbox';
-import { answerQuestion } from './assistant';
 import {
   catalogImplements,
   catalogSeeds,
@@ -49,7 +52,7 @@ import {
 import { exportBytes, parseGeoBytes, saveGeneratedFile, type GeoFormat } from './geoFiles';
 import { addPhoto, parcelPhotos } from './photos';
 import { cachedSiteData, fetchSoilProfile, previewPlan, regeneratePlan, savePlan } from './plans';
-import { buildReport, escapeHtml, htmlToPdf, reportHtml, reportToXlsx, type ReportType } from './reports';
+import { buildReport, escapeHtml, htmlToPdf, reportToXlsx, type ReportType } from './reports';
 import {
   addObservation,
   archiveParcel,
@@ -63,9 +66,11 @@ import {
   recordCrop,
   runProgress,
   session,
+  setParcelTillage,
   setTaskStatus,
   startIrrigation,
   startWork,
+  updateMachine,
   updateParcel,
   updateWorkLocation,
 } from './services';
@@ -93,17 +98,17 @@ type Body = Record<string, any>;
 type Member = UserProfile & FarmDoc;
 
 const DAY_MS = 86_400_000;
-const SYSTEM_LABELS = { REEL: 'Tambur', PIVOT: 'Pivot', LINEAR: 'Liniar' } as const;
+const SYSTEM_LABELS = { REEL: 'Hose reel', PIVOT: 'Pivot', LINEAR: 'Linear' } as const;
 const ACTIVE = new Set(['RUNNING', 'PAUSED']);
 
-export const notMigrated = () => new ApiError(501, 'NOT_MIGRATED', 'Această funcție nu este încă disponibilă pe Firebase.');
+export const notMigrated = () => new ApiError(501, 'NOT_MIGRATED', 'This feature is not available on Firebase yet.');
 
 const segments = (path: string) => path.split('?')[0]!.split('/').filter(Boolean);
 const isoDate = (value: unknown) => (value ? new Date(value as string).toISOString() : null);
 
 async function requireParcel(id: string) {
   const parcel = (await liveItems<ParcelDoc>('parcels')).find((item) => item.id === id);
-  if (!parcel) throw new ApiError(404, 'NOT_FOUND', 'Parcela nu a fost găsită.');
+  if (!parcel) throw new ApiError(404, 'NOT_FOUND', 'The parcel was not found.');
   return parcel;
 }
 
@@ -113,7 +118,7 @@ const seasonsOf = async (parcelId: string) =>
 const historyOf = (seasons: readonly CropHistoryDoc[], beforeYear?: number): CropHistoryEntry[] =>
   seasons.filter((item) => beforeYear === undefined || item.year < beforeYear).map(({ crop, year }) => ({ crop, year }));
 
-/** Secțiunea de sol, cu indicii calculați când datele sunt complete. */
+/** The soil section, with indices computed when the data is complete. */
 function soilView(analysis: SoilAnalysisDoc | undefined) {
   if (!analysis) return { status: 'PENDING' };
   const { ph, organicMatterPct, clayPct, sandPct, waterHoldingMmPerM } = analysis;
@@ -121,13 +126,13 @@ function soilView(analysis: SoilAnalysisDoc | undefined) {
   return { ...analysis, indices: complete ? soilIndices({ ph, organicMatterPct, clayPct, sandPct, waterHoldingMmPerM }) : null };
 }
 
-/** Analizează solul parcelei. O eroare rămâne vizibilă în secțiunea de sol. */
+/** Analyses the parcel soil. An error remains visible in the soil section. */
 async function refreshSoil(parcel: Pick<ParcelDoc, 'id' | 'centerLat' | 'centerLng'>) {
   const data = await fetchSoilProfile(parcel.centerLat, parcel.centerLng)
     .then((profile) =>
-      profile ? { status: 'READY', ...profile, errorMessage: null } : { status: 'FAILED', errorMessage: 'SoilGrids nu are date pentru această locație.' },
+      profile ? { status: 'READY', ...profile, errorMessage: null } : { status: 'FAILED', errorMessage: 'SoilGrids has no data for this location.' },
     )
-    .catch(() => ({ status: 'FAILED', errorMessage: 'SoilGrids nu răspunde momentan. Reîncearcă mai târziu.' }));
+    .catch(() => ({ status: 'FAILED', errorMessage: 'SoilGrids is not responding right now. Try again later.' }));
   await queueWrites([{ kind: 'set', collection: 'soilAnalysis', docId: parcel.id, data: { ...farmFields(), parcelId: parcel.id, ...data } }]);
   return data;
 }
@@ -147,6 +152,8 @@ function parcelView(parcel: ParcelDoc, seasons: readonly CropHistoryDoc[], soil?
     county: parcel.county,
     notes: parcel.notes ?? null,
     irrigatedAreaHa: parcel.irrigatedAreaHa ?? null,
+    tillageSystem: isTillageSystem(parcel.tillageSystem) ? parcel.tillageSystem : null,
+    tillageHistory: parseTillageHistory(parcel.tillageHistory),
     archivedAt: parcel.archivedAt,
     seasons: seasons.filter((item) => item.parcelId === parcel.id && item.year === year).map(({ crop, year: seasonYear }) => ({ crop, year: seasonYear })),
     soilProfile: soil ? soilView(soil) : null,
@@ -190,7 +197,7 @@ const parcelRef = (id: string, { parcels }: Lookups) => {
   return { id, name: parcel?.name ?? '', code: parcel?.code ?? '' };
 };
 
-/** Motorina consumată până acum, după consumul stabilit la pornirea lucrării. */
+/** Diesel consumed so far, based on the consumption set when the operation started. */
 function fuelOf(work: MachineWorkDoc, machine: MachineDoc | undefined, elapsedSeconds: number) {
   const perHour = work.fuelLPerH ?? machine?.fuelConsumption;
   return perHour ? Math.round((perHour * elapsedSeconds) / 36) / 100 : null;
@@ -231,20 +238,22 @@ function irrigationView(run: IrrigationDoc, lookups: Lookups) {
 
 function taskView(task: TaskDoc, lookups: Lookups) {
   const assignee = lookups.members.find((item) => item.uid === task.responsibleUser);
+  const machine = task.machineId ? lookups.machines.find((item) => item.id === task.machineId) : undefined;
   return {
     ...task,
     parcel: task.parcelId ? parcelRef(task.parcelId, lookups) : null,
     assignee: assignee ? { id: assignee.uid, fullName: assignee.name } : null,
+    machine: machine ? { id: machine.id, name: machine.name } : null,
   };
 }
 
-/** Caută operațiunea în datele locale, apoi direct pe server. */
+/** Looks for the operation in local data, then directly on the server. */
 async function findRun<T extends FarmDoc>(name: CollectionName, id: string): Promise<T> {
   const local = (await liveItems<T>(name)).find((item) => item.id === id);
   if (local) return local;
   const snapshot = await getDoc(doc(firestore, name, id)).catch(() => null);
   if (snapshot?.exists()) return { ...(snapshot.data() as T), id };
-  throw new ApiError(404, 'NOT_FOUND', 'Operațiunea nu a fost găsită. Trage ecranul în jos pentru a reîncărca lista.');
+  throw new ApiError(404, 'NOT_FOUND', 'The operation was not found. Pull the screen down to reload the list.');
 }
 
 const byNewest = <T extends { startDate: string }>(items: T[]) => [...items].sort((a, b) => b.startDate.localeCompare(a.startDate));
@@ -252,7 +261,7 @@ const byNewest = <T extends { startDate: string }>(items: T[]) => [...items].sor
 const labelled = <T extends IrrigationDoc>(runs: readonly T[], lookups: Lookups) =>
   runs.map((run, index) => ({ ...irrigationView(run, lookups), label: `${SYSTEM_LABELS[run.type]} #${index + 1}` }));
 
-/** Ultima cultură declarată la configurare nu este cultura din câmp când planul începe într-un an viitor. */
+/** The last crop declared at setup is not the crop in the field when the plan starts in a future year. */
 function fieldSeason(seasons: readonly CropHistoryDoc[], plan: CropPlanDoc | undefined, year: number) {
   const recorded = seasons.find((item) => item.year === year);
   return recorded && plan && plan.year > year && !recorded.sowingDate ? undefined : recorded;
@@ -341,7 +350,7 @@ function nextPlanStep(plan: CropPlanDoc, tasks: readonly TaskDoc[], now: Date): 
   return {
     code: 'PLAN_STEP',
     action: next.title,
-    reason: `Este următorul pas din planul tehnologic pentru ${plan.cropName.toLowerCase()}.`,
+    reason: `It is the next step in the technology plan for ${plan.cropName.toLowerCase()}.`,
     priority: 'MEDIUM',
     riskLevel: 'LOW',
     confidencePct: 80,
@@ -465,11 +474,11 @@ function economicsOf(parcel: ParcelDoc, season: CropHistoryDoc | null, expenses:
 
 async function waterView(parcel: ParcelDoc, year: number) {
   const season = (await seasonsOf(parcel.id)).find((item) => item.year === year);
-  if (!season) throw new ApiError(404, 'NOT_FOUND', `Nu există o cultură înregistrată pentru anul ${year}.`);
-  // Fără date de semănat și recoltare se folosește sezonul de vegetație aprilie-septembrie.
+  if (!season) throw new ApiError(404, 'NOT_FOUND', `There is no crop recorded for ${year}.`);
+  // Without sowing and harvest dates, the April-September growing season is used.
   const start = (season.sowingDate ?? new Date(Date.UTC(year, 3, 1)).toISOString()).slice(0, 10);
   const latest = new Date(Date.now() - 2 * DAY_MS).toISOString().slice(0, 10);
-  // O cultură semănată și nerecoltată primește apă până în prezent.
+  // A sown and unharvested crop receives water up to the present.
   const seasonEnd = (season.harvestDate ?? (season.sowingDate ? new Date().toISOString() : new Date(Date.UTC(year, 8, 30)).toISOString())).slice(0, 10);
   const end = seasonEnd < latest ? seasonEnd : latest;
   const days = start <= end ? await getHistory(parcel.centerLat, parcel.centerLng, start, end) : [];
@@ -491,6 +500,16 @@ async function routeGet(parts: string[], params?: Record<string, string | number
     if (id === 'seeds') return catalogSeeds();
     if (id === 'tractors') return catalogTractors();
     if (id === 'implements') return catalogImplements();
+  }
+  if (root === 'economics') {
+    const economics = await import('./economics');
+    if (id === 'settings') return economics.loadSettings();
+    if (id === 'farm') return economics.farmEconomics(Number(params?.year ?? new Date().getFullYear()), params?.parcelId ? String(params.parcelId) : undefined);
+    if (id === 'sheets' && sub && detail) return { parcelId: sub, year: Number(detail), sheet: (await economics.loadSheets(Number(detail))).get(sub) ?? (await import('@fermapp/domain')).emptySheet() };
+    if (id === 'sheets') {
+      const year = Number(params?.year ?? new Date().getFullYear());
+      return [...(await economics.loadSheets(year)).entries()].map(([parcelId, sheet]) => ({ parcelId, year, sheet }));
+    }
   }
   if (root === 'dashboard') return dashboard();
   if (root === 'map' && id === 'overview') return mapOverview();
@@ -537,7 +556,7 @@ async function routeGet(parts: string[], params?: Record<string, string | number
     }
     if (sub === 'water') return waterView(await requireParcel(id), Number(params?.year ?? new Date().getFullYear()));
     if (sub === 'satellite') {
-      if (detail === 'compare') throw new ApiError(404, 'NOT_FOUND', 'Nu există observații satelitare pentru aceste date.');
+      if (detail === 'compare') throw new ApiError(404, 'NOT_FOUND', 'There are no satellite observations for these dates.');
       return { configured: false, observations: [] };
     }
     if (sub === 'weather') {
@@ -586,7 +605,7 @@ async function login(body: Body): Promise<Session> {
     const ref = doc(firestore, 'users', user.uid);
     if (!(await getDoc(ref)).exists()) {
       await joinInvitedFarm().catch(() => {
-        throw new ApiError(403, 'NOT_INVITED', 'Confirmă adresa de email din mesajul primit și verifică dacă ai o invitație la fermă.');
+        throw new ApiError(403, 'NOT_INVITED', 'Confirm your email address from the message you received and check that you have an invitation to the farm.');
       });
     }
     return sessionFor((await getDoc(ref)).data() as UserProfile);
@@ -613,7 +632,7 @@ async function register(body: Body): Promise<Session> {
     if (!body.farmName?.trim()) {
       await registerInvited({ name: body.fullName, email: body.email, password: body.password });
       await signOutFirebase();
-      throw new ApiError(200, 'VERIFY_EMAIL', 'Ți-am trimis un email de confirmare. Confirmă adresa, apoi intră în cont.');
+      throw new ApiError(200, 'VERIFY_EMAIL', 'We sent you a confirmation email. Confirm the address, then sign in.');
     }
     await registerFarm({ name: body.fullName, email: body.email, password: body.password, farmName: body.farmName.trim() });
     const uid = auth.currentUser!.uid;
@@ -629,7 +648,7 @@ async function planContext(parcelId: string) {
   return { tasks: tasks.filter((task) => task.parcelId === parcelId), plans: plans.filter((plan) => plan.parcelId === parcelId && plan.active) };
 }
 
-/** Parcela pentru care se calculează planul: existentă sau doar desenată. */
+/** The parcel the plan is calculated for: existing or only drawn. */
 async function planTarget(body: Body) {
   if (body.parcelId) {
     const parcel = await requireParcel(body.parcelId);
@@ -637,7 +656,7 @@ async function planTarget(body: Body) {
   }
   const geometry = (body.geometry ?? body.draft?.geometry) as PolygonGeometry;
   const metrics = computeGeoMetrics(geometry);
-  const parcel = { id: '', name: body.name ?? body.draft?.name ?? 'Parcelă nouă', area: metrics.areaHa, centerLat: metrics.center.lat, centerLng: metrics.center.lng };
+  const parcel = { id: '', name: body.name ?? body.draft?.name ?? 'New parcel', area: metrics.areaHa, centerLat: metrics.center.lat, centerLng: metrics.center.lng };
   return { parcel, history: [] as CropHistoryEntry[] };
 }
 
@@ -663,7 +682,7 @@ async function completePlan(body: Body) {
   return { parcel: { id: parcelId }, plan };
 }
 
-/** Recalculează planul fără să țină utilizatorul pe loc. */
+/** Recalculates the plan without keeping the user waiting. */
 function replan(parcelId: string, year: number) {
   void (async () => {
     if (year < new Date().getFullYear()) return;
@@ -679,13 +698,13 @@ function replan(parcelId: string, year: number) {
       tasks: context.tasks,
       activePlanIds: context.plans.filter((item) => item.year === year).map((item) => item.id),
     });
-  })().catch((error: unknown) => console.warn('Planul nu a putut fi recalculat', error));
+  })().catch((error: unknown) => console.warn('The plan could not be recalculated', error));
 }
 
 async function removeSeason(id: string) {
   const seasons = await liveItems<CropHistoryDoc>('cropHistory');
   const season = seasons.find((item) => item.id === id);
-  if (!season) throw new ApiError(404, 'NOT_FOUND', 'Cultura nu a fost găsită.');
+  if (!season) throw new ApiError(404, 'NOT_FOUND', 'The crop was not found.');
   const { tasks, plans } = await planContext(season.parcelId);
   const yearPlans = plans.filter((plan) => plan.year === season.year);
   const planIds = new Set(yearPlans.map((plan) => plan.id));
@@ -700,7 +719,7 @@ async function removeSeason(id: string) {
 async function updateSeason(id: string, body: Body) {
   const seasons = await liveItems<CropHistoryDoc>('cropHistory');
   const before = seasons.find((item) => item.id === id);
-  if (!before) throw new ApiError(404, 'NOT_FOUND', 'Cultura nu a fost găsită.');
+  if (!before) throw new ApiError(404, 'NOT_FOUND', 'The crop was not found.');
   const data = { ...body, ...('sowingDate' in body ? { sowingDate: isoDate(body.sowingDate) } : {}), ...('harvestDate' in body ? { harvestDate: isoDate(body.harvestDate) } : {}) };
   await queueWrites([{ kind: 'update', collection: 'cropHistory', docId: id, data }]);
   const replanned = (body.crop && body.crop !== before.crop) || ('sowingDate' in body && data.sowingDate !== before.sowingDate);
@@ -712,7 +731,7 @@ export async function firebaseSend<T>(method: 'POST' | 'PATCH' | 'DELETE', path:
 }
 
 async function routeSend(method: string, parts: string[], body: Body): Promise<unknown> {
-  const [root, id, sub] = parts;
+  const [root, id, sub, detail] = parts;
 
   if (root === 'auth') {
     if (id === 'login') return login(body);
@@ -732,9 +751,13 @@ async function routeSend(method: string, parts: string[], body: Body): Promise<u
     }
     if (id && sub === 'soil') return refreshSoil(await requireParcel(id));
     if (id && sub === 'satellite') {
-      throw new ApiError(503, 'NOT_CONFIGURED', 'Imaginile satelitare au nevoie de un cont Copernicus și de un server care să îi păstreze parola în siguranță.');
+      throw new ApiError(503, 'NOT_CONFIGURED', 'Satellite imagery needs a Copernicus account and a server to keep its password safe.');
     }
     if (method === 'PATCH' && id && !sub) return updateParcel(id, body);
+    if (id && sub === 'tillage') {
+      if (!isTillageSystem(body.system)) throw new ApiError(400, 'VALIDATION', 'Choose a tillage technology.');
+      return setParcelTillage(await requireParcel(id), body.system, Number(body.year ?? new Date().getFullYear()));
+    }
     if (id && sub === 'archive') return archiveParcel(id);
     if (id && sub === 'observations') return addObservation(id, body.text);
     if (id && sub === 'seasons') {
@@ -762,7 +785,21 @@ async function routeSend(method: string, parts: string[], body: Body): Promise<u
     if (id === 'tractors') return saveTractor(sub ?? body.id, body);
   }
 
-  if (root === 'ai' && id === 'chat') return answerQuestion(body.parcelId ? await intelligence(body.parcelId) : null);
+  if (root === 'ai' && id === 'chat') {
+    // The copilot screen calls the engine directly; this keeps the old endpoint answering from the same engine.
+    const { buildFarmSnapshot } = await import('./copilot');
+    const snapshot = await buildFarmSnapshot();
+    const parcel = body.parcelId ? snapshot.parcels.find((item) => item.id === body.parcelId) : undefined;
+    const { answer } = askCopilot(String(body.message ?? ''), snapshot, { ...EMPTY_MEMORY, parcelId: parcel?.id ?? null });
+    const content = [answer.direct, ...answer.reasoning.slice(0, 3), ...answer.risks.slice(0, 2)].join('\n');
+    return { conversationId: 'local', message: { id: `local-${Date.now()}`, content, source: 'rules' } };
+  }
+
+  if (root === 'economics' && method === 'POST') {
+    const economics = await import('./economics');
+    if (id === 'settings') return economics.saveSettings(body);
+    if (id === 'sheets' && sub && detail) return economics.saveSheet(sub, Number(detail), body);
+  }
 
   if (root === 'costs' && method === 'POST') {
     const docId = newId('expenses');
@@ -776,7 +813,7 @@ async function routeSend(method: string, parts: string[], body: Body): Promise<u
         year: body.year,
         category: body.category as CostCategory,
         amount: body.amount,
-        currency: body.currency ?? 'RON',
+        currency: 'EUR',
         date: new Date().toISOString(),
         notes: body.notes ?? null,
       },
@@ -804,6 +841,7 @@ async function routeSend(method: string, parts: string[], body: Body): Promise<u
 
   if (root === 'machines') {
     if (method === 'POST') return { id: await createMachine(body) };
+    if (method === 'PATCH' && id) return updateMachine(id, body);
     if (method === 'DELETE' && id) return queueWrites([{ kind: 'delete', collection: 'machines', docId: id }]);
   }
 
@@ -814,7 +852,7 @@ async function routeSend(method: string, parts: string[], body: Body): Promise<u
     }
     if (sub === 'location') return updateWorkLocation(id, body as Parameters<typeof updateWorkLocation>[1]);
     if (sub === 'pause' || sub === 'resume' || sub === 'complete' || sub === 'cancel') {
-      return controlRun('machineWork', await findRun<MachineWorkDoc>('machineWork', id), sub);
+      return controlRun('machineWork', await findRun<MachineWorkDoc>('machineWork', id), sub, await liveItems<TaskDoc>('tasks'));
     }
   }
 
@@ -837,7 +875,7 @@ function queryOf(path: string) {
   return { get: (name: string) => decodeURIComponent(pairs.find(([key]) => key === name)?.[1] ?? '') || null };
 }
 
-/** Importă parcele sau atașează o fotografie, pe baza fișierului ales pe telefon. */
+/** Imports parcels or attaches a photo, based on the file chosen on the phone. */
 export async function firebaseUpload<T>(path: string, file: { uri: string }, fields?: Record<string, string>): Promise<T> {
   const parts = segments(path);
   if (parts[0] === 'catalog' && parts[1] === 'import') {
@@ -862,19 +900,24 @@ export async function firebaseUpload<T>(path: string, file: { uri: string }, fie
 function parcelReportHtml(data: Awaited<ReturnType<typeof intelligence>>) {
   const row = (label: string, value: unknown) => `<tr><th>${escapeHtml(label)}</th><td>${escapeHtml(value ?? '-')}</td></tr>`;
   const { header, crop, soil, tasks, nextAction, plan } = data;
-  return `<h1>Parcela ${escapeHtml(header.name)}</h1><p>${escapeHtml(header.code)}, ${escapeHtml(header.areaHa)} ha</p>
-    <table>${row('Cultură', crop?.name ?? plan?.data.cropName)}${row('Tip sol', soil.status === 'READY' ? (soil as SoilAnalysisDoc).label : null)}${row('Scor rotație', data.rotation.score)}${row('Următoarea acțiune', nextAction.action)}${row('Task-uri de făcut', tasks.summary.todo)}${row('Task-uri finalizate', tasks.summary.done)}</table>
-    ${plan ? `<h2>Plan tehnologic ${escapeHtml(plan.year)}</h2><table>${plan.data.steps.map((step) => row(step.date.slice(0, 10), step.title)).join('')}</table>` : ''}`;
+  return `<h1>Parcel ${escapeHtml(header.name)}</h1><p>${escapeHtml(header.code)}, ${escapeHtml(header.areaHa)} ha</p>
+    <table>${row('Crop', crop?.name ?? plan?.data.cropName)}${row('Soil type', soil.status === 'READY' ? (soil as SoilAnalysisDoc).label : null)}${row('Rotation score', data.rotation.score)}${row('Next action', nextAction.action)}${row('Open tasks', tasks.summary.todo)}${row('Completed tasks', tasks.summary.done)}</table>
+    ${plan ? `<h2>Technology plan ${escapeHtml(plan.year)}</h2><table>${plan.data.steps.map((step) => row(step.date.slice(0, 10), step.title)).join('')}</table>` : ''}`;
 }
 
-/** Generează pe telefon fișierul cerut și returnează adresa lui. */
+/** Generates the requested file on the phone and returns its address. */
 export async function firebaseDownload(path: string, filename: string): Promise<string> {
   const parts = segments(path);
   const params = queryOf(path);
   if (parts[0] === 'reports' && parts[1]) {
     const report = await buildReport(parts[1] as ReportType, Number(params.get('year') ?? new Date().getFullYear()));
     const { farmName } = session();
-    if (params.get('format') === 'pdf') return htmlToPdf(reportHtml(report, farmName), filename);
+    if (params.get('format') === 'pdf') {
+      const { reportToHtml } = await import('../features/reports/pdfReport');
+      const requested = params.get('orientation');
+      const printed = reportToHtml(report, { farmName, orientation: requested === 'portrait' || requested === 'landscape' ? requested : undefined });
+      return htmlToPdf(printed.html, filename, printed.orientation);
+    }
     return saveGeneratedFile(filename, await reportToXlsx(report, farmName));
   }
   if (parts[0] === 'parcels' && parts[1] === 'export') {

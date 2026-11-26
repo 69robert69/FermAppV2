@@ -15,20 +15,23 @@ const DUE_SOON_MS = 86_400_000;
 const ALERT_INTERVAL_MS = 3 * 3_600_000;
 const FIRST_ALERT_DELAY_MS = 10_000;
 const MAP: QueryKey = ['map-overview'];
+const COPILOT: QueryKey = ['copilot-insights'];
+const CALENDAR: QueryKey = ['calendar'];
 
-/** Ce ecrane se reîmprospătează când se schimbă o colecție. */
+/** Which screens refresh when a collection changes. */
 const REFRESHES: Partial<Record<CollectionName, QueryKey[]>> = {
-  users: [['team']],
-  parcels: [['parcels'], ['parcel'], ['dashboard'], ['intelligence'], MAP],
-  cropHistory: [['seasons'], ['parcels'], ['parcel'], ['dashboard'], ['intelligence'], ['rotation'], MAP],
-  tasks: [['tasks'], ['dashboard'], ['intelligence'], MAP],
-  machines: [['machines'], ['work']],
-  machineWork: [['work'], ['dashboard'], ['intelligence'], ['machine-location'], MAP],
-  irrigations: [['irrigation'], ['dashboard'], ['intelligence'], MAP],
+  users: [['team'], ['economics'], CALENDAR],
+  parcels: [['parcels'], ['parcel'], ['dashboard'], ['intelligence'], MAP, ['economics']],
+  cropHistory: [['seasons'], ['parcels'], ['parcel'], ['dashboard'], ['intelligence'], ['rotation'], MAP, ['economics'], COPILOT, CALENDAR],
+  tasks: [['tasks'], ['dashboard'], ['intelligence'], MAP, COPILOT, CALENDAR, ['calendar-suggestions']],
+  machines: [['machines'], ['work'], ['economics'], CALENDAR],
+  machineWork: [['work'], ['dashboard'], ['intelligence'], ['machine-location'], MAP, ['economics'], COPILOT, CALENDAR],
+  irrigations: [['irrigation'], ['dashboard'], ['intelligence'], MAP, CALENDAR],
   cropPlans: [['intelligence'], MAP],
   reports: [['intelligence']],
+  economics: [['economics'], ['report']],
   observations: [['intelligence']],
-  expenses: [['costs'], ['intelligence'], ['report']],
+  expenses: [['costs'], ['intelligence'], ['report'], ['economics']],
   soilAnalysis: [['parcel'], ['intelligence']],
   photos: [['intelligence']],
   notifications: [['dashboard']],
@@ -56,7 +59,7 @@ function plain(data: DocumentData): DocumentData {
   );
 }
 
-/** Modificările care așteaptă trimiterea apar imediat în liste. */
+/** Changes waiting to be sent appear immediately in lists. */
 function withPending<T extends FarmDoc>(list: readonly T[], writes: readonly PendingWrite[], name: CollectionName) {
   const result = new Map(list.map((item) => [item.id, item]));
   for (const write of writes) {
@@ -76,14 +79,14 @@ export const subscribeLive = (listener: () => void) => {
   };
 };
 
-/** Datele disponibile acum, inclusiv modificările netrimise. */
+/** The data available now, including unsent changes. */
 export function currentItems<T extends FarmDoc>(name: CollectionName): T[] {
   const list = withPending((items.get(name) ?? []) as T[], pendingSnapshot(), name);
   if (name !== 'notifications') return list;
   return list.filter((item) => (item as unknown as NotificationDoc).userId === activeProfile?.uid);
 }
 
-/** Așteaptă prima încărcare a colecției, de pe server sau de pe telefon. */
+/** Waits for the first load of the collection, from the server or from the phone. */
 export async function liveItems<T extends FarmDoc>(name: CollectionName): Promise<T[]> {
   await started;
   await ready.get(name);
@@ -96,7 +99,7 @@ function watch(name: CollectionName, profile: UserProfile) {
   if (name === 'notifications') constraints.push(where('userId', '==', profile.uid));
   let live = false;
   let first = true;
-  // Modificările văzute fără conexiune se aplică abia când serverul le confirmă.
+  // Changes seen without a connection are applied only when the server confirms them.
   let unconfirmed = false;
   let markReady = () => {};
   ready.set(name, new Promise<void>((resolve) => {
@@ -112,10 +115,10 @@ function watch(name: CollectionName, profile: UserProfile) {
 
   return onSnapshot(
     query(collection(firestore, name), ...constraints),
-    // Fără această opțiune, confirmarea serverului pentru date neschimbate nu ar ajunge la aplicație.
+    // Without this option, the server's confirmation for unchanged data would not reach the app.
     { includeMetadataChanges: true },
     (snapshot) => {
-      // Fără conexiune, memoria Firestore este goală și nu trebuie să înlocuiască datele salvate pe telefon.
+      // Without a connection, the Firestore memory is empty and must not replace the data saved on the phone.
       if (snapshot.metadata.fromCache) {
         unconfirmed = true;
         return;
@@ -141,7 +144,7 @@ function watch(name: CollectionName, profile: UserProfile) {
   );
 }
 
-/** Fără Cloud Functions, telefoanele deschise încheie lucrările și anunță task-urile scadente. */
+/** Without Cloud Functions, open phones complete operations and announce due tasks. */
 function watchFarm(profile: UserProfile) {
   const announced = new Set<string>();
   return () => {
@@ -150,11 +153,13 @@ function watchFarm(profile: UserProfile) {
     const work = currentItems<MachineWorkDoc>('machineWork');
     if (profile.role !== 'AGRONOMIST') {
       void completeFinishedRuns({
-        // Operatorul poate încheia doar lucrările proprii.
+        // Operators can only complete their own operations.
         work: profile.role === 'OPERATOR' ? work.filter((run) => run.operatorId === profile.uid) : work,
         irrigations: currentItems<IrrigationDoc>('irrigations'),
         members,
         parcelName: (id) => parcels.find((parcel) => parcel.id === id)?.name ?? '',
+        // Operators may only update tasks assigned to them; the rules reject the rest.
+        tasks: currentItems<TaskDoc>('tasks').filter((task) => profile.role !== 'OPERATOR' || task.responsibleUser === profile.uid),
       });
     }
     const now = Date.now();
@@ -164,12 +169,12 @@ function watchFarm(profile: UserProfile) {
       if (announced.has(eventId)) continue;
       announced.add(eventId);
       const recipients = members.filter((member) => member.uid === task.responsibleUser);
-      void queueWrites(notificationWrites(recipients, eventId, { kind: 'TASK_DUE', title: 'Task scadent', body: task.title }));
+      void queueWrites(notificationWrites(recipients, eventId, { kind: 'TASK_DUE', title: 'Task due', body: task.title }));
     }
   };
 }
 
-/** Fără Cloud Functions, alertele meteo se verifică de pe telefoanele deschise. */
+/** Without Cloud Functions, weather alerts are checked from open phones. */
 async function checkWeatherAlerts() {
   const members = currentItems<UserProfile & FarmDoc>('users');
   for (const parcel of currentItems<ParcelDoc>('parcels').filter((item) => !item.archivedAt)) {
@@ -189,23 +194,38 @@ async function checkWeatherAlerts() {
   }
 }
 
-/** Pornește ascultarea datelor fermei. Ecranele citesc din această copie, deci nu consumă citiri în plus. */
+/** Weather alerts, then the copilot's findings (overdue work, harvest and nitrogen windows, conflicts). */
+async function checkAlerts() {
+  await checkWeatherAlerts();
+  await import('../features/satellite/background')
+    .then(({ refreshSatelliteInBackground }) => refreshSatelliteInBackground())
+    .catch((error: unknown) => console.warn('The satellite images could not be refreshed', error));
+  await import('./copilot')
+    .then(({ notifyCopilotInsights }) => notifyCopilotInsights())
+    .catch((error: unknown) => console.warn('The copilot could not check the farm', error));
+}
+
+/** Starts listening to the farm data. Screens read from this copy, so they do not consume extra reads. */
 export function startLiveStore(profile: UserProfile) {
   activeProfile = profile;
   const names: CollectionName[] = ['users', 'parcels', 'cropHistory', 'tasks', 'machines', 'machineWork', 'irrigations', 'cropPlans', 'observations', 'soilAnalysis', 'notifications', 'seedCatalog', 'machineCatalog', 'implementCatalog'];
-  // Regulile de securitate ascund datele financiare de operatori.
-  if (profile.role !== 'OPERATOR') names.push('reports', 'expenses');
+  // Security rules hide financial data from operators.
+  if (profile.role !== 'OPERATOR') names.push('reports', 'expenses', 'economics');
   observeWrites({
     queued: (writes) => new Set(writes.map((write) => write.collection)).forEach(refresh),
-    rejected: (code) => useToast.getState().show(`Ultima modificare nu a fost salvată pe server (${code}).`),
+    rejected: (code) => useToast.getState().show(`The last change was not saved on the server (${code}).`),
   });
   const stops = names.map((name) => watch(name, profile));
   announceStart?.();
   const tick = watchFarm(profile);
   const timer = setInterval(tick, WATCH_INTERVAL_MS);
-  void ensureCatalogSeeded(profile).catch((error: unknown) => console.warn('Catalogul nu a putut fi încărcat', error));
-  const firstAlerts = setTimeout(() => void checkWeatherAlerts(), FIRST_ALERT_DELAY_MS);
-  const alertTimer = setInterval(() => void checkWeatherAlerts(), ALERT_INTERVAL_MS);
+  void ensureCatalogSeeded(profile).catch((error: unknown) => console.warn('The catalog could not be loaded', error));
+  // Amounts recorded in lei move to euro once per farm.
+  void import('./economics')
+    .then(({ migrateFarmToEuro }) => migrateFarmToEuro(profile))
+    .catch((error: unknown) => console.warn('The amounts could not be moved to euro', error));
+  const firstAlerts = setTimeout(() => void checkAlerts(), FIRST_ALERT_DELAY_MS);
+  const alertTimer = setInterval(() => void checkAlerts(), ALERT_INTERVAL_MS);
   return () => {
     clearInterval(timer);
     clearTimeout(firstAlerts);

@@ -83,7 +83,7 @@ export function getForecast(lat: number, lng: number): Promise<Forecast> {
       longitude: coord(lng),
       hourly: HOURLY,
       daily: DAILY,
-      // Ziua curentă plus următoarele 14 zile complete.
+      // The current day plus the next 14 full days.
       forecast_days: '15',
       past_days: '1',
       timezone: 'auto',
@@ -124,7 +124,7 @@ export function getForecast(lat: number, lng: number): Promise<Forecast> {
   });
 }
 
-/** Ora curentă în fusul orar al parcelei, în formatul folosit de prognoză. */
+/** Current hour in the parcel's time zone, in the format used by the forecast. */
 export const localHour = (forecast: Pick<Forecast, 'utcOffsetSeconds'>, now = new Date()) =>
   `${new Date(now.getTime() + forecast.utcOffsetSeconds * 1000).toISOString().slice(0, 13)}:00`;
 

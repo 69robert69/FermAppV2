@@ -6,7 +6,7 @@ import { useCatalogSeeds, useSeedRanking, type CatalogSeed } from './api';
 
 const NONE = 'none';
 
-/** Afișează doar hibrizii și soiurile compatibile cu cultura aleasă. */
+/** Shows only the hybrids and varieties compatible with the chosen crop. */
 export function SeedPicker({
   crop,
   value,
@@ -22,11 +22,11 @@ export function SeedPicker({
   const ranking = useSeedRanking(parcelId, crop);
   const compatible = useMemo(() => (seeds.data ?? []).filter((seed) => seed.crop === crop), [seeds.data, crop]);
   if (!usesFirebase || !crop) return null;
-  if (seeds.data && compatible.length === 0) return <Txt variant="small">Catalogul nu are încă produse pentru această cultură.</Txt>;
+  if (seeds.data && compatible.length === 0) return <Txt variant="small">The catalog has no products for this crop yet.</Txt>;
 
   const scoreOf = (seed: CatalogSeed) => ranking.data?.find((item) => item.seed.id === seed.id)?.score;
   const options = [
-    { value: NONE, label: 'Nu am ales încă' },
+    { value: NONE, label: 'Not chosen yet' },
     ...compatible.map((seed) => {
       const score = scoreOf(seed);
       return { value: seed.id, label: score === undefined ? seed.name : `${seed.name}, ${score}%` };
@@ -34,7 +34,7 @@ export function SeedPicker({
   ];
   return (
     <Choice
-      label="Ce hibrid sau soi folosești?"
+      label="Which hybrid or variety are you using?"
       options={options}
       value={value ?? NONE}
       onChange={(id) => onChange(compatible.find((seed) => seed.id === id) ?? null)}

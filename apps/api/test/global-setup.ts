@@ -14,7 +14,7 @@ export default async function setup() {
     password: 'fermapp',
     port: PORT,
     persistent: false,
-    // Pe Windows, codarea implicită nu acceptă diacriticele românești.
+    // On Windows, the default encoding does not accept Romanian diacritics.
     initdbFlags: ['--encoding=UTF8', '--locale=C'],
     onLog: () => undefined,
     onError: () => undefined,

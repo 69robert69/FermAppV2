@@ -72,6 +72,10 @@ export const useAuth = create<AuthState>((set, get) => ({
     await clearLocalData().catch(() => undefined);
     const { queryClient } = await import('../api/queryClient');
     queryClient.clear();
+    // The copilot conversation and its action log hold farm data.
+    const { useCopilot } = await import('../features/copilot/store');
+    useCopilot.setState({ messages: [], actions: [] });
+    useCopilot.getState().clear();
   },
 }));
 

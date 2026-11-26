@@ -1,4 +1,4 @@
-/** Bază de date minimă, suficientă pentru cozile și copiile locale ale aplicației. */
+/** Minimal database, sufficient for the app's local queues and copies. */
 interface Row { seq: number; batch_id: string; kind: string; collection: string; doc_id: string; data: string | null; error: string | null }
 
 const writes: Row[] = [];

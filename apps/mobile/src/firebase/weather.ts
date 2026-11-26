@@ -12,11 +12,13 @@ import { readSnapshot, writeSnapshot } from './outbox';
 
 const FORECAST_TTL_MS = 30 * 60_000;
 const HISTORY_TTL_MS = 12 * 3_600_000;
-/** Panoul parcelei nu așteaptă mult după prognoză când semnalul este slab. */
+/** The parcel panel does not wait long for the forecast when the signal is weak. */
 const FORECAST_TIMEOUT_MS = 12_000;
 const OPERATIONS: FieldOperation[] = ['SPRAYING', 'FERTILIZING', 'SOWING', 'HARVESTING'];
 
-const HOURLY = 'temperature_2m,relative_humidity_2m,precipitation,precipitation_probability,wind_speed_10m,shortwave_radiation,evapotranspiration,et0_fao_evapotranspiration,weather_code';
+const HOURLY = 'temperature_2m,relative_humidity_2m,precipitation,precipitation_probability,wind_speed_10m,wind_gusts_10m,shortwave_radiation,evapotranspiration,et0_fao_evapotranspiration,weather_code';
+/** Measured conditions, refreshed every 15 minutes by the provider. */
+const CURRENT = 'temperature_2m,relative_humidity_2m,weather_code,wind_speed_10m,wind_gusts_10m,is_day';
 const DAILY = 'temperature_2m_max,temperature_2m_min,temperature_2m_mean,precipitation_sum,shortwave_radiation_sum,et0_fao_evapotranspiration,wind_speed_10m_max,relative_humidity_2m_mean';
 
 export interface WeatherDay {
@@ -32,14 +34,28 @@ export interface WeatherDay {
 }
 
 interface FullHour extends ForecastHour {
+  gustKmh?: number | null;
   radiationWm2: number | null;
   evapotranspirationMm: number | null;
   et0Mm: number | null;
 }
 
+export interface CurrentWeather {
+  time: string;
+  temperatureC: number;
+  humidityPct: number;
+  windKmh: number;
+  gustKmh: number | null;
+  weatherCode: number | null;
+  isDay: boolean | null;
+}
+
 export interface Forecast {
   timezone: string;
   utcOffsetSeconds: number;
+  /** When the forecast was downloaded (ms). Missing in snapshots saved before it was added. */
+  fetchedAt?: number;
+  current?: CurrentWeather | null;
   hours: FullHour[];
   days: WeatherDay[];
 }
@@ -67,7 +83,23 @@ function mapDays(daily: Series): WeatherDay[] {
   });
 }
 
-/** Ultimul rezultat rămâne disponibil și fără conexiune. */
+function mapCurrent(current: Record<string, number | string | null> | undefined): CurrentWeather | null {
+  const num = (key: string) => (typeof current?.[key] === 'number' ? (current[key] as number) : null);
+  const temperatureC = num('temperature_2m');
+  if (!current || typeof current.time !== 'string' || temperatureC == null) return null;
+  const isDay = num('is_day');
+  return {
+    time: current.time,
+    temperatureC,
+    humidityPct: num('relative_humidity_2m') ?? 0,
+    windKmh: num('wind_speed_10m') ?? 0,
+    gustKmh: num('wind_gusts_10m'),
+    weatherCode: num('weather_code'),
+    isDay: isDay == null ? null : isDay === 1,
+  };
+}
+
+/** The last result remains available without a connection. */
 async function remembered<T>(key: string, ttlMs: number, load: () => Promise<T>) {
   const saved = await readSnapshot<{ savedAt: number; value: T }>(key);
   if (saved && Date.now() - saved.savedAt < ttlMs) return saved.value;
@@ -81,10 +113,11 @@ async function remembered<T>(key: string, ttlMs: number, load: () => Promise<T>)
   }
 }
 
-export function getForecast(lat: number, lng: number) {
-  return remembered<Forecast>(`weather:${coord(lat)}:${coord(lng)}`, FORECAST_TTL_MS, async () => {
-    const data = await fetchJson<{ timezone: string; utc_offset_seconds: number; hourly: Series; daily: Series }>(
-      `https://api.open-meteo.com/v1/forecast?latitude=${coord(lat)}&longitude=${coord(lng)}&hourly=${HOURLY}&daily=${DAILY}&forecast_days=15&past_days=1&timezone=auto&wind_speed_unit=kmh`,
+/** `maxAgeMs` is how old a saved forecast may be before it is downloaded again; 0 forces a download. */
+export function getForecast(lat: number, lng: number, maxAgeMs = FORECAST_TTL_MS) {
+  return remembered<Forecast>(`weather:${coord(lat)}:${coord(lng)}`, maxAgeMs, async () => {
+    const data = await fetchJson<{ timezone: string; utc_offset_seconds: number; hourly: Series; daily: Series; current?: Record<string, number | string | null> }>(
+      `https://api.open-meteo.com/v1/forecast?latitude=${coord(lat)}&longitude=${coord(lng)}&hourly=${HOURLY}&daily=${DAILY}&current=${CURRENT}&forecast_days=15&past_days=1&timezone=auto&wind_speed_unit=kmh`,
       FORECAST_TIMEOUT_MS,
     );
     const hours = data.hourly.time.flatMap((time, i): FullHour[] => {
@@ -97,13 +130,21 @@ export function getForecast(lat: number, lng: number) {
         precipitationMm: data.hourly.precipitation?.[i] ?? 0,
         precipitationProbabilityPct: data.hourly.precipitation_probability?.[i] ?? null,
         windKmh: data.hourly.wind_speed_10m?.[i] ?? 0,
+        gustKmh: data.hourly.wind_gusts_10m?.[i] ?? null,
         weatherCode: data.hourly.weather_code?.[i] ?? null,
         radiationWm2: data.hourly.shortwave_radiation?.[i] ?? null,
         evapotranspirationMm: data.hourly.evapotranspiration?.[i] ?? null,
         et0Mm: data.hourly.et0_fao_evapotranspiration?.[i] ?? null,
       }];
     });
-    return { timezone: data.timezone, utcOffsetSeconds: data.utc_offset_seconds, hours, days: mapDays(data.daily) };
+    return {
+      timezone: data.timezone,
+      utcOffsetSeconds: data.utc_offset_seconds,
+      fetchedAt: Date.now(),
+      current: mapCurrent(data.current),
+      hours,
+      days: mapDays(data.daily),
+    };
   });
 }
 
@@ -116,7 +157,7 @@ export function getHistory(lat: number, lng: number, start: string, end: string)
   });
 }
 
-const localHour = (forecast: Forecast, now = new Date()) =>
+export const localHour = (forecast: Forecast, now = new Date()) =>
   `${new Date(now.getTime() + forecast.utcOffsetSeconds * 1000).toISOString().slice(0, 13)}:00`;
 
 export const upcomingHours = (forecast: Forecast, now = new Date()) => {
@@ -160,7 +201,7 @@ export async function workWindows(lat: number, lng: number) {
   });
 }
 
-/** Secțiunea meteo din panoul parcelei. */
+/** The weather section of the parcel panel. */
 export async function parcelWeather(lat: number, lng: number) {
   const forecast = await getForecast(lat, lng);
   const hours = upcomingHours(forecast);

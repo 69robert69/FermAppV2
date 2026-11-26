@@ -1,4 +1,4 @@
-import { computeGeoMetrics, polygonFromPoints, validatePolygon, type Position } from '@fermapp/domain';
+import { computeGeoMetrics, polygonFromPoints, validatePolygon, type Position, type TillageSystem } from '@fermapp/domain';
 import type { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { useQuery } from '@tanstack/react-query';
 import * as Location from 'expo-location';
@@ -9,6 +9,7 @@ import { Button, HelperText } from 'react-native-paper';
 import { apiGet, apiSend } from '../api/client';
 import type { Parcel } from '../api/types';
 import { Field, IconButton, Stat, Txt } from '../components/ui';
+import { TillagePicker } from '../features/tillage';
 import { number, parseNumber } from '../lib/format';
 import { useAction } from '../lib/hooks';
 import type { RootStackParams } from '../navigation/RootNavigator';
@@ -33,6 +34,7 @@ export function ParcelEditorScreen({ route, navigation }: Props) {
   const [county, setCounty] = useState('');
   const [notes, setNotes] = useState('');
   const [irrigated, setIrrigated] = useState('');
+  const [tillage, setTillage] = useState<TillageSystem | null>(null);
   const [loaded, setLoaded] = useState(false);
 
   useEffect(() => {
@@ -47,6 +49,7 @@ export function ParcelEditorScreen({ route, navigation }: Props) {
     setCounty(parcel.county ?? '');
     setNotes(parcel.notes ?? '');
     setIrrigated(parcel.irrigatedAreaHa == null ? '' : String(parcel.irrigatedAreaHa));
+    setTillage(parcel.tillageSystem ?? null);
     setLoaded(true);
     setTimeout(() => map.current?.fitToCoordinates(open.map(toCoord), {
       edgePadding: { top: 40, right: 40, bottom: 40, left: 40 },
@@ -76,13 +79,19 @@ export function ParcelEditorScreen({ route, navigation }: Props) {
     notes: notes.trim() || undefined,
     code: code.trim() || undefined,
     irrigatedAreaHa: irrigated.trim() ? parseNumber(irrigated) : null,
+    tillageSystem: tillage,
   });
 
   const save = useAction<void>(
     async () => {
-      await apiSend('PATCH', `/parcels/${parcelId}`, formValues());
+      const { tillageSystem, ...fields } = formValues();
+      await apiSend('PATCH', `/parcels/${parcelId}`, fields);
+      // The technology goes through its own endpoint, so this year's history entry is kept in step.
+      if (tillageSystem && tillageSystem !== existing.data?.tillageSystem) {
+        await apiSend('POST', `/parcels/${parcelId}/tillage`, { system: tillageSystem, year: new Date().getFullYear() });
+      }
     },
-    [['parcels'], ['parcel', parcelId], ['dashboard']],
+    [['parcels'], ['parcel', parcelId], ['dashboard'], ['map-overview']],
     () => navigation.goBack(),
   );
 
@@ -95,9 +104,9 @@ export function ParcelEditorScreen({ route, navigation }: Props) {
   );
 
   const confirmArchive = () =>
-    Alert.alert('Arhivează parcela', 'Parcela dispare din liste, dar istoricul ei se păstrează.', [
-      { text: 'Renunță', style: 'cancel' },
-      { text: 'Arhivează', style: 'destructive', onPress: () => archive.mutate() },
+    Alert.alert('Archive parcel', 'The parcel disappears from lists, but its history is kept.', [
+      { text: 'Cancel', style: 'cancel' },
+      { text: 'Archive', style: 'destructive', onPress: () => archive.mutate() },
     ]);
 
   const movePoint = (index: number, event: { nativeEvent: { coordinate: { latitude: number; longitude: number } } }) => {
@@ -143,42 +152,44 @@ export function ParcelEditorScreen({ route, navigation }: Props) {
         </MapView>
         <View style={styles.mapTools}>
           <View style={styles.tool}>
-            <IconButton icon="undo" label="Anulează ultimul punct" onPress={() => setPoints((current) => current.slice(0, -1))} />
+            <IconButton icon="undo" label="Undo last point" onPress={() => setPoints((current) => current.slice(0, -1))} />
           </View>
           <View style={styles.tool}>
-            <IconButton icon="delete-outline" label="Șterge poligonul" onPress={() => setPoints([])} color={colors.rust} />
+            <IconButton icon="delete-outline" label="Delete polygon" onPress={() => setPoints([])} color={colors.rust} />
           </View>
         </View>
         {points.length < 3 ? (
           <View style={styles.hint}>
-            <Txt variant="small" color={colors.chaff}>Atinge harta pentru a marca colțurile parcelei. Ține apăsat pe un punct pentru a-l muta.</Txt>
+            <Txt variant="small" color={colors.chaff}>Tap the map to mark the corners of the parcel. Press and hold a point to move it.</Txt>
           </View>
         ) : null}
       </View>
 
       <ScrollView contentContainerStyle={styles.form} keyboardShouldPersistTaps="handled">
         <View style={{ flexDirection: 'row' }}>
-          <Stat value={metrics ? number(metrics.areaHa, 2) : '0'} unit="ha" label="Suprafață" />
-          <Stat value={metrics ? number(metrics.perimeterM, 0) : '0'} unit="m" label="Perimetru" />
+          <Stat value={metrics ? number(metrics.areaHa, 2) : '0'} unit="ha" label="Area" />
+          <Stat value={metrics ? number(metrics.perimeterM, 0) : '0'} unit="m" label="Perimeter" />
         </View>
-        {metrics ? <Txt variant="small">{`Centru GPS: ${metrics.center.lat.toFixed(5)}, ${metrics.center.lng.toFixed(5)}`}</Txt> : null}
+        {metrics ? <Txt variant="small">{`GPS centre: ${metrics.center.lat.toFixed(5)}, ${metrics.center.lng.toFixed(5)}`}</Txt> : null}
         {problem ? <HelperText type="error" visible>{problem}</HelperText> : null}
-        <Field label="Nume parcelă" value={name} onChangeText={setName} />
-        <Field label="Cod parcelă (opțional)" value={code} onChangeText={setCode} autoCapitalize="characters" />
-        <Field label="Localitate" value={locality} onChangeText={setLocality} />
-        <Field label="Județ" value={county} onChangeText={setCounty} />
-        <Field label="Suprafață irigată (ha)" value={irrigated} onChangeText={setIrrigated} keyboardType="decimal-pad" />
-        <Field label="Observații" value={notes} onChangeText={setNotes} multiline />
+        <Field label="Parcel name" value={name} onChangeText={setName} />
+        <Field label="Parcel code (optional)" value={code} onChangeText={setCode} autoCapitalize="characters" />
+        <Field label="Locality" value={locality} onChangeText={setLocality} />
+        <Field label="County" value={county} onChangeText={setCounty} />
+        <Field label="Irrigated area (ha)" value={irrigated} onChangeText={setIrrigated} keyboardType="decimal-pad" />
+        <Field label="Notes" value={notes} onChangeText={setNotes} multiline />
+        <Txt variant="small">Tillage technology</Txt>
+        <TillagePicker value={tillage} onChange={setTillage} />
         <Button
           mode="contained"
           loading={save.isPending}
           disabled={!metrics || !name.trim() || save.isPending}
           onPress={() => (parcelId ? save.mutate() : navigation.navigate('ParcelWizard', { draft: formValues() }))}
         >
-          {parcelId ? 'Salvează parcela' : 'Continuă'}
+          {parcelId ? 'Save parcel' : 'Continue'}
         </Button>
         {parcelId ? (
-          <Button textColor={colors.rust} onPress={confirmArchive}>Arhivează parcela</Button>
+          <Button textColor={colors.rust} onPress={confirmArchive}>Archive parcel</Button>
         ) : null}
       </ScrollView>
     </KeyboardAvoidingView>

@@ -3,7 +3,7 @@ import { startAuthListener, useFirebaseSession } from './auth';
 import { startLiveStore } from './liveStore';
 import { startOutboxSync } from './outbox';
 
-/** Pornește sesiunea Firebase, datele live și sincronizarea automată. */
+/** Starts the Firebase session, live data and automatic sync. */
 export function startFirebase() {
   let stopLive: (() => void) | null = null;
   let liveFarm: string | null = null;
@@ -18,7 +18,7 @@ export function startFirebase() {
       stopLive?.();
       stopLive = null;
       liveFarm = null;
-      // O sesiune salvată de pe serverul vechi nu este valabilă pe Firebase.
+      // A session saved from the old server is not valid on Firebase.
       if (useAuth.getState().status === 'signedIn') void useAuth.getState().signOut();
     }
   });

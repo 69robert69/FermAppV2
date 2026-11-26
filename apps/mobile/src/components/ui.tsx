@@ -55,12 +55,12 @@ export function OfflineBanner() {
   const { online, pending, failed, syncing } = useSync();
   if (online && pending === 0 && failed === 0) return null;
   const message = !online
-    ? `Lucrezi offline${pending ? `. ${pending} modificări așteaptă conexiunea` : '. Datele afișate sunt ultimele salvate'}.`
+    ? `Working offline${pending ? `. ${pending} changes are waiting for a connection` : '. The data shown is the last saved version'}.`
     : syncing
-      ? `Se trimit ${pending} modificări.`
+      ? `Sending ${pending} changes.`
       : failed
-        ? `${failed} modificări au fost refuzate de server. Vezi detaliile în Setări.`
-        : `${pending} modificări așteaptă trimiterea.`;
+        ? `${failed} changes were rejected by the server. See the details in Settings.`
+        : `${pending} changes are waiting to be sent.`;
   return (
     <View style={styles.banner} accessibilityLiveRegion="polite">
       <MaterialCommunityIcons name={online ? 'cloud-sync-outline' : 'cloud-off-outline'} size={16} color={colors.wheatInk} />
@@ -230,22 +230,22 @@ export function Empty({ icon, title, hint, action }: { icon: IconName; title: st
   );
 }
 
-/** Stările de încărcare și eroare pentru orice interogare. */
+/** Loading and error states for any query. */
 export function QueryState<T>({ query, children }: { query: UseQueryResult<T>; children: (data: T) => ReactNode }) {
   if (query.data !== undefined) return <>{children(query.data)}</>;
   if (query.isError) {
     return (
       <Empty
         icon="alert-circle-outline"
-        title="Datele nu au putut fi încărcate"
+        title="The data could not be loaded"
         hint={errorMessage(query.error)}
-        action={<Button onPress={() => void query.refetch()}>Încearcă din nou</Button>}
+        action={<Button onPress={() => void query.refetch()}>Try again</Button>}
       />
     );
   }
   return (
     <View style={styles.loading}>
-      <ActivityIndicator color={colors.wheat} accessibilityLabel="Se încarcă" />
+      <ActivityIndicator color={colors.wheat} accessibilityLabel="Loading" />
     </View>
   );
 }
