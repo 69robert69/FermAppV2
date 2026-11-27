@@ -1,0 +1,4805 @@
+{
+  "cropCatalog" : [ {
+    "code" : "WHEAT",
+    "name" : "Wheat",
+    "family" : "CEREAL",
+    "minBreakYears" : 1,
+    "waterMm" : [ 350, 600 ],
+    "phRange" : [ 6, 7.5 ],
+    "seasonTempC" : [ 8, 18 ],
+    "gddBaseC" : 0,
+    "gddCapC" : 30,
+    "gddToMaturity" : 2100,
+    "textures" : [ "LOAMY", "CLAY_LOAM", "CLAY" ],
+    "referenceYieldTHa" : 6
+  }, {
+    "code" : "BARLEY",
+    "name" : "Barley",
+    "family" : "CEREAL",
+    "minBreakYears" : 1,
+    "waterMm" : [ 300, 500 ],
+    "phRange" : [ 6, 8 ],
+    "seasonTempC" : [ 7, 17 ],
+    "gddBaseC" : 0,
+    "gddCapC" : 30,
+    "gddToMaturity" : 1800,
+    "textures" : [ "LOAMY", "CLAY_LOAM" ],
+    "referenceYieldTHa" : 5.5
+  }, {
+    "code" : "CORN",
+    "name" : "Corn",
+    "family" : "CEREAL",
+    "minBreakYears" : 1,
+    "waterMm" : [ 450, 800 ],
+    "phRange" : [ 5.8, 7.5 ],
+    "seasonTempC" : [ 18, 26 ],
+    "gddBaseC" : 10,
+    "gddCapC" : 30,
+    "gddToMaturity" : 1450,
+    "textures" : [ "LOAMY", "CLAY_LOAM" ],
+    "referenceYieldTHa" : 8
+  }, {
+    "code" : "SUNFLOWER",
+    "name" : "Sunflower",
+    "family" : "ASTERACEAE",
+    "minBreakYears" : 4,
+    "waterMm" : [ 400, 700 ],
+    "phRange" : [ 6, 7.8 ],
+    "seasonTempC" : [ 17, 26 ],
+    "gddBaseC" : 6,
+    "gddCapC" : 30,
+    "gddToMaturity" : 1600,
+    "textures" : [ "LOAMY", "CLAY_LOAM", "CLAY" ],
+    "referenceYieldTHa" : 2.8
+  }, {
+    "code" : "RAPESEED",
+    "name" : "Rapeseed",
+    "family" : "BRASSICA",
+    "minBreakYears" : 3,
+    "waterMm" : [ 400, 600 ],
+    "phRange" : [ 6, 7.5 ],
+    "seasonTempC" : [ 7, 17 ],
+    "gddBaseC" : 5,
+    "gddCapC" : 30,
+    "gddToMaturity" : 1500,
+    "textures" : [ "LOAMY", "CLAY_LOAM" ],
+    "referenceYieldTHa" : 3.2
+  }, {
+    "code" : "SOY",
+    "name" : "Soybean",
+    "family" : "LEGUME",
+    "minBreakYears" : 2,
+    "waterMm" : [ 450, 700 ],
+    "phRange" : [ 6, 7.2 ],
+    "seasonTempC" : [ 18, 26 ],
+    "gddBaseC" : 10,
+    "gddCapC" : 30,
+    "gddToMaturity" : 1300,
+    "textures" : [ "LOAMY", "CLAY_LOAM" ],
+    "referenceYieldTHa" : 2.8
+  }, {
+    "code" : "ALFALFA",
+    "name" : "Alfalfa",
+    "family" : "LEGUME",
+    "minBreakYears" : 3,
+    "waterMm" : [ 600, 1000 ],
+    "phRange" : [ 6.5, 7.8 ],
+    "seasonTempC" : [ 14, 25 ],
+    "gddBaseC" : 5,
+    "gddCapC" : 30,
+    "gddToMaturity" : 1200,
+    "textures" : [ "LOAMY", "CLAY_LOAM" ],
+    "referenceYieldTHa" : 9
+  }, {
+    "code" : "OAT",
+    "name" : "Oats",
+    "family" : "CEREAL",
+    "minBreakYears" : 2,
+    "waterMm" : [ 350, 550 ],
+    "phRange" : [ 5.2, 7 ],
+    "seasonTempC" : [ 8, 17 ],
+    "gddBaseC" : 0,
+    "gddCapC" : 30,
+    "gddToMaturity" : 1700,
+    "textures" : [ "SANDY", "LOAMY", "CLAY_LOAM" ],
+    "referenceYieldTHa" : 3.5
+  }, {
+    "code" : "POTATO",
+    "name" : "Potato",
+    "family" : "SOLANACEAE",
+    "minBreakYears" : 3,
+    "waterMm" : [ 500, 700 ],
+    "phRange" : [ 5, 6.5 ],
+    "seasonTempC" : [ 14, 20 ],
+    "gddBaseC" : 7,
+    "gddCapC" : 30,
+    "gddToMaturity" : 1300,
+    "textures" : [ "SANDY", "LOAMY" ],
+    "referenceYieldTHa" : 28
+  }, {
+    "code" : "BEET",
+    "name" : "Beet",
+    "family" : "CHENOPOD",
+    "minBreakYears" : 3,
+    "waterMm" : [ 550, 750 ],
+    "phRange" : [ 6.5, 8 ],
+    "seasonTempC" : [ 14, 22 ],
+    "gddBaseC" : 3,
+    "gddCapC" : 30,
+    "gddToMaturity" : 2400,
+    "textures" : [ "LOAMY", "CLAY_LOAM" ],
+    "referenceYieldTHa" : 60
+  }, {
+    "code" : "VEGETABLES",
+    "name" : "Vegetables",
+    "family" : "VEGETABLE",
+    "minBreakYears" : 2,
+    "waterMm" : [ 400, 800 ],
+    "phRange" : [ 6, 7.2 ],
+    "seasonTempC" : [ 15, 25 ],
+    "gddBaseC" : 8,
+    "gddCapC" : 30,
+    "gddToMaturity" : 1100,
+    "textures" : [ "SANDY", "LOAMY", "CLAY_LOAM" ],
+    "referenceYieldTHa" : 30
+  } ],
+  "cropCodes" : [ "WHEAT", "BARLEY", "CORN", "SUNFLOWER", "RAPESEED", "SOY", "ALFALFA", "OAT", "POTATO", "BEET", "VEGETABLES" ],
+  "isCropCode" : [ true, false, false ],
+  "implements" : [ {
+    "id" : "plug",
+    "name" : "Reversible plough",
+    "operation" : "PLOWING",
+    "widthsM" : [ 1.6, 2.1, 2.8, 3.5 ],
+    "speedKmh" : 7,
+    "efficiencyPct" : 80,
+    "hpPerMeter" : 90,
+    "fuelLoad" : 0.8
+  }, {
+    "id" : "disc",
+    "name" : "Disc harrow",
+    "operation" : "DISCING",
+    "widthsM" : [ 3, 4, 6, 8 ],
+    "speedKmh" : 11,
+    "efficiencyPct" : 80,
+    "hpPerMeter" : 30,
+    "fuelLoad" : 0.6
+  }, {
+    "id" : "scarificator",
+    "name" : "Subsoiler",
+    "operation" : "SUBSOILING",
+    "widthsM" : [ 2.5, 3, 4, 5 ],
+    "speedKmh" : 8,
+    "efficiencyPct" : 80,
+    "hpPerMeter" : 70,
+    "fuelLoad" : 0.8
+  }, {
+    "id" : "semanatoare",
+    "name" : "Seed drill",
+    "operation" : "SOWING",
+    "widthsM" : [ 3, 4.5, 6, 8, 12 ],
+    "speedKmh" : 8,
+    "efficiencyPct" : 70,
+    "hpPerMeter" : 22,
+    "fuelLoad" : 0.35
+  }, {
+    "id" : "fertilizator",
+    "name" : "Fertilizer spreader",
+    "operation" : "FERTILIZING",
+    "widthsM" : [ 12, 18, 24 ],
+    "speedKmh" : 12,
+    "efficiencyPct" : 70,
+    "hpPerMeter" : 3,
+    "fuelLoad" : 0.25
+  }, {
+    "id" : "erbicidator",
+    "name" : "Field sprayer",
+    "operation" : "SPRAYING",
+    "widthsM" : [ 18, 24, 28 ],
+    "speedKmh" : 10,
+    "efficiencyPct" : 70,
+    "hpPerMeter" : 4,
+    "fuelLoad" : 0.25
+  } ],
+  "implementForSowing" : {
+    "id" : "semanatoare",
+    "name" : "Seed drill",
+    "operation" : "SOWING",
+    "widthsM" : [ 3, 4.5, 6, 8, 12 ],
+    "speedKmh" : 8,
+    "efficiencyPct" : 70,
+    "hpPerMeter" : 22,
+    "fuelLoad" : 0.35
+  },
+  "implementForHarvest" : false,
+  "money" : [ "€1.250", "€12.450,50", "-€3,46", "-", "-", "€1.234.567,00", "€0" ],
+  "toEuro" : [ 100, 10, 10, 10 ],
+  "workEstimate" : {
+    "capacityHaH" : 3.6,
+    "durationHours" : 5,
+    "eta" : "2026-05-20T13:30:00.000Z"
+  },
+  "timedProgress" : {
+    "elapsedMs" : 1800000,
+    "remainingMs" : 1800000,
+    "percent" : 50,
+    "eta" : "2026-05-20T09:30:00.000Z",
+    "finished" : false
+  },
+  "irrigationEstimate" : {
+    "durationHours" : 18.29,
+    "eta" : "2026-05-21T02:47:08.571Z"
+  },
+  "economicLabels" : {
+    "SEEDS" : "Seeds",
+    "FERTILIZERS" : "Fertilisers",
+    "CHEMICALS" : "Crop protection",
+    "FUEL" : "Diesel",
+    "MACHINERY" : "Machinery",
+    "LABOR" : "Labour",
+    "OTHER" : "Other costs"
+  },
+  "recordedToEconomic" : {
+    "SEED" : "SEEDS",
+    "FERTILIZER" : "FERTILIZERS",
+    "PESTICIDE" : "CHEMICALS",
+    "FUEL" : "FUEL",
+    "LABOR" : "LABOR",
+    "IRRIGATION" : "OTHER",
+    "OTHER" : "OTHER"
+  },
+  "verdictLabels" : {
+    "RECOMMENDED" : "✅ Recommended",
+    "ACCEPTABLE" : "⚠️ Acceptable",
+    "NOT_RECOMMENDED" : "❌ Not recommended"
+  },
+  "fieldStateLabels" : {
+    "OVERDUE" : "Overdue work",
+    "DUE_TODAY" : "Work due today",
+    "ACTIVE" : "Work in progress",
+    "SCHEDULED" : "Work scheduled",
+    "COMPLETE" : "All work completed"
+  },
+  "operationLabels" : {
+    "SPRAYING" : "spraying",
+    "FERTILIZING" : "fertilizing",
+    "SOWING" : "sowing",
+    "HARVESTING" : "harvesting"
+  },
+  "cropSeasonDays" : {
+    "WHEAT" : 270,
+    "BARLEY" : 250,
+    "CORN" : 170,
+    "SUNFLOWER" : 125,
+    "RAPESEED" : 300,
+    "SOY" : 130,
+    "ALFALFA" : 180,
+    "OAT" : 110,
+    "POTATO" : 120,
+    "BEET" : 190,
+    "VEGETABLES" : 100
+  },
+  "cropCalendars" : {
+    "WHEAT" : {
+      "sowingMonth" : 10,
+      "sowingDay" : 5,
+      "emergenceDays" : 12,
+      "topDressingDays" : 165,
+      "diseaseDays" : 205,
+      "pestDays" : 225,
+      "harvestDays" : 275,
+      "criticalFrom" : 4,
+      "criticalTo" : 5,
+      "rainShare" : 0.8,
+      "priceEurPerT" : 200,
+      "costEurHa" : 800,
+      "nutrientsPerT" : [ 25, 10, 6 ]
+    },
+    "BARLEY" : {
+      "sowingMonth" : 9,
+      "sowingDay" : 28,
+      "emergenceDays" : 12,
+      "topDressingDays" : 165,
+      "diseaseDays" : 195,
+      "pestDays" : 215,
+      "harvestDays" : 270,
+      "criticalFrom" : 4,
+      "criticalTo" : 5,
+      "rainShare" : 0.8,
+      "priceEurPerT" : 180,
+      "costEurHa" : 700,
+      "nutrientsPerT" : [ 24, 10, 7 ]
+    },
+    "CORN" : {
+      "sowingMonth" : 4,
+      "sowingDay" : 5,
+      "emergenceDays" : 12,
+      "topDressingDays" : 40,
+      "diseaseDays" : 66,
+      "pestDays" : 118,
+      "harvestDays" : 193,
+      "criticalFrom" : 7,
+      "criticalTo" : 8,
+      "rainShare" : 0.6,
+      "priceEurPerT" : 190,
+      "costEurHa" : 1000,
+      "nutrientsPerT" : [ 23, 10, 7 ]
+    },
+    "SUNFLOWER" : {
+      "sowingMonth" : 4,
+      "sowingDay" : 1,
+      "emergenceDays" : 12,
+      "topDressingDays" : 35,
+      "diseaseDays" : 75,
+      "pestDays" : 60,
+      "harvestDays" : 150,
+      "criticalFrom" : 6,
+      "criticalTo" : 7,
+      "rainShare" : 0.6,
+      "priceEurPerT" : 430,
+      "costEurHa" : 650,
+      "nutrientsPerT" : [ 40, 18, 12 ]
+    },
+    "RAPESEED" : {
+      "sowingMonth" : 8,
+      "sowingDay" : 28,
+      "emergenceDays" : 8,
+      "topDressingDays" : 190,
+      "diseaseDays" : 225,
+      "pestDays" : 205,
+      "harvestDays" : 305,
+      "criticalFrom" : 4,
+      "criticalTo" : 5,
+      "rainShare" : 0.8,
+      "priceEurPerT" : 460,
+      "costEurHa" : 850,
+      "nutrientsPerT" : [ 50, 25, 12 ]
+    },
+    "SOY" : {
+      "sowingMonth" : 4,
+      "sowingDay" : 25,
+      "emergenceDays" : 12,
+      "topDressingDays" : null,
+      "diseaseDays" : 70,
+      "pestDays" : 85,
+      "harvestDays" : 145,
+      "criticalFrom" : 7,
+      "criticalTo" : 8,
+      "rainShare" : 0.6,
+      "priceEurPerT" : 400,
+      "costEurHa" : 650,
+      "nutrientsPerT" : [ 0, 15, 12 ]
+    },
+    "ALFALFA" : {
+      "sowingMonth" : 4,
+      "sowingDay" : 1,
+      "emergenceDays" : 10,
+      "topDressingDays" : null,
+      "diseaseDays" : 40,
+      "pestDays" : 50,
+      "harvestDays" : 75,
+      "criticalFrom" : 6,
+      "criticalTo" : 8,
+      "rainShare" : 0.7,
+      "priceEurPerT" : 130,
+      "costEurHa" : 500,
+      "nutrientsPerT" : [ 0, 6, 20 ]
+    },
+    "OAT" : {
+      "sowingMonth" : 3,
+      "sowingDay" : 15,
+      "emergenceDays" : 14,
+      "topDressingDays" : 40,
+      "diseaseDays" : 70,
+      "pestDays" : 80,
+      "harvestDays" : 125,
+      "criticalFrom" : 5,
+      "criticalTo" : 6,
+      "rainShare" : 0.6,
+      "priceEurPerT" : 170,
+      "costEurHa" : 550,
+      "nutrientsPerT" : [ 25, 10, 8 ]
+    },
+    "POTATO" : {
+      "sowingMonth" : 4,
+      "sowingDay" : 5,
+      "emergenceDays" : 20,
+      "topDressingDays" : 35,
+      "diseaseDays" : 60,
+      "pestDays" : 50,
+      "harvestDays" : 130,
+      "criticalFrom" : 6,
+      "criticalTo" : 7,
+      "rainShare" : 0.6,
+      "priceEurPerT" : 200,
+      "costEurHa" : 4000,
+      "nutrientsPerT" : [ 4, 1.5, 6 ]
+    },
+    "BEET" : {
+      "sowingMonth" : 3,
+      "sowingDay" : 25,
+      "emergenceDays" : 14,
+      "topDressingDays" : 45,
+      "diseaseDays" : 100,
+      "pestDays" : 60,
+      "harvestDays" : 195,
+      "criticalFrom" : 7,
+      "criticalTo" : 8,
+      "rainShare" : 0.65,
+      "priceEurPerT" : 40,
+      "costEurHa" : 1800,
+      "nutrientsPerT" : [ 2, 1, 2.5 ]
+    },
+    "VEGETABLES" : {
+      "sowingMonth" : 4,
+      "sowingDay" : 20,
+      "emergenceDays" : 10,
+      "topDressingDays" : 35,
+      "diseaseDays" : 50,
+      "pestDays" : 40,
+      "harvestDays" : 100,
+      "criticalFrom" : 6,
+      "criticalTo" : 8,
+      "rainShare" : 0.55,
+      "priceEurPerT" : 350,
+      "costEurHa" : 6000,
+      "nutrientsPerT" : [ 3, 1.5, 4 ]
+    }
+  },
+  "tillageSystems" : {
+    "CONVENTIONAL" : {
+      "code" : "CONVENTIONAL",
+      "name" : "Conventional Tillage",
+      "badge" : "CONV",
+      "color" : "#DE4467",
+      "description" : "Full inversion with the plough, followed by secondary tillage.",
+      "costPerHa" : 520,
+      "fuelLPerHa" : 60,
+      "soilHealth" : 60,
+      "waterRetention" : 2,
+      "waterGainPct" : 0,
+      "passes" : 4,
+      "operations" : [ {
+        "key" : "plowing",
+        "label" : "Ploughing",
+        "workType" : "PLOWING",
+        "taskType" : "SOIL_PREP",
+        "offsetDays" : 0
+      }, {
+        "key" : "discing",
+        "label" : "Discing",
+        "workType" : "DISCING",
+        "taskType" : "SOIL_PREP",
+        "offsetDays" : 10
+      }, {
+        "key" : "seedbed",
+        "label" : "Seedbed preparation",
+        "workType" : "DISCING",
+        "taskType" : "SOIL_PREP",
+        "offsetDays" : 18
+      }, {
+        "key" : "sowing",
+        "label" : "Sowing",
+        "workType" : "SOWING",
+        "taskType" : "SOWING",
+        "offsetDays" : 21
+      } ],
+      "discouragedWork" : { },
+      "discouragedTasks" : { }
+    },
+    "MINIMUM_TILL" : {
+      "code" : "MINIMUM_TILL",
+      "name" : "Minimum Till",
+      "badge" : "MIN",
+      "color" : "#B48A10",
+      "description" : "Loosening without inversion; residues stay near the surface.",
+      "costPerHa" : 420,
+      "fuelLPerHa" : 35,
+      "soilHealth" : 75,
+      "waterRetention" : 4,
+      "waterGainPct" : 15,
+      "passes" : 3,
+      "operations" : [ {
+        "key" : "subsoiling",
+        "label" : "Subsoiling",
+        "workType" : "SUBSOILING",
+        "taskType" : "SOIL_PREP",
+        "offsetDays" : 0
+      }, {
+        "key" : "chiselling",
+        "label" : "Chiselling",
+        "workType" : "SUBSOILING",
+        "taskType" : "SOIL_PREP",
+        "offsetDays" : 7
+      }, {
+        "key" : "shallow-discing",
+        "label" : "Shallow discing",
+        "workType" : "DISCING",
+        "taskType" : "SOIL_PREP",
+        "offsetDays" : 14
+      }, {
+        "key" : "sowing",
+        "label" : "Sowing",
+        "workType" : "SOWING",
+        "taskType" : "SOWING",
+        "offsetDays" : 18
+      } ],
+      "discouragedWork" : {
+        "PLOWING" : "Ploughing inverts the soil and cancels the benefits of Minimum Till."
+      },
+      "discouragedTasks" : { }
+    },
+    "STRIP_TILL" : {
+      "code" : "STRIP_TILL",
+      "name" : "Strip Till",
+      "badge" : "STRIP",
+      "color" : "#3A8FD0",
+      "description" : "Only the seed row strips are tilled and fertilised.",
+      "costPerHa" : 350,
+      "fuelLPerHa" : 25,
+      "soilHealth" : 82,
+      "waterRetention" : 4,
+      "waterGainPct" : 18,
+      "passes" : 2,
+      "operations" : [ {
+        "key" : "strip-prep",
+        "label" : "Strip preparation",
+        "workType" : "SUBSOILING",
+        "taskType" : "SOIL_PREP",
+        "offsetDays" : 0
+      }, {
+        "key" : "band-fertilizing",
+        "label" : "Band fertilisation",
+        "workType" : "FERTILIZING",
+        "taskType" : "FERTILIZATION",
+        "offsetDays" : 0
+      }, {
+        "key" : "strip-sowing",
+        "label" : "Strip sowing",
+        "workType" : "SOWING",
+        "taskType" : "SOWING",
+        "offsetDays" : 10
+      } ],
+      "discouragedWork" : {
+        "PLOWING" : "Ploughing destroys the untilled strips between rows.",
+        "DISCING" : "Full-width discing works the strips that Strip Till keeps covered."
+      },
+      "discouragedTasks" : { }
+    },
+    "NO_TILL" : {
+      "code" : "NO_TILL",
+      "name" : "No Till",
+      "badge" : "NO-TILL",
+      "color" : "#58A23A",
+      "description" : "Direct sowing into the residue of the previous crop.",
+      "costPerHa" : 250,
+      "fuelLPerHa" : 12,
+      "soilHealth" : 90,
+      "waterRetention" : 5,
+      "waterGainPct" : 20,
+      "passes" : 1,
+      "operations" : [ {
+        "key" : "direct-sowing",
+        "label" : "Direct sowing",
+        "workType" : "SOWING",
+        "taskType" : "SOWING",
+        "offsetDays" : 0
+      } ],
+      "discouragedWork" : {
+        "PLOWING" : "No Till does not plough. Ploughing breaks the soil structure built up over years.",
+        "DISCING" : "No Till does not disc. Discing buries the residue that protects the soil.",
+        "SUBSOILING" : "No Till does not loosen the soil before sowing."
+      },
+      "discouragedTasks" : {
+        "SOIL_PREP" : "No Till skips seedbed preparation; sow directly into the residue."
+      }
+    }
+  },
+  "rotation" : [ {
+    "crop" : "WHEAT",
+    "year" : 2026,
+    "score" : 30,
+    "verdict" : "NOT_RECOMMENDED",
+    "label" : "❌ Not recommended",
+    "explanation" : "Wheat was grown last year on this parcel. A minimum break of one year is recommended. The risk of disease and yield loss is high.",
+    "factors" : [ {
+      "code" : "MIN_BREAK",
+      "impact" : -45,
+      "message" : "Wheat was grown last year on this parcel. A minimum break of one year is recommended. The risk of disease and yield loss is high."
+    } ]
+  }, {
+    "crop" : "BARLEY",
+    "year" : 2026,
+    "score" : 60,
+    "verdict" : "ACCEPTABLE",
+    "label" : "⚠️ Acceptable",
+    "explanation" : "Wheat and barley belong to the same family and share diseases and pests.",
+    "factors" : [ {
+      "code" : "SAME_FAMILY",
+      "impact" : -15,
+      "message" : "Wheat and barley belong to the same family and share diseases and pests."
+    } ]
+  }, {
+    "crop" : "CORN",
+    "year" : 2026,
+    "score" : 65,
+    "verdict" : "ACCEPTABLE",
+    "label" : "⚠️ Acceptable",
+    "explanation" : "Wheat and corn belong to the same family and share diseases and pests.",
+    "factors" : [ {
+      "code" : "SAME_FAMILY",
+      "impact" : -15,
+      "message" : "Wheat and corn belong to the same family and share diseases and pests."
+    }, {
+      "code" : "BREAK_OK",
+      "impact" : 5,
+      "message" : "The two years break since the last corn crop is respected."
+    } ]
+  }, {
+    "crop" : "SUNFLOWER",
+    "year" : 2026,
+    "score" : 30,
+    "verdict" : "NOT_RECOMMENDED",
+    "label" : "❌ Not recommended",
+    "explanation" : "Sunflower was grown 4 years ago on this parcel. A minimum break of 4 years is recommended. The risk of disease and yield loss is high.",
+    "factors" : [ {
+      "code" : "MIN_BREAK",
+      "impact" : -45,
+      "message" : "Sunflower was grown 4 years ago on this parcel. A minimum break of 4 years is recommended. The risk of disease and yield loss is high."
+    } ]
+  }, {
+    "crop" : "RAPESEED",
+    "year" : 2026,
+    "score" : 75,
+    "verdict" : "RECOMMENDED",
+    "label" : "✅ Recommended",
+    "explanation" : "Rapeseed has no rotation restrictions on this parcel.",
+    "factors" : [ ]
+  }, {
+    "crop" : "SOY",
+    "year" : 2026,
+    "score" : 39,
+    "verdict" : "NOT_RECOMMENDED",
+    "label" : "❌ Not recommended",
+    "explanation" : "Soybean was grown 2 years ago on this parcel. A minimum break of two years is recommended. The risk of disease and yield loss is high.",
+    "factors" : [ {
+      "code" : "MIN_BREAK",
+      "impact" : -45,
+      "message" : "Soybean was grown 2 years ago on this parcel. A minimum break of two years is recommended. The risk of disease and yield loss is high."
+    }, {
+      "code" : "SOY_AFTER_CEREAL",
+      "impact" : 15,
+      "message" : "Soybean is recommended after cereals, and wheat is a good preceding crop."
+    } ]
+  }, {
+    "crop" : "ALFALFA",
+    "year" : 2026,
+    "score" : 75,
+    "verdict" : "RECOMMENDED",
+    "label" : "✅ Recommended",
+    "explanation" : "Alfalfa has no rotation restrictions on this parcel.",
+    "factors" : [ ]
+  }, {
+    "crop" : "OAT",
+    "year" : 2026,
+    "score" : 60,
+    "verdict" : "ACCEPTABLE",
+    "label" : "⚠️ Acceptable",
+    "explanation" : "Wheat and oats belong to the same family and share diseases and pests.",
+    "factors" : [ {
+      "code" : "SAME_FAMILY",
+      "impact" : -15,
+      "message" : "Wheat and oats belong to the same family and share diseases and pests."
+    } ]
+  }, {
+    "crop" : "POTATO",
+    "year" : 2026,
+    "score" : 75,
+    "verdict" : "RECOMMENDED",
+    "label" : "✅ Recommended",
+    "explanation" : "Potato has no rotation restrictions on this parcel.",
+    "factors" : [ ]
+  }, {
+    "crop" : "BEET",
+    "year" : 2026,
+    "score" : 75,
+    "verdict" : "RECOMMENDED",
+    "label" : "✅ Recommended",
+    "explanation" : "Beet has no rotation restrictions on this parcel.",
+    "factors" : [ ]
+  }, {
+    "crop" : "VEGETABLES",
+    "year" : 2026,
+    "score" : 75,
+    "verdict" : "RECOMMENDED",
+    "label" : "✅ Recommended",
+    "explanation" : "Vegetables has no rotation restrictions on this parcel.",
+    "factors" : [ ]
+  }, {
+    "crop" : "CORN",
+    "year" : 2026,
+    "score" : 70,
+    "verdict" : "RECOMMENDED",
+    "label" : "✅ Recommended",
+    "explanation" : "The parcel has no crop history, so the assessment is indicative.",
+    "factors" : [ {
+      "code" : "NO_HISTORY",
+      "impact" : -5,
+      "message" : "The parcel has no crop history, so the assessment is indicative."
+    } ]
+  }, {
+    "crop" : "CORN",
+    "year" : 2026,
+    "score" : 90,
+    "verdict" : "RECOMMENDED",
+    "label" : "✅ Recommended",
+    "explanation" : "Corn uses the nitrogen left in the soil by alfalfa.",
+    "factors" : [ {
+      "code" : "CORN_AFTER_LEGUME",
+      "impact" : 15,
+      "message" : "Corn uses the nitrogen left in the soil by alfalfa."
+    } ]
+  }, {
+    "crop" : "WHEAT",
+    "year" : 2026,
+    "score" : 85,
+    "verdict" : "RECOMMENDED",
+    "label" : "✅ Recommended",
+    "explanation" : "Alfalfa has improved the soil nitrogen reserve.",
+    "factors" : [ {
+      "code" : "ALFALFA_NITROGEN",
+      "impact" : 15,
+      "message" : "Alfalfa has improved the soil nitrogen reserve."
+    }, {
+      "code" : "HIGH_FREQUENCY",
+      "impact" : -10,
+      "message" : "Wheat occupied the parcel in 3 of the last 4 recorded years."
+    }, {
+      "code" : "BREAK_OK",
+      "impact" : 5,
+      "message" : "The one year break since the last wheat crop is respected."
+    } ]
+  }, {
+    "crop" : "SUNFLOWER",
+    "year" : 2026,
+    "score" : 60,
+    "verdict" : "ACCEPTABLE",
+    "label" : "⚠️ Acceptable",
+    "explanation" : "Rapeseed and sunflower are both hosts of white mould (Sclerotinia).",
+    "factors" : [ {
+      "code" : "SCLEROTINIA",
+      "impact" : -20,
+      "message" : "Rapeseed and sunflower are both hosts of white mould (Sclerotinia)."
+    }, {
+      "code" : "BREAK_OK",
+      "impact" : 5,
+      "message" : "The 4 years break since the last sunflower crop is respected."
+    } ]
+  } ],
+  "rankRotation" : [ {
+    "crop" : "CORN",
+    "year" : 2026,
+    "score" : 65,
+    "verdict" : "ACCEPTABLE",
+    "label" : "⚠️ Acceptable",
+    "explanation" : "Wheat and corn belong to the same family and share diseases and pests.",
+    "factors" : [ {
+      "code" : "SAME_FAMILY",
+      "impact" : -15,
+      "message" : "Wheat and corn belong to the same family and share diseases and pests."
+    }, {
+      "code" : "BREAK_OK",
+      "impact" : 5,
+      "message" : "The two years break since the last corn crop is respected."
+    } ]
+  }, {
+    "crop" : "SOY",
+    "year" : 2026,
+    "score" : 39,
+    "verdict" : "NOT_RECOMMENDED",
+    "label" : "❌ Not recommended",
+    "explanation" : "Soybean was grown 2 years ago on this parcel. A minimum break of two years is recommended. The risk of disease and yield loss is high.",
+    "factors" : [ {
+      "code" : "MIN_BREAK",
+      "impact" : -45,
+      "message" : "Soybean was grown 2 years ago on this parcel. A minimum break of two years is recommended. The risk of disease and yield loss is high."
+    }, {
+      "code" : "SOY_AFTER_CEREAL",
+      "impact" : 15,
+      "message" : "Soybean is recommended after cereals, and wheat is a good preceding crop."
+    } ]
+  }, {
+    "crop" : "WHEAT",
+    "year" : 2026,
+    "score" : 30,
+    "verdict" : "NOT_RECOMMENDED",
+    "label" : "❌ Not recommended",
+    "explanation" : "Wheat was grown last year on this parcel. A minimum break of one year is recommended. The risk of disease and yield loss is high.",
+    "factors" : [ {
+      "code" : "MIN_BREAK",
+      "impact" : -45,
+      "message" : "Wheat was grown last year on this parcel. A minimum break of one year is recommended. The risk of disease and yield loss is high."
+    } ]
+  } ],
+  "recommendFull" : [ {
+    "crop" : "BEET",
+    "name" : "Beet",
+    "score" : 91,
+    "reasons" : [ "Rotation 75/100: Beet has no rotation restrictions on this parcel.", "pH 6.8 is within the optimal range of 6.5-8.", "The mean temperature of 19.5 °C is favourable.", "Rainfall of 540 mm is below the minimum requirement of 550 mm." ],
+    "missingData" : [ ]
+  }, {
+    "crop" : "VEGETABLES",
+    "name" : "Vegetables",
+    "score" : 91,
+    "reasons" : [ "Rotation 75/100: Vegetables has no rotation restrictions on this parcel.", "pH 6.8 is within the optimal range of 6-7.2.", "The mean temperature of 19.5 °C is favourable.", "Rainfall of 540 mm covers the minimum requirement of 400 mm." ],
+    "missingData" : [ ]
+  }, {
+    "crop" : "CORN",
+    "name" : "Corn",
+    "score" : 88,
+    "reasons" : [ "Rotation 65/100: Wheat and corn belong to the same family and share diseases and pests.", "pH 6.8 is within the optimal range of 5.8-7.5.", "The mean temperature of 19.5 °C is favourable.", "Rainfall of 540 mm covers the minimum requirement of 450 mm." ],
+    "missingData" : [ ]
+  }, {
+    "crop" : "POTATO",
+    "name" : "Potato",
+    "score" : 88,
+    "reasons" : [ "Rotation 75/100: Potato has no rotation restrictions on this parcel.", "pH 6.8 is outside the optimal range of 5-6.5.", "The mean temperature of 19.5 °C is favourable.", "Rainfall of 540 mm covers the minimum requirement of 500 mm." ],
+    "missingData" : [ ]
+  }, {
+    "crop" : "ALFALFA",
+    "name" : "Alfalfa",
+    "score" : 87,
+    "reasons" : [ "Rotation 75/100: Alfalfa has no rotation restrictions on this parcel.", "pH 6.8 is within the optimal range of 6.5-7.8.", "The mean temperature of 19.5 °C is favourable.", "Rainfall of 540 mm is below the minimum requirement of 600 mm." ],
+    "missingData" : [ ]
+  }, {
+    "crop" : "RAPESEED",
+    "name" : "Rapeseed",
+    "score" : 85,
+    "reasons" : [ "Rotation 75/100: Rapeseed has no rotation restrictions on this parcel.", "pH 6.8 is within the optimal range of 6-7.5.", "The mean temperature of 19.5 °C is outside the optimum of 7-17 °C.", "Rainfall of 540 mm covers the minimum requirement of 400 mm." ],
+    "missingData" : [ ]
+  }, {
+    "crop" : "OAT",
+    "name" : "Oats",
+    "score" : 80,
+    "reasons" : [ "Rotation 60/100: Wheat and oats belong to the same family and share diseases and pests.", "pH 6.8 is within the optimal range of 5.2-7.", "The mean temperature of 19.5 °C is outside the optimum of 8-17 °C.", "Rainfall of 540 mm covers the minimum requirement of 350 mm." ],
+    "missingData" : [ ]
+  }, {
+    "crop" : "SOY",
+    "name" : "Soybean",
+    "score" : 79,
+    "reasons" : [ "Rotation 39/100: Soybean was grown 2 years ago on this parcel. A minimum break of two years is recommended. The risk of disease and yield loss is high.", "pH 6.8 is within the optimal range of 6-7.2.", "The mean temperature of 19.5 °C is favourable.", "Rainfall of 540 mm covers the minimum requirement of 450 mm." ],
+    "missingData" : [ ]
+  }, {
+    "crop" : "BARLEY",
+    "name" : "Barley",
+    "score" : 77,
+    "reasons" : [ "Rotation 60/100: Wheat and barley belong to the same family and share diseases and pests.", "pH 6.8 is within the optimal range of 6-8.", "The mean temperature of 19.5 °C is outside the optimum of 7-17 °C.", "Rainfall of 540 mm covers the minimum requirement of 300 mm." ],
+    "missingData" : [ ]
+  }, {
+    "crop" : "SUNFLOWER",
+    "name" : "Sunflower",
+    "score" : 76,
+    "reasons" : [ "Rotation 30/100: Sunflower was grown 4 years ago on this parcel. A minimum break of 4 years is recommended. The risk of disease and yield loss is high.", "pH 6.8 is within the optimal range of 6-7.8.", "The mean temperature of 19.5 °C is favourable.", "Rainfall of 540 mm covers the minimum requirement of 400 mm." ],
+    "missingData" : [ ]
+  }, {
+    "crop" : "WHEAT",
+    "name" : "Wheat",
+    "score" : 72,
+    "reasons" : [ "Rotation 30/100: Wheat was grown last year on this parcel. A minimum break of one year is recommended. The risk of disease and yield loss is high.", "pH 6.8 is within the optimal range of 6-7.5.", "The mean temperature of 19.5 °C is outside the optimum of 8-18 °C.", "Rainfall of 540 mm covers the minimum requirement of 350 mm." ],
+    "missingData" : [ ]
+  } ],
+  "recommendEmpty" : [ {
+    "crop" : "OAT",
+    "name" : "Oats",
+    "score" : 67,
+    "reasons" : [ "Rotation 70/100: The parcel has no crop history, so the assessment is indicative." ],
+    "missingData" : [ "soil", "climate" ]
+  }, {
+    "crop" : "POTATO",
+    "name" : "Potato",
+    "score" : 67,
+    "reasons" : [ "Rotation 70/100: The parcel has no crop history, so the assessment is indicative." ],
+    "missingData" : [ "soil", "climate" ]
+  } ],
+  "recommendPoor" : [ {
+    "crop" : "CORN",
+    "name" : "Corn",
+    "score" : 42,
+    "reasons" : [ "Rotation 65/100: Wheat and corn belong to the same family and share diseases and pests.", "pH 4.9 is outside the optimal range of 5.8-7.5.", "The soil texture is not among those preferred by the crop.", "The mean temperature of 9.3 °C is outside the optimum of 18-26 °C.", "Rainfall of 280 mm is below the minimum requirement of 450 mm." ],
+    "missingData" : [ ]
+  }, {
+    "crop" : "BEET",
+    "name" : "Beet",
+    "score" : 41,
+    "reasons" : [ "Rotation 75/100: Beet has no rotation restrictions on this parcel.", "pH 4.9 is outside the optimal range of 6.5-8.", "The soil texture is not among those preferred by the crop.", "The mean temperature of 9.3 °C is outside the optimum of 14-22 °C.", "Rainfall of 280 mm is below the minimum requirement of 550 mm." ],
+    "missingData" : [ ]
+  }, {
+    "crop" : "ALFALFA",
+    "name" : "Alfalfa",
+    "score" : 39,
+    "reasons" : [ "Rotation 75/100: Alfalfa has no rotation restrictions on this parcel.", "pH 4.9 is outside the optimal range of 6.5-7.8.", "The soil texture is not among those preferred by the crop.", "The mean temperature of 9.3 °C is outside the optimum of 14-25 °C.", "Rainfall of 280 mm is below the minimum requirement of 600 mm." ],
+    "missingData" : [ ]
+  } ],
+  "waterBalance" : [ {
+    "crop" : "CORN",
+    "requiredMinMm" : 450,
+    "requiredMaxMm" : 800,
+    "requiredMm" : 625,
+    "receivedMm" : 380,
+    "deficitMm" : 245,
+    "coveragePct" : 61,
+    "irrigationPasses" : 9,
+    "doseMm" : 30,
+    "suggestion" : "Corn: deficit of 245 mm. 9 irrigation passes of 30 mm are recommended."
+  }, {
+    "crop" : "CORN",
+    "requiredMinMm" : 450,
+    "requiredMaxMm" : 800,
+    "requiredMm" : 625,
+    "receivedMm" : 600,
+    "deficitMm" : 25,
+    "coveragePct" : 96,
+    "irrigationPasses" : 1,
+    "doseMm" : 30,
+    "suggestion" : "Corn: water received reaches the minimum threshold. Irrigation is optional, with 1 passes of 30 mm for maximum yield."
+  }, {
+    "crop" : "WHEAT",
+    "requiredMinMm" : 350,
+    "requiredMaxMm" : 600,
+    "requiredMm" : 475,
+    "receivedMm" : 380,
+    "deficitMm" : 95,
+    "coveragePct" : 80,
+    "irrigationPasses" : 4,
+    "doseMm" : 25,
+    "suggestion" : "Wheat: water received reaches the minimum threshold. Irrigation is optional, with 4 passes of 25 mm for maximum yield."
+  }, {
+    "crop" : "SOY",
+    "requiredMinMm" : 450,
+    "requiredMaxMm" : 700,
+    "requiredMm" : 575,
+    "receivedMm" : 0,
+    "deficitMm" : 575,
+    "coveragePct" : 0,
+    "irrigationPasses" : 15,
+    "doseMm" : 40,
+    "suggestion" : "Soybean: deficit of 575 mm. 15 irrigation passes of 40 mm are recommended."
+  } ],
+  "dailyGdd" : [ 14, 0, 21.5 ],
+  "development" : [ {
+    "crop" : "CORN",
+    "accumulatedGdd" : 71,
+    "requiredGdd" : 1450,
+    "percent" : 5,
+    "stage" : "Emergence"
+  }, {
+    "crop" : "CORN",
+    "accumulatedGdd" : 657,
+    "requiredGdd" : 1450,
+    "percent" : 45,
+    "stage" : "Flowering"
+  }, {
+    "crop" : "WHEAT",
+    "accumulatedGdd" : 1530,
+    "requiredGdd" : 2100,
+    "percent" : 73,
+    "stage" : "Grain fill"
+  }, {
+    "crop" : "SOY",
+    "accumulatedGdd" : 0,
+    "requiredGdd" : 1300,
+    "percent" : 0,
+    "stage" : "Emergence"
+  } ],
+  "vegetation" : [ {
+    "healthIndex" : 94,
+    "healthClass" : "GOOD",
+    "color" : "green",
+    "label" : "Good growth"
+  }, {
+    "healthIndex" : 50,
+    "healthClass" : "MODERATE",
+    "color" : "yellow",
+    "label" : "Moderate stress"
+  }, {
+    "healthIndex" : 10,
+    "healthClass" : "PROBLEM",
+    "color" : "red",
+    "label" : "Possible problem"
+  } ],
+  "geoMetrics" : [ {
+    "areaHa" : 88.3323,
+    "perimeterM" : 3812.7,
+    "center" : {
+      "lat" : 44.405,
+      "lng" : 26.105
+    }
+  }, {
+    "areaHa" : 84.7989,
+    "perimeterM" : 3812.7,
+    "center" : {
+      "lat" : 44.405,
+      "lng" : 26.105
+    }
+  } ],
+  "geoValidation" : [ null, "The parcel outline intersects itself.", "The polygon has no outline.", "The outline needs at least 3 distinct points.", "Coordinates must be valid longitude and latitude values.", "The parcel area must be greater than zero." ],
+  "closeRing" : [ [ [ 26.1, 44.4 ], [ 26.110000000000003, 44.4 ], [ 26.110000000000003, 44.41 ], [ 26.1, 44.41 ], [ 26.1, 44.4 ] ], [ ] ],
+  "haversine" : 68388.91492864858,
+  "polygon" : {
+    "type" : "Polygon",
+    "coordinates" : [ [ [ 26.1, 44.4 ], [ 26.110000000000003, 44.4 ], [ 26.110000000000003, 44.41 ], [ 26.1, 44.41 ] ] ]
+  },
+  "soil" : [ {
+    "siltPct" : 43,
+    "organicMatterPct" : 3.28,
+    "waterHoldingMmPerM" : 200,
+    "texture" : "CLAY_LOAM",
+    "textureLabel" : "clay loam",
+    "soilType" : "Chernozem",
+    "label" : "Chernozem (clay loam)"
+  }, {
+    "siltPct" : 18,
+    "organicMatterPct" : 1.03,
+    "waterHoldingMmPerM" : 135,
+    "texture" : "SANDY",
+    "textureLabel" : "sandy",
+    "soilType" : "Luvisol",
+    "label" : "Luvisol (sandy)"
+  }, {
+    "siltPct" : 38,
+    "organicMatterPct" : 2.07,
+    "waterHoldingMmPerM" : 160,
+    "texture" : "CLAY",
+    "textureLabel" : "clay",
+    "soilType" : "Vertisol",
+    "label" : "Vertisol (clay)"
+  }, {
+    "siltPct" : 0,
+    "organicMatterPct" : 3.79,
+    "waterHoldingMmPerM" : 143,
+    "texture" : "SANDY",
+    "textureLabel" : "sandy",
+    "soilType" : "Arenosol",
+    "label" : "Arenosol (sandy)"
+  }, {
+    "siltPct" : 38,
+    "organicMatterPct" : 3.45,
+    "waterHoldingMmPerM" : 197,
+    "texture" : "LOAMY",
+    "textureLabel" : "loam",
+    "soilType" : "Phaeozem",
+    "label" : "Phaeozem (loam)"
+  }, {
+    "siltPct" : 38,
+    "organicMatterPct" : 1.38,
+    "waterHoldingMmPerM" : 185,
+    "texture" : "LOAMY",
+    "textureLabel" : "loam",
+    "soilType" : "Eutric Cambisol",
+    "label" : "Eutric Cambisol (loam)"
+  } ],
+  "soilIndices" : [ {
+    "soilScore" : 92,
+    "fertilityIndex" : 88,
+    "waterRetentionIndex" : 90
+  }, {
+    "soilScore" : 37,
+    "fertilityIndex" : 34,
+    "waterRetentionIndex" : 30
+  }, {
+    "soilScore" : 83,
+    "fertilityIndex" : 86,
+    "waterRetentionIndex" : 100
+  } ],
+  "windows" : {
+    "SPRAYING" : [ {
+      "operation" : "SPRAYING",
+      "start" : "2026-05-21T20:00",
+      "end" : "2026-05-22T00:00",
+      "hours" : 4,
+      "score" : 83,
+      "label" : "Thursday 20:00-00:00"
+    }, {
+      "operation" : "SPRAYING",
+      "start" : "2026-05-21T09:00",
+      "end" : "2026-05-21T15:00",
+      "hours" : 6,
+      "score" : 76,
+      "label" : "Thursday 09:00-15:00"
+    }, {
+      "operation" : "SPRAYING",
+      "start" : "2026-05-20T10:00",
+      "end" : "2026-05-20T14:00",
+      "hours" : 4,
+      "score" : 71,
+      "label" : "Wednesday 10:00-14:00"
+    }, {
+      "operation" : "SPRAYING",
+      "start" : "2026-05-20T03:00",
+      "end" : "2026-05-20T06:00",
+      "hours" : 3,
+      "score" : 70,
+      "label" : "Wednesday 03:00-06:00"
+    }, {
+      "operation" : "SPRAYING",
+      "start" : "2026-05-21T00:00",
+      "end" : "2026-05-21T04:00",
+      "hours" : 4,
+      "score" : 61,
+      "label" : "Thursday 00:00-04:00"
+    } ],
+    "SPRAYING-message" : "Best window for spraying: Thursday 20:00-00:00",
+    "FERTILIZING" : [ {
+      "operation" : "FERTILIZING",
+      "start" : "2026-05-21T00:00",
+      "end" : "2026-05-22T00:00",
+      "hours" : 24,
+      "score" : 86,
+      "label" : "Thursday 00:00-00:00"
+    }, {
+      "operation" : "FERTILIZING",
+      "start" : "2026-05-20T00:00",
+      "end" : "2026-05-20T14:00",
+      "hours" : 14,
+      "score" : 83,
+      "label" : "Wednesday 00:00-14:00"
+    }, {
+      "operation" : "FERTILIZING",
+      "start" : "2026-05-22T06:00",
+      "end" : "2026-05-22T12:00",
+      "hours" : 6,
+      "score" : 69,
+      "label" : "Friday 06:00-12:00"
+    }, {
+      "operation" : "FERTILIZING",
+      "start" : "2026-05-20T15:00",
+      "end" : "2026-05-20T18:00",
+      "hours" : 3,
+      "score" : 67,
+      "label" : "Wednesday 15:00-18:00"
+    }, {
+      "operation" : "FERTILIZING",
+      "start" : "2026-05-20T19:00",
+      "end" : "2026-05-20T22:00",
+      "hours" : 3,
+      "score" : 54,
+      "label" : "Wednesday 19:00-22:00"
+    } ],
+    "FERTILIZING-message" : "Best window for fertilizing: Thursday 00:00-00:00",
+    "SOWING" : [ {
+      "operation" : "SOWING",
+      "start" : "2026-05-20T10:00",
+      "end" : "2026-05-20T14:00",
+      "hours" : 4,
+      "score" : 90,
+      "label" : "Wednesday 10:00-14:00"
+    }, {
+      "operation" : "SOWING",
+      "start" : "2026-05-21T09:00",
+      "end" : "2026-05-21T17:00",
+      "hours" : 8,
+      "score" : 89,
+      "label" : "Thursday 09:00-17:00"
+    }, {
+      "operation" : "SOWING",
+      "start" : "2026-05-21T20:00",
+      "end" : "2026-05-22T00:00",
+      "hours" : 4,
+      "score" : 89,
+      "label" : "Thursday 20:00-00:00"
+    }, {
+      "operation" : "SOWING",
+      "start" : "2026-05-20T00:00",
+      "end" : "2026-05-20T07:00",
+      "hours" : 7,
+      "score" : 76,
+      "label" : "Wednesday 00:00-07:00"
+    }, {
+      "operation" : "SOWING",
+      "start" : "2026-05-20T15:00",
+      "end" : "2026-05-20T18:00",
+      "hours" : 3,
+      "score" : 76,
+      "label" : "Wednesday 15:00-18:00"
+    }, {
+      "operation" : "SOWING",
+      "start" : "2026-05-20T22:00",
+      "end" : "2026-05-21T05:00",
+      "hours" : 7,
+      "score" : 75,
+      "label" : "Wednesday 22:00 - Thursday 05:00"
+    }, {
+      "operation" : "SOWING",
+      "start" : "2026-05-22T09:00",
+      "end" : "2026-05-22T12:00",
+      "hours" : 3,
+      "score" : 62,
+      "label" : "Friday 09:00-12:00"
+    } ],
+    "SOWING-message" : "Best window for sowing: Wednesday 10:00-14:00",
+    "HARVESTING" : [ {
+      "operation" : "HARVESTING",
+      "start" : "2026-05-20T10:00",
+      "end" : "2026-05-20T14:00",
+      "hours" : 4,
+      "score" : 80,
+      "label" : "Wednesday 10:00-14:00"
+    }, {
+      "operation" : "HARVESTING",
+      "start" : "2026-05-21T09:00",
+      "end" : "2026-05-21T14:00",
+      "hours" : 5,
+      "score" : 79,
+      "label" : "Thursday 09:00-14:00"
+    }, {
+      "operation" : "HARVESTING",
+      "start" : "2026-05-21T20:00",
+      "end" : "2026-05-22T00:00",
+      "hours" : 4,
+      "score" : 73,
+      "label" : "Thursday 20:00-00:00"
+    }, {
+      "operation" : "HARVESTING",
+      "start" : "2026-05-20T02:00",
+      "end" : "2026-05-20T06:00",
+      "hours" : 4,
+      "score" : 62,
+      "label" : "Wednesday 02:00-06:00"
+    } ],
+    "HARVESTING-message" : "Best window for harvesting: Wednesday 10:00-14:00",
+    "from" : [ {
+      "operation" : "FERTILIZING",
+      "start" : "2026-05-21T00:00",
+      "end" : "2026-05-22T00:00",
+      "hours" : 24,
+      "score" : 86,
+      "label" : "Thursday 00:00-00:00"
+    }, {
+      "operation" : "FERTILIZING",
+      "start" : "2026-05-22T06:00",
+      "end" : "2026-05-22T12:00",
+      "hours" : 6,
+      "score" : 69,
+      "label" : "Friday 06:00-12:00"
+    } ],
+    "none" : "No suitable window for harvesting in the analysed period.",
+    "midnight" : [ {
+      "operation" : "SOWING",
+      "start" : "2026-05-20T22:00",
+      "end" : "2026-05-21T00:00",
+      "hours" : 2,
+      "score" : 92,
+      "label" : "Wednesday 22:00-00:00"
+    } ]
+  },
+  "alerts" : [ {
+    "type" : "STORM",
+    "severity" : "SEVERE",
+    "title" : "Thunderstorm",
+    "message" : "Thunderstorm expected in 20 hours on parcel North field.",
+    "startsAt" : "2026-05-20T20:00"
+  }, {
+    "type" : "RAIN",
+    "severity" : "INFO",
+    "title" : "Rain",
+    "message" : "Rain expected in 14 hours on parcel North field.",
+    "startsAt" : "2026-05-20T14:00"
+  }, {
+    "type" : "HEAT",
+    "severity" : "WARNING",
+    "title" : "Extreme temperatures",
+    "message" : "Heatwave expected in 18 hours on parcel North field: 36 °C.",
+    "startsAt" : "2026-05-20T18:00"
+  }, {
+    "type" : "WIND_SPRAYING",
+    "severity" : "WARNING",
+    "title" : "Strong wind",
+    "message" : "Wind 18 km/h. Herbicide spraying is not recommended.",
+    "startsAt" : "2026-05-20T00:00"
+  } ],
+  "alertsLongHorizon" : [ {
+    "type" : "HAIL",
+    "severity" : "SEVERE",
+    "title" : "Hail risk",
+    "message" : "Hailstorm expected in 26 hours on parcel North field.",
+    "startsAt" : "2026-05-21T02:00"
+  }, {
+    "type" : "STORM",
+    "severity" : "SEVERE",
+    "title" : "Thunderstorm",
+    "message" : "Thunderstorm expected in 20 hours on parcel North field.",
+    "startsAt" : "2026-05-20T20:00"
+  }, {
+    "type" : "RAIN",
+    "severity" : "INFO",
+    "title" : "Rain",
+    "message" : "Rain expected in 14 hours on parcel North field.",
+    "startsAt" : "2026-05-20T14:00"
+  }, {
+    "type" : "FROST",
+    "severity" : "WARNING",
+    "title" : "Frost",
+    "message" : "Frost expected in 48 hours on parcel North field: -3 °C.",
+    "startsAt" : "2026-05-22T00:00"
+  }, {
+    "type" : "HEAT",
+    "severity" : "WARNING",
+    "title" : "Extreme temperatures",
+    "message" : "Heatwave expected in 18 hours on parcel North field: 36 °C.",
+    "startsAt" : "2026-05-20T18:00"
+  }, {
+    "type" : "WIND_SPRAYING",
+    "severity" : "WARNING",
+    "title" : "Strong wind",
+    "message" : "Wind 18 km/h. Herbicide spraying is not recommended.",
+    "startsAt" : "2026-05-20T00:00"
+  } ],
+  "alertsEmpty" : [ ],
+  "progress" : [ {
+    "status" : "GROWING",
+    "vegetationDay" : 45,
+    "totalDays" : 170,
+    "percent" : 26,
+    "estimatedHarvestDate" : "2026-09-22T09:00:00.000Z"
+  }, {
+    "status" : "NOT_SOWN",
+    "vegetationDay" : 0,
+    "totalDays" : 270,
+    "percent" : 0,
+    "estimatedHarvestDate" : "2026-07-10T00:00:00.000Z"
+  }, {
+    "status" : "NOT_SOWN",
+    "vegetationDay" : 0,
+    "totalDays" : 270,
+    "percent" : 0,
+    "estimatedHarvestDate" : null
+  }, {
+    "status" : "READY",
+    "vegetationDay" : 227,
+    "totalDays" : 232,
+    "percent" : 98,
+    "estimatedHarvestDate" : "2026-05-25T00:00:00.000Z"
+  }, {
+    "status" : "HARVESTED",
+    "vegetationDay" : 212,
+    "totalDays" : 212,
+    "percent" : 100,
+    "estimatedHarvestDate" : "2026-05-01T09:00:00.000Z"
+  } ],
+  "spraying" : [ [ {
+    "code" : "WIND",
+    "message" : "Wind 18 km/h. Do not spray."
+  }, {
+    "code" : "RAIN",
+    "message" : "Rain probability 75%. Postpone spraying."
+  } ], [ ], [ ] ],
+  "nextAction" : [ {
+    "code" : "PLAN_CROP",
+    "action" : "Plan the crop for this parcel.",
+    "reason" : "The parcel has no crop recorded for the current year.",
+    "priority" : "MEDIUM",
+    "riskLevel" : "LOW",
+    "confidencePct" : 50,
+    "dueInDays" : null
+  }, {
+    "code" : "SET_SOWING",
+    "action" : "Fill in the sowing date.",
+    "reason" : "Without this date the stage of the corn crop cannot be estimated.",
+    "priority" : "MEDIUM",
+    "riskLevel" : "LOW",
+    "confidencePct" : 65,
+    "dueInDays" : null
+  }, {
+    "code" : "POST_HARVEST",
+    "action" : "Prepare the land for the next crop.",
+    "reason" : "The corn crop has been harvested.",
+    "priority" : "LOW",
+    "riskLevel" : "LOW",
+    "confidencePct" : 95,
+    "dueInDays" : 14
+  }, {
+    "code" : "HARVEST",
+    "action" : "Prepare for harvest.",
+    "reason" : "The corn crop has reached 97% of its estimated cycle. Check grain moisture.",
+    "priority" : "HIGH",
+    "riskLevel" : "MEDIUM",
+    "confidencePct" : 95,
+    "dueInDays" : 7
+  }, {
+    "code" : "FROST",
+    "action" : "Check the plants after the expected frost.",
+    "reason" : "-3 °C is expected and the crop is at a sensitive stage.",
+    "priority" : "HIGH",
+    "riskLevel" : "HIGH",
+    "confidencePct" : 80,
+    "dueInDays" : 2
+  }, {
+    "code" : "SCOUT",
+    "action" : "Inspect the parcel in the field.",
+    "reason" : "The latest satellite image indicates a possible vegetation problem.",
+    "priority" : "HIGH",
+    "riskLevel" : "HIGH",
+    "confidencePct" : 95,
+    "dueInDays" : 2
+  }, {
+    "code" : "IRRIGATE",
+    "action" : "Plan an irrigation within the next 3 days.",
+    "reason" : "Soil moisture is 22%.",
+    "priority" : "HIGH",
+    "riskLevel" : "MEDIUM",
+    "confidencePct" : 90,
+    "dueInDays" : 3
+  }, {
+    "code" : "IRRIGATE",
+    "action" : "Plan an irrigation within the next 3 days.",
+    "reason" : "Evapotranspiration exceeds rainfall by 37 mm over the next 7 days.",
+    "priority" : "HIGH",
+    "riskLevel" : "MEDIUM",
+    "confidencePct" : 80,
+    "dueInDays" : 3
+  }, {
+    "code" : "FUNGICIDE",
+    "action" : "Check for foliar diseases and prepare a fungicide treatment within 4 days.",
+    "reason" : "Mean humidity of 82% and 3 rainy days raise the risk of foliar diseases.",
+    "priority" : "HIGH",
+    "riskLevel" : "HIGH",
+    "confidencePct" : 95,
+    "dueInDays" : 4
+  }, {
+    "code" : "NITROGEN",
+    "action" : "Plan a nitrogen fertilization.",
+    "reason" : "The wheat crop is actively growing and no fertilization has been recorded in the last 30 days.",
+    "priority" : "MEDIUM",
+    "riskLevel" : "MEDIUM",
+    "confidencePct" : 95,
+    "dueInDays" : 7
+  }, {
+    "code" : "WEEDS",
+    "action" : "Check the level of weed infestation.",
+    "reason" : "In the early stages, weeds compete strongly with the crop for water and nutrients.",
+    "priority" : "MEDIUM",
+    "riskLevel" : "MEDIUM",
+    "confidencePct" : 65,
+    "dueInDays" : 5
+  }, {
+    "code" : "MONITOR",
+    "action" : "Keep monitoring the crop.",
+    "reason" : "The available data does not indicate an urgent intervention.",
+    "priority" : "LOW",
+    "riskLevel" : "LOW",
+    "confidencePct" : 65,
+    "dueInDays" : 7
+  } ],
+  "costSummary" : [ {
+    "totalCost" : 2650.56,
+    "costPerHa" : 212.04,
+    "byCategory" : {
+      "SEED" : 1950.56,
+      "FERTILIZER" : 0,
+      "PESTICIDE" : 0,
+      "FUEL" : 700,
+      "LABOR" : 0,
+      "IRRIGATION" : 0,
+      "OTHER" : 0
+    },
+    "estimatedRevenue" : 17812.5,
+    "estimatedProfit" : 15161.94,
+    "actualRevenue" : 18040,
+    "actualProfit" : 15389.44
+  }, {
+    "totalCost" : 0,
+    "costPerHa" : 0,
+    "byCategory" : {
+      "SEED" : 0,
+      "FERTILIZER" : 0,
+      "PESTICIDE" : 0,
+      "FUEL" : 0,
+      "LABOR" : 0,
+      "IRRIGATION" : 0,
+      "OTHER" : 0
+    },
+    "estimatedRevenue" : null,
+    "estimatedProfit" : null,
+    "actualRevenue" : null,
+    "actualProfit" : null
+  } ],
+  "parcelEconomics" : [ {
+    "seedsCost" : 1950.56,
+    "fertilizerCost" : 0,
+    "chemicalCost" : 0,
+    "fuelCost" : 700,
+    "laborCost" : 0,
+    "irrigationCost" : 0,
+    "otherCost" : 0,
+    "totalCost" : 2650.56,
+    "costPerHa" : 212.04,
+    "expectedIncome" : 17812.5,
+    "expectedProfit" : 15161.94,
+    "profitMarginPct" : 85.1,
+    "roiPct" : 572,
+    "actualIncome" : 18040,
+    "actualProfit" : 15389.44
+  }, {
+    "seedsCost" : 1950.56,
+    "fertilizerCost" : 0,
+    "chemicalCost" : 0,
+    "fuelCost" : 700,
+    "laborCost" : 0,
+    "irrigationCost" : 0,
+    "otherCost" : 0,
+    "totalCost" : 2650.56,
+    "costPerHa" : 212.04,
+    "expectedIncome" : 17812.5,
+    "expectedProfit" : 15161.94,
+    "profitMarginPct" : 85.1,
+    "roiPct" : 572,
+    "actualIncome" : 15000,
+    "actualProfit" : 12349.44
+  }, {
+    "seedsCost" : 0,
+    "fertilizerCost" : 0,
+    "chemicalCost" : 0,
+    "fuelCost" : 0,
+    "laborCost" : 0,
+    "irrigationCost" : 0,
+    "otherCost" : 0,
+    "totalCost" : 0,
+    "costPerHa" : 0,
+    "expectedIncome" : null,
+    "expectedProfit" : null,
+    "profitMarginPct" : null,
+    "roiPct" : null,
+    "actualIncome" : null,
+    "actualProfit" : null
+  } ],
+  "tillageEstimates" : [ {
+    "system" : "CONVENTIONAL",
+    "areaHa" : 23.75,
+    "costPerHa" : 520,
+    "totalCost" : 12350,
+    "costSavings" : 0,
+    "fuelPerHa" : 60,
+    "seasonFuelL" : 1425,
+    "annualFuelL" : 1425,
+    "annualFuelSavingsL" : 0,
+    "passes" : 4,
+    "passesSaved" : 0,
+    "soilHealth" : 60,
+    "waterRetention" : 2,
+    "waterGainPct" : 0
+  }, {
+    "system" : "MINIMUM_TILL",
+    "areaHa" : 23.75,
+    "costPerHa" : 420,
+    "totalCost" : 9975,
+    "costSavings" : 2375,
+    "fuelPerHa" : 35,
+    "seasonFuelL" : 831,
+    "annualFuelL" : 831,
+    "annualFuelSavingsL" : 594,
+    "passes" : 3,
+    "passesSaved" : 1,
+    "soilHealth" : 75,
+    "waterRetention" : 4,
+    "waterGainPct" : 15
+  }, {
+    "system" : "STRIP_TILL",
+    "areaHa" : 23.75,
+    "costPerHa" : 350,
+    "totalCost" : 8313,
+    "costSavings" : 4038,
+    "fuelPerHa" : 25,
+    "seasonFuelL" : 594,
+    "annualFuelL" : 594,
+    "annualFuelSavingsL" : 831,
+    "passes" : 2,
+    "passesSaved" : 2,
+    "soilHealth" : 82,
+    "waterRetention" : 4,
+    "waterGainPct" : 18
+  }, {
+    "system" : "NO_TILL",
+    "areaHa" : 23.75,
+    "costPerHa" : 250,
+    "totalCost" : 5938,
+    "costSavings" : 6413,
+    "fuelPerHa" : 12,
+    "seasonFuelL" : 285,
+    "annualFuelL" : 285,
+    "annualFuelSavingsL" : 1140,
+    "passes" : 1,
+    "passesSaved" : 3,
+    "soilHealth" : 90,
+    "waterRetention" : 5,
+    "waterGainPct" : 20
+  } ],
+  "tillageAdvice" : {
+    "CONVENTIONAL-corn" : [ {
+      "tone" : "warning",
+      "message" : "High compaction risk from repeated passes. Consider Minimum Till."
+    } ],
+    "CONVENTIONAL-wheat" : [ {
+      "tone" : "warning",
+      "message" : "High compaction risk from repeated passes. Consider Minimum Till."
+    } ],
+    "CONVENTIONAL-none" : [ {
+      "tone" : "warning",
+      "message" : "High compaction risk from repeated passes. Consider Minimum Till."
+    } ],
+    "MINIMUM_TILL-corn" : [ {
+      "tone" : "success",
+      "message" : "A good fit for corn and sunflower."
+    }, {
+      "tone" : "info",
+      "message" : "For row crops, Strip Till can cut costs further with banded fertiliser."
+    } ],
+    "MINIMUM_TILL-wheat" : [ {
+      "tone" : "success",
+      "message" : "A good fit for corn and sunflower."
+    } ],
+    "MINIMUM_TILL-none" : [ {
+      "tone" : "success",
+      "message" : "A good fit for corn and sunflower."
+    } ],
+    "STRIP_TILL-corn" : [ {
+      "tone" : "success",
+      "message" : "Efficient for row crops and placed fertilisation."
+    } ],
+    "STRIP_TILL-wheat" : [ {
+      "tone" : "success",
+      "message" : "Efficient for row crops and placed fertilisation."
+    }, {
+      "tone" : "warning",
+      "message" : "Strip Till pays off mostly in wide-row crops; check the row spacing of this crop."
+    } ],
+    "STRIP_TILL-none" : [ {
+      "tone" : "success",
+      "message" : "Efficient for row crops and placed fertilisation."
+    } ],
+    "NO_TILL-corn" : [ {
+      "tone" : "success",
+      "message" : "Excellent moisture conservation in dry conditions."
+    }, {
+      "tone" : "info",
+      "message" : "Use a No Till drill and manage residue and weeds closely in the first years."
+    } ],
+    "NO_TILL-wheat" : [ {
+      "tone" : "success",
+      "message" : "Excellent moisture conservation in dry conditions."
+    }, {
+      "tone" : "info",
+      "message" : "Use a No Till drill and manage residue and weeds closely in the first years."
+    } ],
+    "NO_TILL-none" : [ {
+      "tone" : "success",
+      "message" : "Excellent moisture conservation in dry conditions."
+    }, {
+      "tone" : "info",
+      "message" : "Use a No Till drill and manage residue and weeds closely in the first years."
+    } ]
+  },
+  "tillageInYear" : [ null, "CONVENTIONAL", "NO_TILL" ],
+  "withTillageYear" : [ {
+    "year" : 2024,
+    "system" : "STRIP_TILL"
+  }, {
+    "year" : 2025,
+    "system" : "NO_TILL"
+  } ],
+  "withTillageYearNew" : [ {
+    "year" : 2020,
+    "system" : "MINIMUM_TILL"
+  }, {
+    "year" : 2024,
+    "system" : "CONVENTIONAL"
+  }, {
+    "year" : 2025,
+    "system" : "NO_TILL"
+  } ],
+  "tillageParse" : [ "NO_TILL", null, null ],
+  "tillageHistory" : [ {
+    "year" : 2022,
+    "system" : "STRIP_TILL"
+  }, {
+    "year" : 2025,
+    "system" : "NO_TILL"
+  } ],
+  "tillageHistoryNotArray" : [ ],
+  "fieldStatus" : {
+    "overdue" : {
+      "state" : "OVERDUE",
+      "badge" : "1 task overdue",
+      "overdue" : 1,
+      "dueToday" : 1,
+      "upcoming" : 1,
+      "pending" : 3,
+      "later" : 1,
+      "nextDue" : {
+        "id" : "t2",
+        "title" : "Sowing",
+        "type" : "SOWING",
+        "status" : "IN_PROGRESS",
+        "dueDate" : "2026-05-20T06:00:00.000Z",
+        "parcelId" : "p1"
+      },
+      "completionScore" : 20,
+      "done" : 1,
+      "total" : 5
+    },
+    "tomorrow" : {
+      "state" : "SCHEDULED",
+      "badge" : "Work scheduled tomorrow",
+      "overdue" : 0,
+      "dueToday" : 0,
+      "upcoming" : 1,
+      "pending" : 1,
+      "later" : 0,
+      "nextDue" : {
+        "id" : "t6",
+        "title" : "Check",
+        "type" : "PEST_CHECK",
+        "status" : "TODO",
+        "dueDate" : "2026-05-21T09:00:00.000Z",
+        "parcelId" : "p2"
+      },
+      "completionScore" : 0,
+      "done" : 0,
+      "total" : 1
+    },
+    "today" : {
+      "state" : "DUE_TODAY",
+      "badge" : "1 task due today",
+      "overdue" : 0,
+      "dueToday" : 1,
+      "upcoming" : 0,
+      "pending" : 1,
+      "later" : 0,
+      "nextDue" : {
+        "id" : "t8",
+        "title" : "Today",
+        "type" : "PEST_CHECK",
+        "status" : "TODO",
+        "dueDate" : "2026-05-20T12:00:00.000Z",
+        "parcelId" : "p3"
+      },
+      "completionScore" : 0,
+      "done" : 0,
+      "total" : 1
+    },
+    "active" : {
+      "state" : "ACTIVE",
+      "badge" : "Work in progress, 1 task left",
+      "overdue" : 0,
+      "dueToday" : 1,
+      "upcoming" : 0,
+      "pending" : 1,
+      "later" : 0,
+      "nextDue" : {
+        "id" : "t8",
+        "title" : "Today",
+        "type" : "PEST_CHECK",
+        "status" : "TODO",
+        "dueDate" : "2026-05-20T12:00:00.000Z",
+        "parcelId" : "p3"
+      },
+      "completionScore" : 0,
+      "done" : 0,
+      "total" : 1
+    },
+    "activeIdle" : {
+      "state" : "ACTIVE",
+      "badge" : "Work in progress",
+      "overdue" : 0,
+      "dueToday" : 0,
+      "upcoming" : 0,
+      "pending" : 0,
+      "later" : 0,
+      "nextDue" : null,
+      "completionScore" : null,
+      "done" : 0,
+      "total" : 0
+    },
+    "complete" : {
+      "state" : "COMPLETE",
+      "badge" : "All work completed",
+      "overdue" : 0,
+      "dueToday" : 0,
+      "upcoming" : 0,
+      "pending" : 0,
+      "later" : 0,
+      "nextDue" : null,
+      "completionScore" : null,
+      "done" : 0,
+      "total" : 0
+    },
+    "scheduled" : {
+      "state" : "SCHEDULED",
+      "badge" : "2 scheduled activities",
+      "overdue" : 0,
+      "dueToday" : 0,
+      "upcoming" : 2,
+      "pending" : 2,
+      "later" : 0,
+      "nextDue" : {
+        "id" : "t6",
+        "title" : "Check",
+        "type" : "PEST_CHECK",
+        "status" : "TODO",
+        "dueDate" : "2026-05-21T09:00:00.000Z",
+        "parcelId" : "p2"
+      },
+      "completionScore" : 0,
+      "done" : 0,
+      "total" : 2
+    }
+  },
+  "workToTaskTypes" : {
+    "DISCING" : [ "SOIL_PREP" ],
+    "FERTILIZING" : [ "FERTILIZATION" ],
+    "HARVESTING" : [ "HARVEST" ],
+    "PLOWING" : [ "SOIL_PREP" ],
+    "SOWING" : [ "SOWING" ],
+    "SPRAYING" : [ "HERBICIDE", "FUNGICIDE", "INSECTICIDE" ],
+    "SUBSOILING" : [ "SOIL_PREP" ]
+  },
+  "taskForWork" : [ {
+    "status" : "TODO",
+    "type" : "SOWING",
+    "dueDate" : "2026-05-22T08:30:00.000Z"
+  }, {
+    "status" : "IN_PROGRESS",
+    "type" : "FUNGICIDE",
+    "dueDate" : "2026-05-16T08:30:00.000Z"
+  }, null, null ],
+  "plans" : {
+    "corn" : {
+      "year" : 2027,
+      "crop" : "CORN",
+      "cropName" : "Corn",
+      "rotationScore" : 65,
+      "rotationExplanation" : "Wheat and corn belong to the same family and share diseases and pests.",
+      "sowingDate" : "2027-04-05T09:00:00.000Z",
+      "harvestDate" : "2027-10-15T09:00:00.000Z",
+      "steps" : [ {
+        "key" : "SOIL_PREP",
+        "title" : "Seedbed preparation",
+        "taskType" : "SOIL_PREP",
+        "date" : "2027-03-10T09:00:00.000Z",
+        "priority" : "MEDIUM",
+        "past" : false
+      }, {
+        "key" : "SEED_PURCHASE",
+        "title" : "Seed purchase",
+        "taskType" : "SEED_PURCHASE",
+        "date" : "2027-03-25T09:00:00.000Z",
+        "priority" : "MEDIUM",
+        "past" : false
+      }, {
+        "key" : "BASE_FERTILIZATION",
+        "title" : "Base fertilization",
+        "taskType" : "FERTILIZATION",
+        "date" : "2027-03-30T09:00:00.000Z",
+        "priority" : "MEDIUM",
+        "past" : false
+      }, {
+        "key" : "SOWING",
+        "title" : "Sowing",
+        "taskType" : "SOWING",
+        "date" : "2027-04-05T09:00:00.000Z",
+        "priority" : "HIGH",
+        "past" : false
+      }, {
+        "key" : "PRE_EMERGENT",
+        "title" : "Pre-emergence herbicide",
+        "taskType" : "HERBICIDE",
+        "date" : "2027-04-07T09:00:00.000Z",
+        "priority" : "MEDIUM",
+        "past" : false
+      }, {
+        "key" : "EMERGENCE_CHECK",
+        "title" : "Emergence check",
+        "taskType" : "EMERGENCE_CHECK",
+        "date" : "2027-04-17T09:00:00.000Z",
+        "priority" : "MEDIUM",
+        "past" : false
+      }, {
+        "key" : "TOP_DRESSING",
+        "title" : "Top dressing",
+        "taskType" : "FERTILIZATION",
+        "date" : "2027-05-15T09:00:00.000Z",
+        "priority" : "MEDIUM",
+        "past" : false
+      }, {
+        "key" : "DISEASE_MONITORING",
+        "title" : "Disease monitoring",
+        "taskType" : "DISEASE_CHECK",
+        "date" : "2027-06-10T09:00:00.000Z",
+        "priority" : "MEDIUM",
+        "past" : false
+      }, {
+        "key" : "PEST_MONITORING",
+        "title" : "Pest monitoring",
+        "taskType" : "PEST_CHECK",
+        "date" : "2027-08-01T09:00:00.000Z",
+        "priority" : "MEDIUM",
+        "past" : false
+      }, {
+        "key" : "HARVEST_PREP",
+        "title" : "Harvest preparation",
+        "taskType" : "HARVEST_PREP",
+        "date" : "2027-10-01T09:00:00.000Z",
+        "priority" : "MEDIUM",
+        "past" : false
+      }, {
+        "key" : "HARVEST",
+        "title" : "Harvest",
+        "taskType" : "HARVEST",
+        "date" : "2027-10-15T09:00:00.000Z",
+        "priority" : "HIGH",
+        "past" : false
+      } ],
+      "irrigation" : {
+        "requiredMm" : 625,
+        "effectiveRainMm" : 312,
+        "deficitMm" : 313,
+        "passes" : 11,
+        "doseMm" : 30,
+        "criticalPeriod" : "July-August"
+      },
+      "fertilization" : [ {
+        "stage" : "Base fertilization",
+        "date" : "2027-03-30T09:00:00.000Z",
+        "nKgHa" : 35,
+        "pKgHa" : 50,
+        "kKgHa" : 35
+      }, {
+        "stage" : "Top dressing",
+        "date" : "2027-05-15T09:00:00.000Z",
+        "nKgHa" : 75,
+        "pKgHa" : 0,
+        "kKgHa" : 0
+      } ],
+      "monitoring" : [ {
+        "title" : "Emergence check",
+        "date" : "2027-04-17T09:00:00.000Z"
+      }, {
+        "title" : "Disease monitoring",
+        "date" : "2027-06-10T09:00:00.000Z"
+      }, {
+        "title" : "Pest monitoring",
+        "date" : "2027-08-01T09:00:00.000Z"
+      } ],
+      "recommendations" : [ {
+        "crop" : "POTATO",
+        "name" : "Potato",
+        "score" : 91,
+        "reasons" : [ "Rotation 75/100: Potato has no rotation restrictions on this parcel.", "pH 6.4 is within the optimal range of 5-6.5.", "The mean temperature of 18.4 °C is favourable.", "Rainfall of 520 mm covers the minimum requirement of 500 mm." ],
+        "missingData" : [ ],
+        "reason" : "Potato is a good fit because the parcel had wheat last year, the pH of 6.4 is optimal and rainfall of 520 mm covers the minimum requirement."
+      }, {
+        "crop" : "VEGETABLES",
+        "name" : "Vegetables",
+        "score" : 91,
+        "reasons" : [ "Rotation 75/100: Vegetables has no rotation restrictions on this parcel.", "pH 6.4 is within the optimal range of 6-7.2.", "The mean temperature of 18.4 °C is favourable.", "Rainfall of 520 mm covers the minimum requirement of 400 mm." ],
+        "missingData" : [ ],
+        "reason" : "Vegetables is a good fit because the parcel had wheat last year, the pH of 6.4 is optimal and rainfall of 520 mm covers the minimum requirement."
+      }, {
+        "crop" : "CORN",
+        "name" : "Corn",
+        "score" : 88,
+        "reasons" : [ "Rotation 65/100: Wheat and corn belong to the same family and share diseases and pests.", "pH 6.4 is within the optimal range of 5.8-7.5.", "The mean temperature of 18.4 °C is favourable.", "Rainfall of 520 mm covers the minimum requirement of 450 mm." ],
+        "missingData" : [ ],
+        "reason" : "Corn is a good fit because the pH of 6.4 is optimal and rainfall of 520 mm covers the minimum requirement."
+      }, {
+        "crop" : "RAPESEED",
+        "name" : "Rapeseed",
+        "score" : 88,
+        "reasons" : [ "Rotation 75/100: Rapeseed has no rotation restrictions on this parcel.", "pH 6.4 is within the optimal range of 6-7.5.", "The mean temperature of 18.4 °C is outside the optimum of 7-17 °C.", "Rainfall of 520 mm covers the minimum requirement of 400 mm." ],
+        "missingData" : [ ],
+        "reason" : "Rapeseed is a good fit because the parcel had wheat last year, the pH of 6.4 is optimal and rainfall of 520 mm covers the minimum requirement."
+      }, {
+        "crop" : "BEET",
+        "name" : "Beet",
+        "score" : 88,
+        "reasons" : [ "Rotation 75/100: Beet has no rotation restrictions on this parcel.", "pH 6.4 is outside the optimal range of 6.5-8.", "The mean temperature of 18.4 °C is favourable.", "Rainfall of 520 mm is below the minimum requirement of 550 mm." ],
+        "missingData" : [ ],
+        "reason" : "Beet is a good fit because the parcel had wheat last year."
+      }, {
+        "crop" : "ALFALFA",
+        "name" : "Alfalfa",
+        "score" : 85,
+        "reasons" : [ "Rotation 75/100: Alfalfa has no rotation restrictions on this parcel.", "pH 6.4 is outside the optimal range of 6.5-7.8.", "The mean temperature of 18.4 °C is favourable.", "Rainfall of 520 mm is below the minimum requirement of 600 mm." ],
+        "missingData" : [ ],
+        "reason" : "Alfalfa is a good fit because the parcel had wheat last year and it enriches the soil with nitrogen."
+      }, {
+        "crop" : "OAT",
+        "name" : "Oats",
+        "score" : 83,
+        "reasons" : [ "Rotation 60/100: Wheat and oats belong to the same family and share diseases and pests.", "pH 6.4 is within the optimal range of 5.2-7.", "The mean temperature of 18.4 °C is outside the optimum of 8-17 °C.", "Rainfall of 520 mm covers the minimum requirement of 350 mm." ],
+        "missingData" : [ ],
+        "reason" : "Oats is a good fit because the pH of 6.4 is optimal and rainfall of 520 mm covers the minimum requirement."
+      }, {
+        "crop" : "BARLEY",
+        "name" : "Barley",
+        "score" : 81,
+        "reasons" : [ "Rotation 60/100: Wheat and barley belong to the same family and share diseases and pests.", "pH 6.4 is within the optimal range of 6-8.", "The mean temperature of 18.4 °C is outside the optimum of 7-17 °C.", "Rainfall of 520 mm covers the minimum requirement of 300 mm." ],
+        "missingData" : [ ],
+        "reason" : "Barley is a good fit because the pH of 6.4 is optimal and rainfall of 520 mm covers the minimum requirement."
+      }, {
+        "crop" : "SOY",
+        "name" : "Soybean",
+        "score" : 79,
+        "reasons" : [ "Rotation 39/100: Soybean was grown 2 years ago on this parcel. A minimum break of two years is recommended. The risk of disease and yield loss is high.", "pH 6.4 is within the optimal range of 6-7.2.", "The mean temperature of 18.4 °C is favourable.", "Rainfall of 520 mm covers the minimum requirement of 450 mm." ],
+        "missingData" : [ ],
+        "reason" : "Soybean is a good fit because the pH of 6.4 is optimal and rainfall of 520 mm covers the minimum requirement."
+      }, {
+        "crop" : "SUNFLOWER",
+        "name" : "Sunflower",
+        "score" : 76,
+        "reasons" : [ "Rotation 30/100: Sunflower was grown 4 years ago on this parcel. A minimum break of 4 years is recommended. The risk of disease and yield loss is high.", "pH 6.4 is within the optimal range of 6-7.8.", "The mean temperature of 18.4 °C is favourable.", "Rainfall of 520 mm covers the minimum requirement of 400 mm." ],
+        "missingData" : [ ],
+        "reason" : "Sunflower is a good fit because the pH of 6.4 is optimal and rainfall of 520 mm covers the minimum requirement."
+      }, {
+        "crop" : "WHEAT",
+        "name" : "Wheat",
+        "score" : 75,
+        "reasons" : [ "Rotation 30/100: Wheat was grown last year on this parcel. A minimum break of one year is recommended. The risk of disease and yield loss is high.", "pH 6.4 is within the optimal range of 6-7.5.", "The mean temperature of 18.4 °C is outside the optimum of 8-18 °C.", "Rainfall of 520 mm covers the minimum requirement of 350 mm." ],
+        "missingData" : [ ],
+        "reason" : "Wheat is a good fit because the pH of 6.4 is optimal and rainfall of 520 mm covers the minimum requirement."
+      } ],
+      "report" : {
+        "parcelName" : "North field",
+        "areaHa" : 23.46,
+        "soilType" : "Chernozem (loam)",
+        "lastCropName" : "Wheat",
+        "plannedCropName" : "Corn",
+        "recommendedCrop" : "POTATO",
+        "recommendedCropName" : "Potato",
+        "recommendedScore" : 91,
+        "compatibilityScore" : 88,
+        "expectedYieldTHa" : 4.8,
+        "expectedProfitEurHa" : -90,
+        "priceEurPerT" : 190,
+        "costEurHa" : 1000,
+        "risks" : [ "Drought during July-August.", "Rainfall deficit estimated at 313 mm per season.", "Wheat and corn belong to the same family and share diseases and pests." ],
+        "recommendation" : "Plan at least 11 irrigation cycles of 30 mm during the critical growth period (July-August).",
+        "missingData" : [ ]
+      }
+    },
+    "wheatNoData" : {
+      "year" : 2027,
+      "crop" : "WHEAT",
+      "cropName" : "Wheat",
+      "rotationScore" : 70,
+      "rotationExplanation" : "The parcel has no crop history, so the assessment is indicative.",
+      "sowingDate" : "2026-10-05T09:00:00.000Z",
+      "harvestDate" : "2027-07-07T09:00:00.000Z",
+      "steps" : [ {
+        "key" : "SOIL_PREP",
+        "title" : "Seedbed preparation",
+        "taskType" : "SOIL_PREP",
+        "date" : "2026-09-09T09:00:00.000Z",
+        "priority" : "MEDIUM",
+        "past" : false
+      }, {
+        "key" : "SEED_PURCHASE",
+        "title" : "Seed purchase",
+        "taskType" : "SEED_PURCHASE",
+        "date" : "2026-09-24T09:00:00.000Z",
+        "priority" : "MEDIUM",
+        "past" : false
+      }, {
+        "key" : "BASE_FERTILIZATION",
+        "title" : "Base fertilization",
+        "taskType" : "FERTILIZATION",
+        "date" : "2026-09-29T09:00:00.000Z",
+        "priority" : "MEDIUM",
+        "past" : false
+      }, {
+        "key" : "SOWING",
+        "title" : "Sowing",
+        "taskType" : "SOWING",
+        "date" : "2026-10-05T09:00:00.000Z",
+        "priority" : "HIGH",
+        "past" : false
+      }, {
+        "key" : "PRE_EMERGENT",
+        "title" : "Pre-emergence herbicide",
+        "taskType" : "HERBICIDE",
+        "date" : "2026-10-07T09:00:00.000Z",
+        "priority" : "MEDIUM",
+        "past" : false
+      }, {
+        "key" : "EMERGENCE_CHECK",
+        "title" : "Emergence check",
+        "taskType" : "EMERGENCE_CHECK",
+        "date" : "2026-10-17T09:00:00.000Z",
+        "priority" : "MEDIUM",
+        "past" : false
+      }, {
+        "key" : "TOP_DRESSING",
+        "title" : "Top dressing",
+        "taskType" : "FERTILIZATION",
+        "date" : "2027-03-19T09:00:00.000Z",
+        "priority" : "MEDIUM",
+        "past" : false
+      }, {
+        "key" : "DISEASE_MONITORING",
+        "title" : "Disease monitoring",
+        "taskType" : "DISEASE_CHECK",
+        "date" : "2027-04-28T09:00:00.000Z",
+        "priority" : "MEDIUM",
+        "past" : false
+      }, {
+        "key" : "PEST_MONITORING",
+        "title" : "Pest monitoring",
+        "taskType" : "PEST_CHECK",
+        "date" : "2027-05-18T09:00:00.000Z",
+        "priority" : "MEDIUM",
+        "past" : false
+      }, {
+        "key" : "HARVEST_PREP",
+        "title" : "Harvest preparation",
+        "taskType" : "HARVEST_PREP",
+        "date" : "2027-06-23T09:00:00.000Z",
+        "priority" : "MEDIUM",
+        "past" : false
+      }, {
+        "key" : "HARVEST",
+        "title" : "Harvest",
+        "taskType" : "HARVEST",
+        "date" : "2027-07-07T09:00:00.000Z",
+        "priority" : "HIGH",
+        "past" : false
+      } ],
+      "irrigation" : {
+        "requiredMm" : 475,
+        "effectiveRainMm" : null,
+        "deficitMm" : null,
+        "passes" : 0,
+        "doseMm" : 30,
+        "criticalPeriod" : "April-May"
+      },
+      "fertilization" : [ {
+        "stage" : "Base fertilization",
+        "date" : "2026-09-29T09:00:00.000Z",
+        "nKgHa" : 40,
+        "pKgHa" : 55,
+        "kKgHa" : 30
+      }, {
+        "stage" : "Top dressing",
+        "date" : "2027-03-19T09:00:00.000Z",
+        "nKgHa" : 95,
+        "pKgHa" : 0,
+        "kKgHa" : 0
+      } ],
+      "monitoring" : [ {
+        "title" : "Emergence check",
+        "date" : "2026-10-17T09:00:00.000Z"
+      }, {
+        "title" : "Disease monitoring",
+        "date" : "2027-04-28T09:00:00.000Z"
+      }, {
+        "title" : "Pest monitoring",
+        "date" : "2027-05-18T09:00:00.000Z"
+      } ],
+      "recommendations" : [ {
+        "crop" : "WHEAT",
+        "name" : "Wheat",
+        "score" : 67,
+        "reasons" : [ "Rotation 70/100: The parcel has no crop history, so the assessment is indicative." ],
+        "missingData" : [ "soil", "climate" ],
+        "reason" : "Wheat has an indicative score, because data is missing about soil and climate."
+      }, {
+        "crop" : "BARLEY",
+        "name" : "Barley",
+        "score" : 67,
+        "reasons" : [ "Rotation 70/100: The parcel has no crop history, so the assessment is indicative." ],
+        "missingData" : [ "soil", "climate" ],
+        "reason" : "Barley has an indicative score, because data is missing about soil and climate."
+      }, {
+        "crop" : "CORN",
+        "name" : "Corn",
+        "score" : 67,
+        "reasons" : [ "Rotation 70/100: The parcel has no crop history, so the assessment is indicative." ],
+        "missingData" : [ "soil", "climate" ],
+        "reason" : "Corn has an indicative score, because data is missing about soil and climate."
+      }, {
+        "crop" : "SUNFLOWER",
+        "name" : "Sunflower",
+        "score" : 67,
+        "reasons" : [ "Rotation 70/100: The parcel has no crop history, so the assessment is indicative." ],
+        "missingData" : [ "soil", "climate" ],
+        "reason" : "Sunflower has an indicative score, because data is missing about soil and climate."
+      }, {
+        "crop" : "RAPESEED",
+        "name" : "Rapeseed",
+        "score" : 67,
+        "reasons" : [ "Rotation 70/100: The parcel has no crop history, so the assessment is indicative." ],
+        "missingData" : [ "soil", "climate" ],
+        "reason" : "Rapeseed has an indicative score, because data is missing about soil and climate."
+      }, {
+        "crop" : "SOY",
+        "name" : "Soybean",
+        "score" : 67,
+        "reasons" : [ "Rotation 70/100: The parcel has no crop history, so the assessment is indicative." ],
+        "missingData" : [ "soil", "climate" ],
+        "reason" : "Soybean has an indicative score, because data is missing about soil and climate."
+      }, {
+        "crop" : "ALFALFA",
+        "name" : "Alfalfa",
+        "score" : 67,
+        "reasons" : [ "Rotation 70/100: The parcel has no crop history, so the assessment is indicative." ],
+        "missingData" : [ "soil", "climate" ],
+        "reason" : "Alfalfa has an indicative score, because data is missing about soil and climate."
+      }, {
+        "crop" : "OAT",
+        "name" : "Oats",
+        "score" : 67,
+        "reasons" : [ "Rotation 70/100: The parcel has no crop history, so the assessment is indicative." ],
+        "missingData" : [ "soil", "climate" ],
+        "reason" : "Oats has an indicative score, because data is missing about soil and climate."
+      }, {
+        "crop" : "POTATO",
+        "name" : "Potato",
+        "score" : 67,
+        "reasons" : [ "Rotation 70/100: The parcel has no crop history, so the assessment is indicative." ],
+        "missingData" : [ "soil", "climate" ],
+        "reason" : "Potato has an indicative score, because data is missing about soil and climate."
+      }, {
+        "crop" : "BEET",
+        "name" : "Beet",
+        "score" : 67,
+        "reasons" : [ "Rotation 70/100: The parcel has no crop history, so the assessment is indicative." ],
+        "missingData" : [ "soil", "climate" ],
+        "reason" : "Beet has an indicative score, because data is missing about soil and climate."
+      }, {
+        "crop" : "VEGETABLES",
+        "name" : "Vegetables",
+        "score" : 67,
+        "reasons" : [ "Rotation 70/100: The parcel has no crop history, so the assessment is indicative." ],
+        "missingData" : [ "soil", "climate" ],
+        "reason" : "Vegetables has an indicative score, because data is missing about soil and climate."
+      } ],
+      "report" : {
+        "parcelName" : "South",
+        "areaHa" : 8,
+        "soilType" : null,
+        "lastCropName" : "Tomatoes",
+        "plannedCropName" : "Wheat",
+        "recommendedCrop" : "WHEAT",
+        "recommendedCropName" : "Wheat",
+        "recommendedScore" : 67,
+        "compatibilityScore" : 67,
+        "expectedYieldTHa" : 5.3,
+        "expectedProfitEurHa" : 260,
+        "priceEurPerT" : 200,
+        "costEurHa" : 800,
+        "risks" : [ "The available data does not indicate major risks." ],
+        "recommendation" : "Check the water reserve before the critical period (April-May).",
+        "missingData" : [ "soil", "climate" ]
+      }
+    },
+    "soyRecorded" : {
+      "year" : 2026,
+      "crop" : "SOY",
+      "cropName" : "Soybean",
+      "rotationScore" : 20,
+      "rotationExplanation" : "Soybean was grown last year on this parcel. A minimum break of two years is recommended. The risk of disease and yield loss is high.",
+      "sowingDate" : "2026-04-25T09:00:00.000Z",
+      "harvestDate" : "2026-09-17T09:00:00.000Z",
+      "steps" : [ {
+        "key" : "SOIL_PREP",
+        "title" : "Seedbed preparation",
+        "taskType" : "SOIL_PREP",
+        "date" : "2026-03-30T09:00:00.000Z",
+        "priority" : "MEDIUM",
+        "past" : true
+      }, {
+        "key" : "SEED_PURCHASE",
+        "title" : "Seed purchase",
+        "taskType" : "SEED_PURCHASE",
+        "date" : "2026-04-14T09:00:00.000Z",
+        "priority" : "MEDIUM",
+        "past" : true
+      }, {
+        "key" : "BASE_FERTILIZATION",
+        "title" : "Base fertilization",
+        "taskType" : "FERTILIZATION",
+        "date" : "2026-04-19T09:00:00.000Z",
+        "priority" : "MEDIUM",
+        "past" : true
+      }, {
+        "key" : "SOWING",
+        "title" : "Sowing",
+        "taskType" : "SOWING",
+        "date" : "2026-04-25T09:00:00.000Z",
+        "priority" : "HIGH",
+        "past" : true
+      }, {
+        "key" : "PRE_EMERGENT",
+        "title" : "Pre-emergence herbicide",
+        "taskType" : "HERBICIDE",
+        "date" : "2026-04-27T09:00:00.000Z",
+        "priority" : "MEDIUM",
+        "past" : true
+      }, {
+        "key" : "EMERGENCE_CHECK",
+        "title" : "Emergence check",
+        "taskType" : "EMERGENCE_CHECK",
+        "date" : "2026-05-07T09:00:00.000Z",
+        "priority" : "MEDIUM",
+        "past" : true
+      }, {
+        "key" : "DISEASE_MONITORING",
+        "title" : "Disease monitoring",
+        "taskType" : "DISEASE_CHECK",
+        "date" : "2026-07-04T09:00:00.000Z",
+        "priority" : "MEDIUM",
+        "past" : false
+      }, {
+        "key" : "PEST_MONITORING",
+        "title" : "Pest monitoring",
+        "taskType" : "PEST_CHECK",
+        "date" : "2026-07-19T09:00:00.000Z",
+        "priority" : "MEDIUM",
+        "past" : false
+      }, {
+        "key" : "HARVEST_PREP",
+        "title" : "Harvest preparation",
+        "taskType" : "HARVEST_PREP",
+        "date" : "2026-09-03T09:00:00.000Z",
+        "priority" : "MEDIUM",
+        "past" : false
+      }, {
+        "key" : "HARVEST",
+        "title" : "Harvest",
+        "taskType" : "HARVEST",
+        "date" : "2026-09-17T09:00:00.000Z",
+        "priority" : "HIGH",
+        "past" : false
+      } ],
+      "irrigation" : {
+        "requiredMm" : 575,
+        "effectiveRainMm" : 540,
+        "deficitMm" : 35,
+        "passes" : 2,
+        "doseMm" : 30,
+        "criticalPeriod" : "July-August"
+      },
+      "fertilization" : [ {
+        "stage" : "Base fertilization",
+        "date" : "2026-04-19T09:00:00.000Z",
+        "nKgHa" : 0,
+        "pKgHa" : 30,
+        "kKgHa" : 25
+      } ],
+      "monitoring" : [ {
+        "title" : "Emergence check",
+        "date" : "2026-05-07T09:00:00.000Z"
+      }, {
+        "title" : "Disease monitoring",
+        "date" : "2026-07-04T09:00:00.000Z"
+      }, {
+        "title" : "Pest monitoring",
+        "date" : "2026-07-19T09:00:00.000Z"
+      } ],
+      "recommendations" : [ {
+        "crop" : "POTATO",
+        "name" : "Potato",
+        "score" : 76,
+        "reasons" : [ "Rotation 75/100: Potato has no rotation restrictions on this parcel.", "pH 4.8 is outside the optimal range of 5-6.5.", "The mean temperature of 16.0 °C is favourable.", "Rainfall of 900 mm covers the minimum requirement of 500 mm." ],
+        "missingData" : [ ],
+        "reason" : "Potato is a good fit because the parcel had soybean last year, it uses the nitrogen left in the soil by soybean and rainfall of 900 mm covers the minimum requirement."
+      }, {
+        "crop" : "VEGETABLES",
+        "name" : "Vegetables",
+        "score" : 73,
+        "reasons" : [ "Rotation 75/100: Vegetables has no rotation restrictions on this parcel.", "pH 4.8 is outside the optimal range of 6-7.2.", "The mean temperature of 16.0 °C is favourable.", "Rainfall of 900 mm covers the minimum requirement of 400 mm." ],
+        "missingData" : [ ],
+        "reason" : "Vegetables is a good fit because the parcel had soybean last year, it uses the nitrogen left in the soil by soybean and rainfall of 900 mm covers the minimum requirement."
+      }, {
+        "crop" : "OAT",
+        "name" : "Oats",
+        "score" : 71,
+        "reasons" : [ "Rotation 85/100: Cereals benefit from the nitrogen fixed by soybean.", "pH 4.8 is outside the optimal range of 5.2-7.", "The mean temperature of 16.0 °C is favourable.", "Rainfall of 900 mm covers the minimum requirement of 350 mm." ],
+        "missingData" : [ ],
+        "reason" : "Oats is a good fit because the parcel had soybean last year, it uses the nitrogen left in the soil by soybean and rainfall of 900 mm covers the minimum requirement."
+      }, {
+        "crop" : "CORN",
+        "name" : "Corn",
+        "score" : 69,
+        "reasons" : [ "Rotation 90/100: Corn uses the nitrogen left in the soil by soybean.", "pH 4.8 is outside the optimal range of 5.8-7.5.", "The soil texture is not among those preferred by the crop.", "The mean temperature of 16.0 °C is outside the optimum of 18-26 °C.", "Rainfall of 900 mm covers the minimum requirement of 450 mm." ],
+        "missingData" : [ ],
+        "reason" : "Corn has a lower score because the pH of 4.8 is outside the 5.8-7.5 range and the soil texture is not suitable."
+      }, {
+        "crop" : "BEET",
+        "name" : "Beet",
+        "score" : 61,
+        "reasons" : [ "Rotation 75/100: Beet has no rotation restrictions on this parcel.", "pH 4.8 is outside the optimal range of 6.5-8.", "The soil texture is not among those preferred by the crop.", "The mean temperature of 16.0 °C is favourable.", "Rainfall of 900 mm covers the minimum requirement of 550 mm." ],
+        "missingData" : [ ],
+        "reason" : "Beet has a lower score because the pH of 4.8 is outside the 6.5-8 range and the soil texture is not suitable."
+      }, {
+        "crop" : "WHEAT",
+        "name" : "Wheat",
+        "score" : 57,
+        "reasons" : [ "Rotation 85/100: Cereals benefit from the nitrogen fixed by soybean.", "pH 4.8 is outside the optimal range of 6-7.5.", "The soil texture is not among those preferred by the crop.", "The mean temperature of 16.0 °C is favourable.", "Rainfall of 900 mm covers the minimum requirement of 350 mm." ],
+        "missingData" : [ ],
+        "reason" : "Wheat has a lower score because the pH of 4.8 is outside the 6-7.5 range and the soil texture is not suitable."
+      }, {
+        "crop" : "BARLEY",
+        "name" : "Barley",
+        "score" : 57,
+        "reasons" : [ "Rotation 85/100: Cereals benefit from the nitrogen fixed by soybean.", "pH 4.8 is outside the optimal range of 6-8.", "The soil texture is not among those preferred by the crop.", "The mean temperature of 16.0 °C is favourable.", "Rainfall of 900 mm covers the minimum requirement of 300 mm." ],
+        "missingData" : [ ],
+        "reason" : "Barley has a lower score because the pH of 4.8 is outside the 6-8 range and the soil texture is not suitable."
+      }, {
+        "crop" : "SUNFLOWER",
+        "name" : "Sunflower",
+        "score" : 51,
+        "reasons" : [ "Rotation 55/100: Soybean and sunflower are both hosts of white mould (Sclerotinia).", "pH 4.8 is outside the optimal range of 6-7.8.", "The soil texture is not among those preferred by the crop.", "The mean temperature of 16.0 °C is outside the optimum of 17-26 °C.", "Rainfall of 900 mm covers the minimum requirement of 400 mm." ],
+        "missingData" : [ ],
+        "reason" : "Sunflower has a lower score because soybean and sunflower are both hosts of white mould (Sclerotinia), the pH of 4.8 is outside the 6-7.8 range and the soil texture is not suitable."
+      }, {
+        "crop" : "RAPESEED",
+        "name" : "Rapeseed",
+        "score" : 47,
+        "reasons" : [ "Rotation 55/100: Soybean and rapeseed are both hosts of white mould (Sclerotinia).", "pH 4.8 is outside the optimal range of 6-7.5.", "The soil texture is not among those preferred by the crop.", "The mean temperature of 16.0 °C is favourable.", "Rainfall of 900 mm covers the minimum requirement of 400 mm." ],
+        "missingData" : [ ],
+        "reason" : "Rapeseed has a lower score because soybean and rapeseed are both hosts of white mould (Sclerotinia), the pH of 4.8 is outside the 6-7.5 range and the soil texture is not suitable."
+      }, {
+        "crop" : "ALFALFA",
+        "name" : "Alfalfa",
+        "score" : 46,
+        "reasons" : [ "Rotation 5/100: Alfalfa was grown 2 years ago on this parcel. A minimum break of 3 years is recommended. The risk of disease and yield loss is high.", "pH 4.8 is outside the optimal range of 6.5-7.8.", "The soil texture is not among those preferred by the crop.", "The mean temperature of 16.0 °C is favourable.", "Rainfall of 900 mm covers the minimum requirement of 600 mm." ],
+        "missingData" : [ ],
+        "reason" : "Alfalfa has a lower score because alfalfa was grown 2 years ago on this parcel. A minimum break of 3 years is recommended. The risk of disease and yield loss is high, the pH of 4.8 is outside the 6.5-7.8 range and the soil texture is not suitable."
+      }, {
+        "crop" : "SOY",
+        "name" : "Soybean",
+        "score" : 36,
+        "reasons" : [ "Rotation 20/100: Soybean was grown last year on this parcel. A minimum break of two years is recommended. The risk of disease and yield loss is high.", "pH 4.8 is outside the optimal range of 6-7.2.", "The soil texture is not among those preferred by the crop.", "The mean temperature of 16.0 °C is outside the optimum of 18-26 °C.", "Rainfall of 900 mm covers the minimum requirement of 450 mm." ],
+        "missingData" : [ ],
+        "reason" : "Soybean has a lower score because soybean was grown last year on this parcel. A minimum break of two years is recommended. The risk of disease and yield loss is high, the pH of 4.8 is outside the 6-7.2 range and the soil texture is not suitable."
+      } ],
+      "report" : {
+        "parcelName" : "East",
+        "areaHa" : 12,
+        "soilType" : "Luvisol (sandy)",
+        "lastCropName" : "Soybean",
+        "plannedCropName" : "Soybean",
+        "recommendedCrop" : "POTATO",
+        "recommendedCropName" : "Potato",
+        "recommendedScore" : 76,
+        "compatibilityScore" : 36,
+        "expectedYieldTHa" : 1.9,
+        "expectedProfitEurHa" : 110,
+        "priceEurPerT" : 400,
+        "costEurHa" : 650,
+        "risks" : [ "Drought during July-August.", "Rainfall deficit estimated at 35 mm per season.", "Soybean was grown last year on this parcel. A minimum break of two years is recommended. The risk of disease and yield loss is high.", "The pH of 4.8 is outside the optimal range of 6-7.2." ],
+        "recommendation" : "Plan at least 2 irrigation cycles of 30 mm during the critical growth period (July-August). Potato scores better on this parcel: 76%.",
+        "missingData" : [ ]
+      }
+    },
+    "sunflowerSown" : {
+      "year" : 2026,
+      "crop" : "SUNFLOWER",
+      "cropName" : "Sunflower",
+      "rotationScore" : 30,
+      "rotationExplanation" : "Sunflower was grown 4 years ago on this parcel. A minimum break of 4 years is recommended. The risk of disease and yield loss is high.",
+      "sowingDate" : "2026-04-12T09:00:00.000Z",
+      "harvestDate" : "2026-09-09T09:00:00.000Z",
+      "steps" : [ {
+        "key" : "SOIL_PREP",
+        "title" : "Seedbed preparation",
+        "taskType" : "SOIL_PREP",
+        "date" : "2026-03-17T09:00:00.000Z",
+        "priority" : "MEDIUM",
+        "past" : true
+      }, {
+        "key" : "SEED_PURCHASE",
+        "title" : "Seed purchase",
+        "taskType" : "SEED_PURCHASE",
+        "date" : "2026-04-01T09:00:00.000Z",
+        "priority" : "MEDIUM",
+        "past" : true
+      }, {
+        "key" : "BASE_FERTILIZATION",
+        "title" : "Base fertilization",
+        "taskType" : "FERTILIZATION",
+        "date" : "2026-04-06T09:00:00.000Z",
+        "priority" : "MEDIUM",
+        "past" : true
+      }, {
+        "key" : "SOWING",
+        "title" : "Sowing",
+        "taskType" : "SOWING",
+        "date" : "2026-04-12T09:00:00.000Z",
+        "priority" : "HIGH",
+        "past" : true
+      }, {
+        "key" : "PRE_EMERGENT",
+        "title" : "Pre-emergence herbicide",
+        "taskType" : "HERBICIDE",
+        "date" : "2026-04-14T09:00:00.000Z",
+        "priority" : "MEDIUM",
+        "past" : true
+      }, {
+        "key" : "EMERGENCE_CHECK",
+        "title" : "Emergence check",
+        "taskType" : "EMERGENCE_CHECK",
+        "date" : "2026-04-24T09:00:00.000Z",
+        "priority" : "MEDIUM",
+        "past" : true
+      }, {
+        "key" : "TOP_DRESSING",
+        "title" : "Top dressing",
+        "taskType" : "FERTILIZATION",
+        "date" : "2026-05-17T09:00:00.000Z",
+        "priority" : "MEDIUM",
+        "past" : true
+      }, {
+        "key" : "PEST_MONITORING",
+        "title" : "Pest monitoring",
+        "taskType" : "PEST_CHECK",
+        "date" : "2026-06-11T09:00:00.000Z",
+        "priority" : "MEDIUM",
+        "past" : false
+      }, {
+        "key" : "DISEASE_MONITORING",
+        "title" : "Disease monitoring",
+        "taskType" : "DISEASE_CHECK",
+        "date" : "2026-06-26T09:00:00.000Z",
+        "priority" : "MEDIUM",
+        "past" : false
+      }, {
+        "key" : "HARVEST_PREP",
+        "title" : "Harvest preparation",
+        "taskType" : "HARVEST_PREP",
+        "date" : "2026-08-26T09:00:00.000Z",
+        "priority" : "MEDIUM",
+        "past" : false
+      }, {
+        "key" : "HARVEST",
+        "title" : "Harvest",
+        "taskType" : "HARVEST",
+        "date" : "2026-09-09T09:00:00.000Z",
+        "priority" : "HIGH",
+        "past" : false
+      } ],
+      "irrigation" : {
+        "requiredMm" : 550,
+        "effectiveRainMm" : 180,
+        "deficitMm" : 370,
+        "passes" : 13,
+        "doseMm" : 30,
+        "criticalPeriod" : "June-July"
+      },
+      "fertilization" : [ {
+        "stage" : "Base fertilization",
+        "date" : "2026-04-06T09:00:00.000Z",
+        "nKgHa" : 20,
+        "pKgHa" : 25,
+        "kKgHa" : 20
+      }, {
+        "stage" : "Top dressing",
+        "date" : "2026-05-17T09:00:00.000Z",
+        "nKgHa" : 40,
+        "pKgHa" : 0,
+        "kKgHa" : 0
+      } ],
+      "monitoring" : [ {
+        "title" : "Emergence check",
+        "date" : "2026-04-24T09:00:00.000Z"
+      }, {
+        "title" : "Pest monitoring",
+        "date" : "2026-06-11T09:00:00.000Z"
+      }, {
+        "title" : "Disease monitoring",
+        "date" : "2026-06-26T09:00:00.000Z"
+      } ],
+      "recommendations" : [ {
+        "crop" : "VEGETABLES",
+        "name" : "Vegetables",
+        "score" : 85,
+        "reasons" : [ "Rotation 75/100: Vegetables has no rotation restrictions on this parcel.", "pH 6.4 is within the optimal range of 6-7.2.", "The mean temperature of 21.0 °C is favourable.", "Rainfall of 300 mm is below the minimum requirement of 400 mm." ],
+        "missingData" : [ ],
+        "reason" : "Vegetables is a good fit because the parcel had wheat last year and the pH of 6.4 is optimal."
+      }, {
+        "crop" : "CORN",
+        "name" : "Corn",
+        "score" : 78,
+        "reasons" : [ "Rotation 65/100: Wheat and corn belong to the same family and share diseases and pests.", "pH 6.4 is within the optimal range of 5.8-7.5.", "The mean temperature of 21.0 °C is favourable.", "Rainfall of 300 mm is below the minimum requirement of 450 mm." ],
+        "missingData" : [ ],
+        "reason" : "Corn is a good fit because the pH of 6.4 is optimal."
+      }, {
+        "crop" : "BARLEY",
+        "name" : "Barley",
+        "score" : 76,
+        "reasons" : [ "Rotation 60/100: Wheat and barley belong to the same family and share diseases and pests.", "pH 6.4 is within the optimal range of 6-8.", "The mean temperature of 21.0 °C is outside the optimum of 7-17 °C.", "Rainfall of 300 mm covers the minimum requirement of 300 mm." ],
+        "missingData" : [ ],
+        "reason" : "Barley is a good fit because the pH of 6.4 is optimal and rainfall of 300 mm covers the minimum requirement."
+      }, {
+        "crop" : "RAPESEED",
+        "name" : "Rapeseed",
+        "score" : 75,
+        "reasons" : [ "Rotation 75/100: Rapeseed has no rotation restrictions on this parcel.", "pH 6.4 is within the optimal range of 6-7.5.", "The mean temperature of 21.0 °C is outside the optimum of 7-17 °C.", "Rainfall of 300 mm is below the minimum requirement of 400 mm." ],
+        "missingData" : [ ],
+        "reason" : "Rapeseed is a good fit because the parcel had wheat last year and the pH of 6.4 is optimal."
+      }, {
+        "crop" : "POTATO",
+        "name" : "Potato",
+        "score" : 75,
+        "reasons" : [ "Rotation 75/100: Potato has no rotation restrictions on this parcel.", "pH 6.4 is within the optimal range of 5-6.5.", "The mean temperature of 21.0 °C is outside the optimum of 14-20 °C.", "Rainfall of 300 mm is below the minimum requirement of 500 mm." ],
+        "missingData" : [ ],
+        "reason" : "Potato is a good fit because the parcel had wheat last year and the pH of 6.4 is optimal."
+      }, {
+        "crop" : "BEET",
+        "name" : "Beet",
+        "score" : 74,
+        "reasons" : [ "Rotation 75/100: Beet has no rotation restrictions on this parcel.", "pH 6.4 is outside the optimal range of 6.5-8.", "The mean temperature of 21.0 °C is favourable.", "Rainfall of 300 mm is below the minimum requirement of 550 mm." ],
+        "missingData" : [ ],
+        "reason" : "Beet is a good fit because the parcel had wheat last year."
+      }, {
+        "crop" : "OAT",
+        "name" : "Oats",
+        "score" : 73,
+        "reasons" : [ "Rotation 60/100: Wheat and oats belong to the same family and share diseases and pests.", "pH 6.4 is within the optimal range of 5.2-7.", "The mean temperature of 21.0 °C is outside the optimum of 8-17 °C.", "Rainfall of 300 mm is below the minimum requirement of 350 mm." ],
+        "missingData" : [ ],
+        "reason" : "Oats is a good fit because the pH of 6.4 is optimal."
+      }, {
+        "crop" : "ALFALFA",
+        "name" : "Alfalfa",
+        "score" : 70,
+        "reasons" : [ "Rotation 75/100: Alfalfa has no rotation restrictions on this parcel.", "pH 6.4 is outside the optimal range of 6.5-7.8.", "The mean temperature of 21.0 °C is favourable.", "Rainfall of 300 mm is below the minimum requirement of 600 mm." ],
+        "missingData" : [ ],
+        "reason" : "Alfalfa is a good fit because the parcel had wheat last year and it enriches the soil with nitrogen."
+      }, {
+        "crop" : "SUNFLOWER",
+        "name" : "Sunflower",
+        "score" : 69,
+        "reasons" : [ "Rotation 30/100: Sunflower was grown 4 years ago on this parcel. A minimum break of 4 years is recommended. The risk of disease and yield loss is high.", "pH 6.4 is within the optimal range of 6-7.8.", "The mean temperature of 21.0 °C is favourable.", "Rainfall of 300 mm is below the minimum requirement of 400 mm." ],
+        "missingData" : [ ],
+        "reason" : "Sunflower has a lower score because sunflower was grown 4 years ago on this parcel. A minimum break of 4 years is recommended. The risk of disease and yield loss is high and rainfall of 300 mm is below the minimum requirement of 400 mm."
+      }, {
+        "crop" : "SOY",
+        "name" : "Soybean",
+        "score" : 69,
+        "reasons" : [ "Rotation 39/100: Soybean was grown 2 years ago on this parcel. A minimum break of two years is recommended. The risk of disease and yield loss is high.", "pH 6.4 is within the optimal range of 6-7.2.", "The mean temperature of 21.0 °C is favourable.", "Rainfall of 300 mm is below the minimum requirement of 450 mm." ],
+        "missingData" : [ ],
+        "reason" : "Soybean has a lower score because soybean was grown 2 years ago on this parcel. A minimum break of two years is recommended. The risk of disease and yield loss is high and rainfall of 300 mm is below the minimum requirement of 450 mm."
+      }, {
+        "crop" : "WHEAT",
+        "name" : "Wheat",
+        "score" : 65,
+        "reasons" : [ "Rotation 30/100: Wheat was grown last year on this parcel. A minimum break of one year is recommended. The risk of disease and yield loss is high.", "pH 6.4 is within the optimal range of 6-7.5.", "The mean temperature of 21.0 °C is outside the optimum of 8-18 °C.", "Rainfall of 300 mm is below the minimum requirement of 350 mm." ],
+        "missingData" : [ ],
+        "reason" : "Wheat has a lower score because wheat was grown last year on this parcel. A minimum break of one year is recommended. The risk of disease and yield loss is high and rainfall of 300 mm is below the minimum requirement of 350 mm."
+      } ],
+      "report" : {
+        "parcelName" : "West",
+        "areaHa" : 30,
+        "soilType" : "Chernozem (loam)",
+        "lastCropName" : "Wheat",
+        "plannedCropName" : "Sunflower",
+        "recommendedCrop" : "VEGETABLES",
+        "recommendedCropName" : "Vegetables",
+        "recommendedScore" : 85,
+        "compatibilityScore" : 69,
+        "expectedYieldTHa" : 1.5,
+        "expectedProfitEurHa" : -5,
+        "priceEurPerT" : 430,
+        "costEurHa" : 650,
+        "risks" : [ "Drought during June-July.", "Rainfall deficit estimated at 370 mm per season.", "Sunflower was grown 4 years ago on this parcel. A minimum break of 4 years is recommended. The risk of disease and yield loss is high." ],
+        "recommendation" : "Plan at least 13 irrigation cycles of 30 mm during the critical growth period (June-July). Vegetables scores better on this parcel: 85%.",
+        "missingData" : [ ]
+      }
+    },
+    "rapeseedHarvestYear" : {
+      "year" : 2027,
+      "crop" : "RAPESEED",
+      "cropName" : "Rapeseed",
+      "rotationScore" : 75,
+      "rotationExplanation" : "Rapeseed has no rotation restrictions on this parcel.",
+      "sowingDate" : "2026-08-28T09:00:00.000Z",
+      "harvestDate" : "2027-06-29T09:00:00.000Z",
+      "steps" : [ {
+        "key" : "SOIL_PREP",
+        "title" : "Seedbed preparation",
+        "taskType" : "SOIL_PREP",
+        "date" : "2026-08-02T09:00:00.000Z",
+        "priority" : "MEDIUM",
+        "past" : true
+      }, {
+        "key" : "SEED_PURCHASE",
+        "title" : "Seed purchase",
+        "taskType" : "SEED_PURCHASE",
+        "date" : "2026-08-17T09:00:00.000Z",
+        "priority" : "MEDIUM",
+        "past" : true
+      }, {
+        "key" : "BASE_FERTILIZATION",
+        "title" : "Base fertilization",
+        "taskType" : "FERTILIZATION",
+        "date" : "2026-08-22T09:00:00.000Z",
+        "priority" : "MEDIUM",
+        "past" : true
+      }, {
+        "key" : "SOWING",
+        "title" : "Sowing",
+        "taskType" : "SOWING",
+        "date" : "2026-08-28T09:00:00.000Z",
+        "priority" : "HIGH",
+        "past" : true
+      }, {
+        "key" : "PRE_EMERGENT",
+        "title" : "Pre-emergence herbicide",
+        "taskType" : "HERBICIDE",
+        "date" : "2026-08-30T09:00:00.000Z",
+        "priority" : "MEDIUM",
+        "past" : true
+      }, {
+        "key" : "EMERGENCE_CHECK",
+        "title" : "Emergence check",
+        "taskType" : "EMERGENCE_CHECK",
+        "date" : "2026-09-05T09:00:00.000Z",
+        "priority" : "MEDIUM",
+        "past" : true
+      }, {
+        "key" : "TOP_DRESSING",
+        "title" : "Top dressing",
+        "taskType" : "FERTILIZATION",
+        "date" : "2027-03-06T09:00:00.000Z",
+        "priority" : "MEDIUM",
+        "past" : false
+      }, {
+        "key" : "PEST_MONITORING",
+        "title" : "Pest monitoring",
+        "taskType" : "PEST_CHECK",
+        "date" : "2027-03-21T09:00:00.000Z",
+        "priority" : "MEDIUM",
+        "past" : false
+      }, {
+        "key" : "DISEASE_MONITORING",
+        "title" : "Disease monitoring",
+        "taskType" : "DISEASE_CHECK",
+        "date" : "2027-04-10T09:00:00.000Z",
+        "priority" : "MEDIUM",
+        "past" : false
+      }, {
+        "key" : "HARVEST_PREP",
+        "title" : "Harvest preparation",
+        "taskType" : "HARVEST_PREP",
+        "date" : "2027-06-15T09:00:00.000Z",
+        "priority" : "MEDIUM",
+        "past" : false
+      }, {
+        "key" : "HARVEST",
+        "title" : "Harvest",
+        "taskType" : "HARVEST",
+        "date" : "2027-06-29T09:00:00.000Z",
+        "priority" : "HIGH",
+        "past" : false
+      } ],
+      "irrigation" : {
+        "requiredMm" : 500,
+        "effectiveRainMm" : 416,
+        "deficitMm" : 84,
+        "passes" : 3,
+        "doseMm" : 30,
+        "criticalPeriod" : "April-May"
+      },
+      "fertilization" : [ {
+        "stage" : "Base fertilization",
+        "date" : "2026-08-22T09:00:00.000Z",
+        "nKgHa" : 40,
+        "pKgHa" : 65,
+        "kKgHa" : 30
+      }, {
+        "stage" : "Top dressing",
+        "date" : "2027-03-06T09:00:00.000Z",
+        "nKgHa" : 90,
+        "pKgHa" : 0,
+        "kKgHa" : 0
+      } ],
+      "monitoring" : [ {
+        "title" : "Emergence check",
+        "date" : "2026-09-05T09:00:00.000Z"
+      }, {
+        "title" : "Pest monitoring",
+        "date" : "2027-03-21T09:00:00.000Z"
+      }, {
+        "title" : "Disease monitoring",
+        "date" : "2027-04-10T09:00:00.000Z"
+      } ],
+      "recommendations" : [ {
+        "crop" : "CORN",
+        "name" : "Corn",
+        "score" : 93,
+        "reasons" : [ "Rotation 80/100: The 3 years break since the last corn crop is respected.", "pH 6.4 is within the optimal range of 5.8-7.5.", "The mean temperature of 18.4 °C is favourable.", "Rainfall of 520 mm covers the minimum requirement of 450 mm." ],
+        "missingData" : [ ],
+        "reason" : "Corn is a good fit because the rotation is favourable, the pH of 6.4 is optimal and rainfall of 520 mm covers the minimum requirement."
+      }, {
+        "crop" : "SUNFLOWER",
+        "name" : "Sunflower",
+        "score" : 93,
+        "reasons" : [ "Rotation 80/100: The 4 years break since the last sunflower crop is respected.", "pH 6.4 is within the optimal range of 6-7.8.", "The mean temperature of 18.4 °C is favourable.", "Rainfall of 520 mm covers the minimum requirement of 400 mm." ],
+        "missingData" : [ ],
+        "reason" : "Sunflower is a good fit because the rotation is favourable, the pH of 6.4 is optimal and rainfall of 520 mm covers the minimum requirement."
+      }, {
+        "crop" : "SOY",
+        "name" : "Soybean",
+        "score" : 93,
+        "reasons" : [ "Rotation 80/100: The two years break since the last soybean crop is respected.", "pH 6.4 is within the optimal range of 6-7.2.", "The mean temperature of 18.4 °C is favourable.", "Rainfall of 520 mm covers the minimum requirement of 450 mm." ],
+        "missingData" : [ ],
+        "reason" : "Soybean is a good fit because the rotation is favourable, it enriches the soil with nitrogen, the pH of 6.4 is optimal and rainfall of 520 mm covers the minimum requirement."
+      }, {
+        "crop" : "WHEAT",
+        "name" : "Wheat",
+        "score" : 92,
+        "reasons" : [ "Rotation 80/100: The one year break since the last wheat crop is respected.", "pH 6.4 is within the optimal range of 6-7.5.", "The mean temperature of 18.4 °C is outside the optimum of 8-18 °C.", "Rainfall of 520 mm covers the minimum requirement of 350 mm." ],
+        "missingData" : [ ],
+        "reason" : "Wheat is a good fit because the rotation is favourable, the pH of 6.4 is optimal and rainfall of 520 mm covers the minimum requirement."
+      }, {
+        "crop" : "POTATO",
+        "name" : "Potato",
+        "score" : 91,
+        "reasons" : [ "Rotation 75/100: Potato has no rotation restrictions on this parcel.", "pH 6.4 is within the optimal range of 5-6.5.", "The mean temperature of 18.4 °C is favourable.", "Rainfall of 520 mm covers the minimum requirement of 500 mm." ],
+        "missingData" : [ ],
+        "reason" : "Potato is a good fit because the rotation is favourable, the pH of 6.4 is optimal and rainfall of 520 mm covers the minimum requirement."
+      }, {
+        "crop" : "VEGETABLES",
+        "name" : "Vegetables",
+        "score" : 91,
+        "reasons" : [ "Rotation 75/100: Vegetables has no rotation restrictions on this parcel.", "pH 6.4 is within the optimal range of 6-7.2.", "The mean temperature of 18.4 °C is favourable.", "Rainfall of 520 mm covers the minimum requirement of 400 mm." ],
+        "missingData" : [ ],
+        "reason" : "Vegetables is a good fit because the rotation is favourable, the pH of 6.4 is optimal and rainfall of 520 mm covers the minimum requirement."
+      }, {
+        "crop" : "RAPESEED",
+        "name" : "Rapeseed",
+        "score" : 88,
+        "reasons" : [ "Rotation 75/100: Rapeseed has no rotation restrictions on this parcel.", "pH 6.4 is within the optimal range of 6-7.5.", "The mean temperature of 18.4 °C is outside the optimum of 7-17 °C.", "Rainfall of 520 mm covers the minimum requirement of 400 mm." ],
+        "missingData" : [ ],
+        "reason" : "Rapeseed is a good fit because the rotation is favourable, the pH of 6.4 is optimal and rainfall of 520 mm covers the minimum requirement."
+      }, {
+        "crop" : "OAT",
+        "name" : "Oats",
+        "score" : 88,
+        "reasons" : [ "Rotation 75/100: Oats has no rotation restrictions on this parcel.", "pH 6.4 is within the optimal range of 5.2-7.", "The mean temperature of 18.4 °C is outside the optimum of 8-17 °C.", "Rainfall of 520 mm covers the minimum requirement of 350 mm." ],
+        "missingData" : [ ],
+        "reason" : "Oats is a good fit because the rotation is favourable, the pH of 6.4 is optimal and rainfall of 520 mm covers the minimum requirement."
+      }, {
+        "crop" : "BEET",
+        "name" : "Beet",
+        "score" : 88,
+        "reasons" : [ "Rotation 75/100: Beet has no rotation restrictions on this parcel.", "pH 6.4 is outside the optimal range of 6.5-8.", "The mean temperature of 18.4 °C is favourable.", "Rainfall of 520 mm is below the minimum requirement of 550 mm." ],
+        "missingData" : [ ],
+        "reason" : "Beet is a good fit because the rotation is favourable."
+      }, {
+        "crop" : "BARLEY",
+        "name" : "Barley",
+        "score" : 86,
+        "reasons" : [ "Rotation 75/100: Barley has no rotation restrictions on this parcel.", "pH 6.4 is within the optimal range of 6-8.", "The mean temperature of 18.4 °C is outside the optimum of 7-17 °C.", "Rainfall of 520 mm covers the minimum requirement of 300 mm." ],
+        "missingData" : [ ],
+        "reason" : "Barley is a good fit because the rotation is favourable, the pH of 6.4 is optimal and rainfall of 520 mm covers the minimum requirement."
+      }, {
+        "crop" : "ALFALFA",
+        "name" : "Alfalfa",
+        "score" : 85,
+        "reasons" : [ "Rotation 75/100: Alfalfa has no rotation restrictions on this parcel.", "pH 6.4 is outside the optimal range of 6.5-7.8.", "The mean temperature of 18.4 °C is favourable.", "Rainfall of 520 mm is below the minimum requirement of 600 mm." ],
+        "missingData" : [ ],
+        "reason" : "Alfalfa is a good fit because the rotation is favourable and it enriches the soil with nitrogen."
+      } ],
+      "report" : {
+        "parcelName" : "Hill",
+        "areaHa" : 5,
+        "soilType" : "Chernozem (loam)",
+        "lastCropName" : "Wheat",
+        "plannedCropName" : "Rapeseed",
+        "recommendedCrop" : "CORN",
+        "recommendedCropName" : "Corn",
+        "recommendedScore" : 93,
+        "compatibilityScore" : 88,
+        "expectedYieldTHa" : 2.6,
+        "expectedProfitEurHa" : 345,
+        "priceEurPerT" : 460,
+        "costEurHa" : 850,
+        "risks" : [ "Drought during April-May.", "Rainfall deficit estimated at 84 mm per season." ],
+        "recommendation" : "Plan at least 3 irrigation cycles of 30 mm during the critical growth period (April-May).",
+        "missingData" : [ ]
+      }
+    }
+  },
+  "nextSeasonYear" : [ 2026, 2027 ],
+  "planCalendar" : {
+    "sowingDate" : "2027-03-25T09:00:00.000Z",
+    "harvestDate" : "2027-10-06T09:00:00.000Z",
+    "seasonYear" : 2027,
+    "steps" : [ {
+      "key" : "SOIL_PREP",
+      "title" : "Seedbed preparation",
+      "taskType" : "SOIL_PREP",
+      "date" : "2027-02-27T09:00:00.000Z",
+      "priority" : "MEDIUM",
+      "past" : false
+    }, {
+      "key" : "SEED_PURCHASE",
+      "title" : "Seed purchase",
+      "taskType" : "SEED_PURCHASE",
+      "date" : "2027-03-14T09:00:00.000Z",
+      "priority" : "MEDIUM",
+      "past" : false
+    }, {
+      "key" : "BASE_FERTILIZATION",
+      "title" : "Base fertilization",
+      "taskType" : "FERTILIZATION",
+      "date" : "2027-03-19T09:00:00.000Z",
+      "priority" : "MEDIUM",
+      "past" : false
+    }, {
+      "key" : "SOWING",
+      "title" : "Sowing",
+      "taskType" : "SOWING",
+      "date" : "2027-03-25T09:00:00.000Z",
+      "priority" : "HIGH",
+      "past" : false
+    }, {
+      "key" : "PRE_EMERGENT",
+      "title" : "Pre-emergence herbicide",
+      "taskType" : "HERBICIDE",
+      "date" : "2027-03-27T09:00:00.000Z",
+      "priority" : "MEDIUM",
+      "past" : false
+    }, {
+      "key" : "EMERGENCE_CHECK",
+      "title" : "Emergence check",
+      "taskType" : "EMERGENCE_CHECK",
+      "date" : "2027-04-08T09:00:00.000Z",
+      "priority" : "MEDIUM",
+      "past" : false
+    }, {
+      "key" : "TOP_DRESSING",
+      "title" : "Top dressing",
+      "taskType" : "FERTILIZATION",
+      "date" : "2027-05-09T09:00:00.000Z",
+      "priority" : "MEDIUM",
+      "past" : false
+    }, {
+      "key" : "PEST_MONITORING",
+      "title" : "Pest monitoring",
+      "taskType" : "PEST_CHECK",
+      "date" : "2027-05-24T09:00:00.000Z",
+      "priority" : "MEDIUM",
+      "past" : false
+    }, {
+      "key" : "DISEASE_MONITORING",
+      "title" : "Disease monitoring",
+      "taskType" : "DISEASE_CHECK",
+      "date" : "2027-07-03T09:00:00.000Z",
+      "priority" : "MEDIUM",
+      "past" : false
+    }, {
+      "key" : "HARVEST_PREP",
+      "title" : "Harvest preparation",
+      "taskType" : "HARVEST_PREP",
+      "date" : "2027-09-22T09:00:00.000Z",
+      "priority" : "MEDIUM",
+      "past" : false
+    }, {
+      "key" : "HARVEST",
+      "title" : "Harvest",
+      "taskType" : "HARVEST",
+      "date" : "2027-10-06T09:00:00.000Z",
+      "priority" : "HIGH",
+      "past" : false
+    } ]
+  },
+  "rankCrops" : [ {
+    "crop" : "RAPESEED",
+    "name" : "Rapeseed",
+    "score" : 77,
+    "reasons" : [ "Rotation 75/100: Rapeseed has no rotation restrictions on this parcel.", "pH 6.4 is within the optimal range of 6-7.5." ],
+    "missingData" : [ "climate" ],
+    "reason" : "Rapeseed is a good fit because the parcel had wheat last year and the pH of 6.4 is optimal."
+  }, {
+    "crop" : "POTATO",
+    "name" : "Potato",
+    "score" : 77,
+    "reasons" : [ "Rotation 75/100: Potato has no rotation restrictions on this parcel.", "pH 6.4 is within the optimal range of 5-6.5." ],
+    "missingData" : [ "climate" ],
+    "reason" : "Potato is a good fit because the parcel had wheat last year and the pH of 6.4 is optimal."
+  }, {
+    "crop" : "VEGETABLES",
+    "name" : "Vegetables",
+    "score" : 77,
+    "reasons" : [ "Rotation 75/100: Vegetables has no rotation restrictions on this parcel.", "pH 6.4 is within the optimal range of 6-7.2." ],
+    "missingData" : [ "climate" ],
+    "reason" : "Vegetables is a good fit because the parcel had wheat last year and the pH of 6.4 is optimal."
+  }, {
+    "crop" : "ALFALFA",
+    "name" : "Alfalfa",
+    "score" : 76,
+    "reasons" : [ "Rotation 75/100: Alfalfa has no rotation restrictions on this parcel.", "pH 6.4 is outside the optimal range of 6.5-7.8." ],
+    "missingData" : [ "climate" ],
+    "reason" : "Alfalfa is a good fit because the parcel had wheat last year and it enriches the soil with nitrogen."
+  }, {
+    "crop" : "BEET",
+    "name" : "Beet",
+    "score" : 76,
+    "reasons" : [ "Rotation 75/100: Beet has no rotation restrictions on this parcel.", "pH 6.4 is outside the optimal range of 6.5-8." ],
+    "missingData" : [ "climate" ],
+    "reason" : "Beet is a good fit because the parcel had wheat last year."
+  }, {
+    "crop" : "CORN",
+    "name" : "Corn",
+    "score" : 74,
+    "reasons" : [ "Rotation 65/100: Wheat and corn belong to the same family and share diseases and pests.", "pH 6.4 is within the optimal range of 5.8-7.5." ],
+    "missingData" : [ "climate" ],
+    "reason" : "Corn is a good fit because the pH of 6.4 is optimal."
+  }, {
+    "crop" : "BARLEY",
+    "name" : "Barley",
+    "score" : 72,
+    "reasons" : [ "Rotation 60/100: Wheat and barley belong to the same family and share diseases and pests.", "pH 6.4 is within the optimal range of 6-8." ],
+    "missingData" : [ "climate" ],
+    "reason" : "Barley is a good fit because the pH of 6.4 is optimal."
+  }, {
+    "crop" : "OAT",
+    "name" : "Oats",
+    "score" : 72,
+    "reasons" : [ "Rotation 60/100: Wheat and oats belong to the same family and share diseases and pests.", "pH 6.4 is within the optimal range of 5.2-7." ],
+    "missingData" : [ "climate" ],
+    "reason" : "Oats is a good fit because the pH of 6.4 is optimal."
+  }, {
+    "crop" : "SOY",
+    "name" : "Soybean",
+    "score" : 65,
+    "reasons" : [ "Rotation 39/100: Soybean was grown 2 years ago on this parcel. A minimum break of two years is recommended. The risk of disease and yield loss is high.", "pH 6.4 is within the optimal range of 6-7.2." ],
+    "missingData" : [ "climate" ],
+    "reason" : "Soybean has a lower score because soybean was grown 2 years ago on this parcel. A minimum break of two years is recommended. The risk of disease and yield loss is high."
+  }, {
+    "crop" : "WHEAT",
+    "name" : "Wheat",
+    "score" : 62,
+    "reasons" : [ "Rotation 30/100: Wheat was grown last year on this parcel. A minimum break of one year is recommended. The risk of disease and yield loss is high.", "pH 6.4 is within the optimal range of 6-7.5." ],
+    "missingData" : [ "climate" ],
+    "reason" : "Wheat has a lower score because wheat was grown last year on this parcel. A minimum break of one year is recommended. The risk of disease and yield loss is high."
+  }, {
+    "crop" : "SUNFLOWER",
+    "name" : "Sunflower",
+    "score" : 62,
+    "reasons" : [ "Rotation 30/100: Sunflower was grown 4 years ago on this parcel. A minimum break of 4 years is recommended. The risk of disease and yield loss is high.", "pH 6.4 is within the optimal range of 6-7.8." ],
+    "missingData" : [ "climate" ],
+    "reason" : "Sunflower has a lower score because sunflower was grown 4 years ago on this parcel. A minimum break of 4 years is recommended. The risk of disease and yield loss is high."
+  } ],
+  "operatorReport" : {
+    "parcelName" : "North field",
+    "areaHa" : 23.46,
+    "soilType" : null,
+    "lastCropName" : null,
+    "plannedCropName" : "Corn",
+    "recommendedCrop" : "SOY",
+    "recommendedCropName" : "Soybean",
+    "recommendedScore" : 88,
+    "compatibilityScore" : 74,
+    "expectedYieldTHa" : 8.1,
+    "risks" : [ "Drought." ],
+    "recommendation" : "Irrigate.",
+    "missingData" : [ ]
+  },
+  "sheet" : {
+    "seeds" : [ {
+      "id" : "s1",
+      "supplier" : "Pioneer",
+      "hybrid" : "P9911",
+      "category" : null,
+      "unit" : "SEEDS",
+      "bagSize" : 80000,
+      "ratePerHa" : 72000,
+      "pricePerBag" : 245,
+      "bagsUsed" : null
+    }, {
+      "id" : "line-1",
+      "supplier" : "Local",
+      "hybrid" : "Glosa",
+      "category" : "C1",
+      "unit" : "KG",
+      "bagSize" : 25,
+      "ratePerHa" : 230,
+      "pricePerBag" : 18.5,
+      "bagsUsed" : 95
+    } ],
+    "fertilizers" : [ {
+      "id" : "f1",
+      "product" : "NPK 20-20-0",
+      "ratePerHaKg" : 200,
+      "pricePerT" : 610,
+      "applications" : 1,
+      "n" : 20,
+      "p" : 20,
+      "k" : null
+    }, {
+      "id" : "f2",
+      "product" : "Urea",
+      "ratePerHaKg" : 150,
+      "pricePerT" : 540,
+      "applications" : 2,
+      "n" : 46,
+      "p" : null,
+      "k" : null
+    } ],
+    "chemicals" : [ {
+      "id" : "c1",
+      "product" : "Adengo",
+      "kind" : "HERBICIDE",
+      "dosePerHa" : 0.44,
+      "unit" : "L",
+      "pricePerUnit" : 160,
+      "applications" : 1
+    }, {
+      "id" : "c2",
+      "product" : "Karate",
+      "kind" : "HERBICIDE",
+      "dosePerHa" : 0.15,
+      "unit" : "KG",
+      "pricePerUnit" : 95,
+      "applications" : 2
+    } ],
+    "misc" : [ {
+      "id" : "m1",
+      "label" : "Insurance",
+      "amount" : 35,
+      "basis" : "PER_HA"
+    }, {
+      "id" : "line-1",
+      "label" : "Transport",
+      "amount" : 900,
+      "basis" : "TOTAL"
+    } ],
+    "revenue" : {
+      "expectedYieldTHa" : 9.2,
+      "actualYieldTHa" : 8.7,
+      "pricePerT" : 190,
+      "actualPricePerT" : null
+    }
+  },
+  "settings" : {
+    "fuelPricePerL" : 1.52,
+    "defaultLaborRate" : 11,
+    "labor" : {
+      "u1" : {
+        "monthlySalary" : 1400,
+        "hourlyRate" : null
+      },
+      "u2" : {
+        "monthlySalary" : null,
+        "hourlyRate" : 13.5
+      }
+    },
+    "machines" : {
+      "m1" : {
+        "purchasePrice" : 120000,
+        "residualPct" : 25,
+        "depreciationYears" : 12,
+        "annualHours" : 600,
+        "serviceCostPerYear" : 1800,
+        "maintenanceCostPerYear" : 2400
+      },
+      "m2" : {
+        "purchasePrice" : 50000,
+        "residualPct" : 20,
+        "depreciationYears" : 10,
+        "annualHours" : 0,
+        "serviceCostPerYear" : 0,
+        "maintenanceCostPerYear" : 0
+      }
+    }
+  },
+  "emptySheet" : {
+    "seeds" : [ ],
+    "fertilizers" : [ ],
+    "chemicals" : [ ],
+    "misc" : [ ],
+    "revenue" : {
+      "expectedYieldTHa" : null,
+      "actualYieldTHa" : null,
+      "pricePerT" : null,
+      "actualPricePerT" : null
+    }
+  },
+  "emptySettings" : {
+    "fuelPricePerL" : 1.45,
+    "defaultLaborRate" : 10,
+    "labor" : { },
+    "machines" : { }
+  },
+  "parcelResult" : {
+    "areaHa" : 23.4,
+    "seeds" : [ {
+      "line" : {
+        "id" : "s1",
+        "supplier" : "Pioneer",
+        "hybrid" : "P9911",
+        "category" : null,
+        "unit" : "SEEDS",
+        "bagSize" : 80000,
+        "ratePerHa" : 72000,
+        "pricePerBag" : 245,
+        "bagsUsed" : null
+      },
+      "costPerHa" : 220.5,
+      "costPerKg" : null,
+      "costPer1000Seeds" : 3.06,
+      "bagsNeeded" : 21.1,
+      "total" : 5159.7
+    }, {
+      "line" : {
+        "id" : "line-1",
+        "supplier" : "Local",
+        "hybrid" : "Glosa",
+        "category" : "C1",
+        "unit" : "KG",
+        "bagSize" : 25,
+        "ratePerHa" : 230,
+        "pricePerBag" : 18.5,
+        "bagsUsed" : 95
+      },
+      "costPerHa" : 170.2,
+      "costPerKg" : 0.74,
+      "costPer1000Seeds" : null,
+      "bagsNeeded" : 215.3,
+      "total" : 1757.5
+    } ],
+    "fertilizers" : [ {
+      "line" : {
+        "id" : "f1",
+        "product" : "NPK 20-20-0",
+        "ratePerHaKg" : 200,
+        "pricePerT" : 610,
+        "applications" : 1,
+        "n" : 20,
+        "p" : 20,
+        "k" : null
+      },
+      "pricePerKg" : 0.61,
+      "costPerHa" : 122,
+      "total" : 2854.8,
+      "nutrients" : {
+        "n" : 40,
+        "p" : 40,
+        "k" : 0
+      }
+    }, {
+      "line" : {
+        "id" : "f2",
+        "product" : "Urea",
+        "ratePerHaKg" : 150,
+        "pricePerT" : 540,
+        "applications" : 2,
+        "n" : 46,
+        "p" : null,
+        "k" : null
+      },
+      "pricePerKg" : 0.54,
+      "costPerHa" : 162,
+      "total" : 3790.8,
+      "nutrients" : {
+        "n" : 138,
+        "p" : 0,
+        "k" : 0
+      }
+    } ],
+    "chemicals" : [ {
+      "line" : {
+        "id" : "c1",
+        "product" : "Adengo",
+        "kind" : "HERBICIDE",
+        "dosePerHa" : 0.44,
+        "unit" : "L",
+        "pricePerUnit" : 160,
+        "applications" : 1
+      },
+      "costPerHa" : 70.4,
+      "total" : 1647.36,
+      "quantity" : 10.3
+    }, {
+      "line" : {
+        "id" : "c2",
+        "product" : "Karate",
+        "kind" : "HERBICIDE",
+        "dosePerHa" : 0.15,
+        "unit" : "KG",
+        "pricePerUnit" : 95,
+        "applications" : 2
+      },
+      "costPerHa" : 28.5,
+      "total" : 666.9,
+      "quantity" : 7
+    } ],
+    "misc" : [ {
+      "line" : {
+        "id" : "m1",
+        "label" : "Insurance",
+        "amount" : 35,
+        "basis" : "PER_HA"
+      },
+      "total" : 819
+    }, {
+      "line" : {
+        "id" : "line-1",
+        "label" : "Transport",
+        "amount" : 900,
+        "basis" : "TOTAL"
+      },
+      "total" : 900
+    } ],
+    "operations" : [ {
+      "id" : "o1",
+      "type" : "PLOWING",
+      "label" : "Ploughing",
+      "machineName" : "Fendt 724",
+      "operatorName" : "Ion",
+      "areaHa" : 23.4,
+      "hours" : 9.5,
+      "fuelL" : 171,
+      "fuelCost" : 259.92,
+      "machineCost" : 185.25,
+      "laborCost" : 79.14,
+      "total" : 524.31,
+      "costPerHa" : 22.41,
+      "projected" : false,
+      "estimated" : false,
+      "startedAt" : "2026-03-20T07:00:00.000Z"
+    }, {
+      "id" : "o2",
+      "type" : "SOWING",
+      "label" : "Sowing",
+      "machineName" : "Seeder",
+      "operatorName" : "Ana",
+      "areaHa" : 9.36,
+      "hours" : 3,
+      "fuelL" : 55,
+      "fuelCost" : 83.6,
+      "machineCost" : 60,
+      "laborCost" : 40.5,
+      "total" : 184.1,
+      "costPerHa" : 19.67,
+      "projected" : false,
+      "estimated" : true,
+      "startedAt" : "2026-04-05T07:00:00.000Z"
+    }, {
+      "id" : "o4",
+      "type" : "DISCING",
+      "label" : "Discing",
+      "machineName" : null,
+      "operatorName" : "X",
+      "areaHa" : 7.02,
+      "hours" : 1.2,
+      "fuelL" : 49,
+      "fuelCost" : 74.69,
+      "machineCost" : 42,
+      "laborCost" : 13.2,
+      "total" : 129.89,
+      "costPerHa" : 18.5,
+      "projected" : false,
+      "estimated" : true,
+      "startedAt" : "2026-03-25T07:00:00.000Z"
+    } ],
+    "projected" : [ {
+      "id" : "projected-0-SUBSOILING",
+      "type" : "SUBSOILING",
+      "label" : "Subsoiling",
+      "machineName" : null,
+      "operatorName" : null,
+      "areaHa" : 23.4,
+      "hours" : 12.2,
+      "fuelL" : 274,
+      "fuelCost" : 416.15,
+      "machineCost" : 426.56,
+      "laborCost" : 134.06,
+      "total" : 976.77,
+      "costPerHa" : 41.74,
+      "projected" : true,
+      "estimated" : true,
+      "startedAt" : null
+    }, {
+      "id" : "projected-1-SUBSOILING",
+      "type" : "SUBSOILING",
+      "label" : "Subsoiling",
+      "machineName" : null,
+      "operatorName" : null,
+      "areaHa" : 23.4,
+      "hours" : 12.2,
+      "fuelL" : 274,
+      "fuelCost" : 416.15,
+      "machineCost" : 426.56,
+      "laborCost" : 134.06,
+      "total" : 976.77,
+      "costPerHa" : 41.74,
+      "projected" : true,
+      "estimated" : true,
+      "startedAt" : null
+    }, {
+      "id" : "projected-2-DISCING",
+      "type" : "DISCING",
+      "label" : "Discing",
+      "machineName" : null,
+      "operatorName" : null,
+      "areaHa" : 23.4,
+      "hours" : 6.6,
+      "fuelL" : 164,
+      "fuelCost" : 248.98,
+      "machineCost" : 232.67,
+      "laborCost" : 73.12,
+      "total" : 554.77,
+      "costPerHa" : 23.71,
+      "projected" : true,
+      "estimated" : true,
+      "startedAt" : null
+    }, {
+      "id" : "projected-3-SOWING",
+      "type" : "SOWING",
+      "label" : "Sowing",
+      "machineName" : null,
+      "operatorName" : null,
+      "areaHa" : 14.04,
+      "hours" : 4.2,
+      "fuelL" : 66,
+      "fuelCost" : 100.3,
+      "machineCost" : 146.25,
+      "laborCost" : 45.96,
+      "total" : 292.52,
+      "costPerHa" : 20.83,
+      "projected" : true,
+      "estimated" : true,
+      "startedAt" : null
+    }, {
+      "id" : "projected-4-FERTILIZING",
+      "type" : "FERTILIZING",
+      "label" : "Fertilising",
+      "machineName" : null,
+      "operatorName" : null,
+      "areaHa" : 23.4,
+      "hours" : 1.5,
+      "fuelL" : 47,
+      "fuelCost" : 71.14,
+      "machineCost" : 54.17,
+      "laborCost" : 17.02,
+      "total" : 142.33,
+      "costPerHa" : 6.08,
+      "projected" : true,
+      "estimated" : true,
+      "startedAt" : null
+    }, {
+      "id" : "projected-5-FERTILIZING",
+      "type" : "FERTILIZING",
+      "label" : "Fertilising",
+      "machineName" : null,
+      "operatorName" : null,
+      "areaHa" : 23.4,
+      "hours" : 1.5,
+      "fuelL" : 47,
+      "fuelCost" : 71.14,
+      "machineCost" : 54.17,
+      "laborCost" : 17.02,
+      "total" : 142.33,
+      "costPerHa" : 6.08,
+      "projected" : true,
+      "estimated" : true,
+      "startedAt" : null
+    }, {
+      "id" : "projected-6-SPRAYING",
+      "type" : "SPRAYING",
+      "label" : "Spraying",
+      "machineName" : null,
+      "operatorName" : null,
+      "areaHa" : 23.4,
+      "hours" : 1.4,
+      "fuelL" : 35,
+      "fuelCost" : 53.35,
+      "machineCost" : 48.75,
+      "laborCost" : 15.32,
+      "total" : 117.42,
+      "costPerHa" : 5.02,
+      "projected" : true,
+      "estimated" : true,
+      "startedAt" : null
+    }, {
+      "id" : "projected-7-SPRAYING",
+      "type" : "SPRAYING",
+      "label" : "Spraying",
+      "machineName" : null,
+      "operatorName" : null,
+      "areaHa" : 23.4,
+      "hours" : 1.4,
+      "fuelL" : 35,
+      "fuelCost" : 53.35,
+      "machineCost" : 48.75,
+      "laborCost" : 15.32,
+      "total" : 117.42,
+      "costPerHa" : 5.02,
+      "projected" : true,
+      "estimated" : true,
+      "startedAt" : null
+    }, {
+      "id" : "projected-8-SPRAYING",
+      "type" : "SPRAYING",
+      "label" : "Spraying",
+      "machineName" : null,
+      "operatorName" : null,
+      "areaHa" : 23.4,
+      "hours" : 1.4,
+      "fuelL" : 35,
+      "fuelCost" : 53.35,
+      "machineCost" : 48.75,
+      "laborCost" : 15.32,
+      "total" : 117.42,
+      "costPerHa" : 5.02,
+      "projected" : true,
+      "estimated" : true,
+      "startedAt" : null
+    }, {
+      "id" : "projected-9-HARVESTING",
+      "type" : "HARVESTING",
+      "label" : "Harvesting",
+      "machineName" : null,
+      "operatorName" : null,
+      "areaHa" : 23.4,
+      "hours" : 9.3,
+      "fuelL" : 374,
+      "fuelCost" : 569.09,
+      "machineCost" : 1114.29,
+      "laborCost" : 102.14,
+      "total" : 1785.52,
+      "costPerHa" : 76.3,
+      "projected" : true,
+      "estimated" : true,
+      "startedAt" : null
+    } ],
+    "recordedTotal" : 500.55,
+    "toDate" : {
+      "byCategory" : {
+        "SEEDS" : 6997.75,
+        "FERTILIZERS" : 6645.6,
+        "CHEMICALS" : 2314.26,
+        "FUEL" : 418.21,
+        "MACHINERY" : 287.25,
+        "LABOR" : 132.84,
+        "OTHER" : 2139
+      },
+      "total" : 18934.91,
+      "perHa" : 809.18
+    },
+    "season" : {
+      "byCategory" : {
+        "SEEDS" : 6997.75,
+        "FERTILIZERS" : 6645.6,
+        "CHEMICALS" : 2314.26,
+        "FUEL" : 2471.21,
+        "MACHINERY" : 2888.17,
+        "LABOR" : 702.18,
+        "OTHER" : 2139
+      },
+      "total" : 24158.17,
+      "perHa" : 1032.4
+    },
+    "expected" : {
+      "yieldTHa" : 9.2,
+      "pricePerT" : 190,
+      "revenue" : 40903.2,
+      "revenuePerHa" : 1748,
+      "profit" : 16745.03,
+      "profitPerHa" : 715.6,
+      "marginPct" : 40.9
+    },
+    "actual" : {
+      "yieldTHa" : 8.7,
+      "pricePerT" : 190,
+      "revenue" : 38680.2,
+      "revenuePerHa" : 1653,
+      "profit" : 14522.03,
+      "profitPerHa" : 620.6,
+      "marginPct" : 37.5
+    }
+  },
+  "bareResult" : {
+    "areaHa" : 10,
+    "seeds" : [ ],
+    "fertilizers" : [ ],
+    "chemicals" : [ ],
+    "misc" : [ ],
+    "operations" : [ ],
+    "projected" : [ {
+      "id" : "projected-0-DISCING",
+      "type" : "DISCING",
+      "label" : "Discing",
+      "machineName" : null,
+      "operatorName" : null,
+      "areaHa" : 10,
+      "hours" : 2.8,
+      "fuelL" : 90,
+      "fuelCost" : 136.8,
+      "machineCost" : 99.43,
+      "laborCost" : 31.25,
+      "total" : 267.48,
+      "costPerHa" : 26.75,
+      "projected" : true,
+      "estimated" : true,
+      "startedAt" : null
+    }, {
+      "id" : "projected-1-SOWING",
+      "type" : "SOWING",
+      "label" : "Sowing",
+      "machineName" : null,
+      "operatorName" : null,
+      "areaHa" : 10,
+      "hours" : 3,
+      "fuelL" : 60,
+      "fuelCost" : 91.2,
+      "machineCost" : 104.17,
+      "laborCost" : 32.74,
+      "total" : 228.1,
+      "costPerHa" : 22.81,
+      "projected" : true,
+      "estimated" : true,
+      "startedAt" : null
+    } ],
+    "recordedTotal" : 0,
+    "toDate" : {
+      "byCategory" : {
+        "SEEDS" : 0,
+        "FERTILIZERS" : 0,
+        "CHEMICALS" : 0,
+        "FUEL" : 0,
+        "MACHINERY" : 0,
+        "LABOR" : 0,
+        "OTHER" : 0
+      },
+      "total" : 0,
+      "perHa" : 0
+    },
+    "season" : {
+      "byCategory" : {
+        "SEEDS" : 0,
+        "FERTILIZERS" : 0,
+        "CHEMICALS" : 0,
+        "FUEL" : 228,
+        "MACHINERY" : 203.6,
+        "LABOR" : 63.99,
+        "OTHER" : 0
+      },
+      "total" : 495.59,
+      "perHa" : 49.56
+    },
+    "expected" : null,
+    "actual" : null
+  },
+  "lossResult" : {
+    "areaHa" : 4,
+    "seeds" : [ ],
+    "fertilizers" : [ ],
+    "chemicals" : [ ],
+    "misc" : [ {
+      "line" : {
+        "id" : "line-0",
+        "label" : "Rent",
+        "amount" : 5000,
+        "basis" : "TOTAL"
+      },
+      "total" : 5000
+    } ],
+    "operations" : [ ],
+    "projected" : [ {
+      "id" : "projected-0-SOWING",
+      "type" : "SOWING",
+      "label" : "Sowing",
+      "machineName" : null,
+      "operatorName" : null,
+      "areaHa" : 4,
+      "hours" : 1.2,
+      "fuelL" : 48,
+      "fuelCost" : 72.96,
+      "machineCost" : 41.67,
+      "laborCost" : 13.1,
+      "total" : 127.72,
+      "costPerHa" : 31.93,
+      "projected" : true,
+      "estimated" : true,
+      "startedAt" : null
+    }, {
+      "id" : "projected-1-HARVESTING",
+      "type" : "HARVESTING",
+      "label" : "Harvesting",
+      "machineName" : null,
+      "operatorName" : null,
+      "areaHa" : 4,
+      "hours" : 1.6,
+      "fuelL" : 64,
+      "fuelCost" : 97.28,
+      "machineCost" : 190.48,
+      "laborCost" : 17.46,
+      "total" : 305.22,
+      "costPerHa" : 76.3,
+      "projected" : true,
+      "estimated" : true,
+      "startedAt" : null
+    } ],
+    "recordedTotal" : 0,
+    "toDate" : {
+      "byCategory" : {
+        "SEEDS" : 0,
+        "FERTILIZERS" : 0,
+        "CHEMICALS" : 0,
+        "FUEL" : 0,
+        "MACHINERY" : 0,
+        "LABOR" : 0,
+        "OTHER" : 5000
+      },
+      "total" : 5000,
+      "perHa" : 1250
+    },
+    "season" : {
+      "byCategory" : {
+        "SEEDS" : 0,
+        "FERTILIZERS" : 0,
+        "CHEMICALS" : 0,
+        "FUEL" : 170.24,
+        "MACHINERY" : 232.15,
+        "LABOR" : 30.56,
+        "OTHER" : 5000
+      },
+      "total" : 5432.95,
+      "perHa" : 1358.24
+    },
+    "expected" : {
+      "yieldTHa" : 3,
+      "pricePerT" : 150,
+      "revenue" : 1800,
+      "revenuePerHa" : 450,
+      "profit" : -3632.95,
+      "profitPerHa" : -908.24,
+      "marginPct" : -201.8
+    },
+    "actual" : null
+  },
+  "insights" : {
+    "bare" : [ {
+      "tone" : "warning",
+      "message" : "Diesel is 46% of the total production cost.",
+      "savings" : null
+    }, {
+      "tone" : "info",
+      "message" : "Discing is the most expensive operation: €26,75/ha (estimated).",
+      "savings" : null
+    }, {
+      "tone" : "info",
+      "message" : "Set the tillage technology to compare the cost of Minimum Till, Strip Till and No Till.",
+      "savings" : null
+    }, {
+      "tone" : "info",
+      "message" : "Enter the expected yield and the sale price to see the profit.",
+      "savings" : null
+    } ],
+    "conventional" : [ {
+      "tone" : "info",
+      "message" : "Seeds is 29% of the total production cost.",
+      "savings" : null
+    }, {
+      "tone" : "info",
+      "message" : "Harvesting is the most expensive operation: €76,30/ha (estimated).",
+      "savings" : null
+    }, {
+      "tone" : "success",
+      "message" : "Applying Minimum Till on this parcel can reduce costs by about 19%.",
+      "savings" : 4590.05
+    }, {
+      "tone" : "warning",
+      "message" : "Diesel costs €106/ha. Fewer passes or combined operations would lower it.",
+      "savings" : null
+    }, {
+      "tone" : "success",
+      "message" : "Profit of €621/ha, a 37.5% margin.",
+      "savings" : null
+    } ],
+    "corn" : [ {
+      "tone" : "info",
+      "message" : "Seeds is 29% of the total production cost.",
+      "savings" : null
+    }, {
+      "tone" : "info",
+      "message" : "Harvesting is the most expensive operation: €76,30/ha (estimated).",
+      "savings" : null
+    }, {
+      "tone" : "success",
+      "message" : "Applying Strip Till on this parcel can reduce costs by about 17%.",
+      "savings" : 4106.89
+    }, {
+      "tone" : "warning",
+      "message" : "Diesel costs €106/ha. Fewer passes or combined operations would lower it.",
+      "savings" : null
+    }, {
+      "tone" : "success",
+      "message" : "Profit of €621/ha, a 37.5% margin.",
+      "savings" : null
+    } ],
+    "loss" : [ {
+      "tone" : "warning",
+      "message" : "Other costs is 92% of the total production cost.",
+      "savings" : null
+    }, {
+      "tone" : "info",
+      "message" : "Harvesting is the most expensive operation: €76,30/ha (estimated).",
+      "savings" : null
+    }, {
+      "tone" : "warning",
+      "message" : "The season runs at a loss of €908/ha. It breaks even at €453/t.",
+      "savings" : null
+    } ]
+  },
+  "fuelPerHaFor" : [ 20, 6.5, 16, 5 ],
+  "machineCost" : [ {
+    "perHour" : 120,
+    "depreciation" : 120,
+    "service" : 0,
+    "maintenance" : 0,
+    "estimated" : true
+  }, {
+    "perHour" : 35,
+    "depreciation" : 35,
+    "service" : 0,
+    "maintenance" : 0,
+    "estimated" : true
+  }, {
+    "perHour" : 19.5,
+    "depreciation" : 12.5,
+    "service" : 3,
+    "maintenance" : 4,
+    "estimated" : false
+  } ],
+  "laborRate" : [ 8.33, 13.5, 9 ],
+  "seasonOperations" : [ "PLOWING", "DISCING", "DISCING", "SOWING", "FERTILIZING", "FERTILIZING", "SPRAYING", "SPRAYING", "SPRAYING", "HARVESTING" ],
+  "farmEconomics" : {
+    "areaHa" : 37.4,
+    "cost" : 30086.71,
+    "costPerHa" : 804.46,
+    "byCategory" : {
+      "SEEDS" : 6997.75,
+      "FERTILIZERS" : 6645.6,
+      "CHEMICALS" : 2314.26,
+      "FUEL" : 2869.45,
+      "MACHINERY" : 3323.92,
+      "LABOR" : 796.73,
+      "OTHER" : 7139
+    },
+    "expectedProfit" : 13112.08,
+    "actualProfit" : 14522.03,
+    "profitPerHa" : 620.6,
+    "byParcel" : [ {
+      "key" : "p1",
+      "label" : "North field",
+      "areaHa" : 23.4,
+      "cost" : 24158.17,
+      "costPerHa" : 1032.4,
+      "fuelL" : 1626,
+      "fuelLPerHa" : 69.5,
+      "passes" : 13,
+      "expectedProfit" : 16745.03,
+      "expectedProfitPerHa" : 715.6,
+      "actualProfit" : 14522.03,
+      "actualProfitPerHa" : 620.6
+    }, {
+      "key" : "p3",
+      "label" : "Hill",
+      "areaHa" : 4,
+      "cost" : 5432.95,
+      "costPerHa" : 1358.24,
+      "fuelL" : 112,
+      "fuelLPerHa" : 28,
+      "passes" : 2,
+      "expectedProfit" : -3632.95,
+      "expectedProfitPerHa" : -908.24,
+      "actualProfit" : null,
+      "actualProfitPerHa" : null
+    }, {
+      "key" : "p2",
+      "label" : "Bare",
+      "areaHa" : 10,
+      "cost" : 495.59,
+      "costPerHa" : 49.56,
+      "fuelL" : 150,
+      "fuelLPerHa" : 15,
+      "passes" : 2,
+      "expectedProfit" : null,
+      "expectedProfitPerHa" : null,
+      "actualProfit" : null,
+      "actualProfitPerHa" : null
+    } ],
+    "byCrop" : [ {
+      "key" : "CORN",
+      "label" : "Corn",
+      "areaHa" : 23.4,
+      "cost" : 24158.17,
+      "costPerHa" : 1032.4,
+      "fuelL" : 1626,
+      "fuelLPerHa" : 69.5,
+      "passes" : 13,
+      "expectedProfit" : 16745.03,
+      "expectedProfitPerHa" : 715.6,
+      "actualProfit" : 14522.03,
+      "actualProfitPerHa" : 620.6
+    }, {
+      "key" : "WHEAT",
+      "label" : "Wheat",
+      "areaHa" : 4,
+      "cost" : 5432.95,
+      "costPerHa" : 1358.24,
+      "fuelL" : 112,
+      "fuelLPerHa" : 28,
+      "passes" : 2,
+      "expectedProfit" : -3632.95,
+      "expectedProfitPerHa" : -908.24,
+      "actualProfit" : null,
+      "actualProfitPerHa" : null
+    }, {
+      "key" : "NONE",
+      "label" : "No crop",
+      "areaHa" : 10,
+      "cost" : 495.59,
+      "costPerHa" : 49.56,
+      "fuelL" : 150,
+      "fuelLPerHa" : 15,
+      "passes" : 2,
+      "expectedProfit" : null,
+      "expectedProfitPerHa" : null,
+      "actualProfit" : null,
+      "actualProfitPerHa" : null
+    } ],
+    "byTillage" : [ {
+      "key" : "MINIMUM_TILL",
+      "label" : "Minimum Till",
+      "areaHa" : 23.4,
+      "cost" : 24158.17,
+      "costPerHa" : 1032.4,
+      "fuelL" : 1626,
+      "fuelLPerHa" : 69.5,
+      "passes" : 13,
+      "expectedProfit" : 16745.03,
+      "expectedProfitPerHa" : 715.6,
+      "actualProfit" : 14522.03,
+      "actualProfitPerHa" : 620.6
+    }, {
+      "key" : "NO_TILL",
+      "label" : "No Till",
+      "areaHa" : 4,
+      "cost" : 5432.95,
+      "costPerHa" : 1358.24,
+      "fuelL" : 112,
+      "fuelLPerHa" : 28,
+      "passes" : 2,
+      "expectedProfit" : -3632.95,
+      "expectedProfitPerHa" : -908.24,
+      "actualProfit" : null,
+      "actualProfitPerHa" : null
+    } ],
+    "mostProfitableParcel" : {
+      "key" : "p1",
+      "label" : "North field",
+      "areaHa" : 23.4,
+      "cost" : 24158.17,
+      "costPerHa" : 1032.4,
+      "fuelL" : 1626,
+      "fuelLPerHa" : 69.5,
+      "passes" : 13,
+      "expectedProfit" : 16745.03,
+      "expectedProfitPerHa" : 715.6,
+      "actualProfit" : 14522.03,
+      "actualProfitPerHa" : 620.6
+    },
+    "mostProfitableCrop" : {
+      "key" : "CORN",
+      "label" : "Corn",
+      "areaHa" : 23.4,
+      "cost" : 24158.17,
+      "costPerHa" : 1032.4,
+      "fuelL" : 1626,
+      "fuelLPerHa" : 69.5,
+      "passes" : 13,
+      "expectedProfit" : 16745.03,
+      "expectedProfitPerHa" : 715.6,
+      "actualProfit" : 14522.03,
+      "actualProfitPerHa" : 620.6
+    },
+    "mostEfficientTillage" : {
+      "key" : "MINIMUM_TILL",
+      "label" : "Minimum Till",
+      "areaHa" : 23.4,
+      "cost" : 24158.17,
+      "costPerHa" : 1032.4,
+      "fuelL" : 1626,
+      "fuelLPerHa" : 69.5,
+      "passes" : 13,
+      "expectedProfit" : 16745.03,
+      "expectedProfitPerHa" : 715.6,
+      "actualProfit" : 14522.03,
+      "actualProfitPerHa" : 620.6
+    }
+  },
+  "farmEconomicsEmpty" : {
+    "areaHa" : 0,
+    "cost" : 0,
+    "costPerHa" : 0,
+    "byCategory" : {
+      "SEEDS" : 0,
+      "FERTILIZERS" : 0,
+      "CHEMICALS" : 0,
+      "FUEL" : 0,
+      "MACHINERY" : 0,
+      "LABOR" : 0,
+      "OTHER" : 0
+    },
+    "expectedProfit" : null,
+    "actualProfit" : null,
+    "profitPerHa" : null,
+    "byParcel" : [ ],
+    "byCrop" : [ ],
+    "byTillage" : [ ],
+    "mostProfitableParcel" : null,
+    "mostProfitableCrop" : null,
+    "mostEfficientTillage" : null
+  },
+  "reports" : {
+    "parcels" : {
+      "title" : "Parcels",
+      "period" : "Year 2026",
+      "columns" : [ {
+        "key" : "parcel",
+        "label" : "Parcel",
+        "width" : 1.4
+      }, {
+        "key" : "code",
+        "label" : "Code",
+        "width" : 0.7
+      }, {
+        "key" : "area",
+        "label" : "ha",
+        "width" : 0.6,
+        "numeric" : true
+      }, {
+        "key" : "crop",
+        "label" : "Crop",
+        "width" : 0.9
+      }, {
+        "key" : "tillage",
+        "label" : "Tillage",
+        "width" : 0.7
+      }, {
+        "key" : "status",
+        "label" : "Status",
+        "width" : 1.1
+      }, {
+        "key" : "open",
+        "label" : "Open tasks",
+        "width" : 0.7,
+        "numeric" : true
+      }, {
+        "key" : "overdue",
+        "label" : "Overdue",
+        "width" : 0.7,
+        "numeric" : true
+      }, {
+        "key" : "completion",
+        "label" : "Completion %",
+        "width" : 0.8,
+        "numeric" : true
+      } ],
+      "rows" : [ {
+        "parcel" : "North field",
+        "code" : "NF-1",
+        "area" : 23.46,
+        "crop" : "Corn",
+        "tillage" : "MIN",
+        "status" : "Overdue work",
+        "open" : 4,
+        "overdue" : 1,
+        "completion" : 20
+      }, {
+        "parcel" : "Bare",
+        "code" : "B-2",
+        "area" : 10,
+        "crop" : "",
+        "tillage" : "",
+        "status" : "Work scheduled",
+        "open" : 1,
+        "overdue" : 0,
+        "completion" : 0
+      }, {
+        "parcel" : "Hill",
+        "code" : "H-3",
+        "area" : 4,
+        "crop" : "Wheat",
+        "tillage" : "NO-TILL",
+        "status" : "Work due today",
+        "open" : 1,
+        "overdue" : 0,
+        "completion" : 0
+      } ],
+      "totals" : {
+        "area" : 37.46,
+        "open" : 6,
+        "overdue" : 1
+      },
+      "orientation" : "landscape",
+      "chart" : {
+        "title" : "Area by parcel",
+        "labelKey" : "parcel",
+        "valueKey" : "area",
+        "unit" : "ha"
+      },
+      "summary" : [ {
+        "label" : "Parcels",
+        "value" : "3"
+      }, {
+        "label" : "Total area",
+        "value" : "37.5 ha"
+      }, {
+        "label" : "Average completion",
+        "value" : "7%"
+      }, {
+        "label" : "With overdue work",
+        "value" : "1"
+      } ]
+    },
+    "parcelsEmpty" : {
+      "title" : "Parcels",
+      "period" : "Year 2026",
+      "columns" : [ {
+        "key" : "parcel",
+        "label" : "Parcel",
+        "width" : 1.4
+      }, {
+        "key" : "code",
+        "label" : "Code",
+        "width" : 0.7
+      }, {
+        "key" : "area",
+        "label" : "ha",
+        "width" : 0.6,
+        "numeric" : true
+      }, {
+        "key" : "crop",
+        "label" : "Crop",
+        "width" : 0.9
+      }, {
+        "key" : "tillage",
+        "label" : "Tillage",
+        "width" : 0.7
+      }, {
+        "key" : "status",
+        "label" : "Status",
+        "width" : 1.1
+      }, {
+        "key" : "open",
+        "label" : "Open tasks",
+        "width" : 0.7,
+        "numeric" : true
+      }, {
+        "key" : "overdue",
+        "label" : "Overdue",
+        "width" : 0.7,
+        "numeric" : true
+      }, {
+        "key" : "completion",
+        "label" : "Completion %",
+        "width" : 0.8,
+        "numeric" : true
+      } ],
+      "rows" : [ ],
+      "totals" : {
+        "area" : 0,
+        "open" : 0,
+        "overdue" : 0
+      },
+      "orientation" : "landscape",
+      "chart" : {
+        "title" : "Area by parcel",
+        "labelKey" : "parcel",
+        "valueKey" : "area",
+        "unit" : "ha"
+      },
+      "summary" : [ {
+        "label" : "Parcels",
+        "value" : "0"
+      }, {
+        "label" : "Total area",
+        "value" : "0 ha"
+      }, {
+        "label" : "Average completion",
+        "value" : "-"
+      }, {
+        "label" : "With overdue work",
+        "value" : "0"
+      } ]
+    },
+    "machines" : {
+      "title" : "Machines",
+      "period" : "Year 2026",
+      "columns" : [ {
+        "key" : "machine",
+        "label" : "Machine",
+        "width" : 1.4
+      }, {
+        "key" : "type",
+        "label" : "Type",
+        "width" : 0.9
+      }, {
+        "key" : "operator",
+        "label" : "Operator",
+        "width" : 1.1
+      }, {
+        "key" : "operations",
+        "label" : "Operations",
+        "width" : 0.8,
+        "numeric" : true
+      }, {
+        "key" : "hours",
+        "label" : "Hours",
+        "width" : 0.7,
+        "numeric" : true
+      }, {
+        "key" : "area",
+        "label" : "Area (ha)",
+        "width" : 0.8,
+        "numeric" : true
+      }, {
+        "key" : "fuel",
+        "label" : "Diesel (l)",
+        "width" : 0.8,
+        "numeric" : true
+      }, {
+        "key" : "status",
+        "label" : "Status",
+        "width" : 1.3
+      } ],
+      "rows" : [ {
+        "machine" : "Fendt 724",
+        "type" : "Tractor",
+        "operator" : "Ion",
+        "operations" : 1,
+        "hours" : 9.5,
+        "area" : 23.5,
+        "fuel" : 180,
+        "status" : "Available"
+      }, {
+        "machine" : "Seeder",
+        "type" : "Seed drill",
+        "operator" : "",
+        "operations" : 1,
+        "hours" : 3,
+        "area" : 9.4,
+        "fuel" : 0,
+        "status" : "Working, Parcel p1"
+      }, {
+        "machine" : "Old",
+        "type" : "PLANE",
+        "operator" : "",
+        "operations" : 0,
+        "hours" : 0,
+        "area" : 0,
+        "fuel" : 0,
+        "status" : "Available"
+      } ],
+      "totals" : {
+        "operations" : 2,
+        "hours" : 12.5,
+        "area" : 32.9,
+        "fuel" : 180
+      },
+      "orientation" : "landscape",
+      "chart" : {
+        "title" : "Working hours by machine",
+        "labelKey" : "machine",
+        "valueKey" : "hours",
+        "unit" : "h"
+      },
+      "summary" : [ {
+        "label" : "Machines",
+        "value" : "3"
+      }, {
+        "label" : "Working now",
+        "value" : "1"
+      }, {
+        "label" : "Hours worked",
+        "value" : "13 h"
+      }, {
+        "label" : "Diesel",
+        "value" : "180 l"
+      } ]
+    },
+    "crops" : {
+      "title" : "Crops",
+      "period" : "Year 2026",
+      "columns" : [ {
+        "key" : "crop",
+        "label" : "Crop",
+        "width" : 1.3
+      }, {
+        "key" : "parcels",
+        "label" : "Parcels",
+        "width" : 0.7,
+        "numeric" : true
+      }, {
+        "key" : "area",
+        "label" : "Area (ha)",
+        "width" : 0.9,
+        "numeric" : true
+      }, {
+        "key" : "share",
+        "label" : "Share (%)",
+        "width" : 0.8,
+        "numeric" : true
+      }, {
+        "key" : "yield",
+        "label" : "Yield (t)",
+        "width" : 0.9,
+        "numeric" : true
+      }, {
+        "key" : "perHa",
+        "label" : "t/ha",
+        "width" : 0.7,
+        "numeric" : true
+      } ],
+      "rows" : [ {
+        "crop" : "Corn",
+        "parcels" : 2,
+        "area" : 33.46,
+        "share" : 89.3,
+        "yield" : 251.4,
+        "perHa" : 7.51
+      }, {
+        "crop" : "Wheat",
+        "parcels" : 1,
+        "area" : 4,
+        "share" : 10.7,
+        "yield" : null,
+        "perHa" : null
+      } ],
+      "totals" : {
+        "parcels" : 3,
+        "area" : 37.46,
+        "yield" : 251.4
+      },
+      "orientation" : "portrait",
+      "chart" : {
+        "title" : "Area by crop",
+        "labelKey" : "crop",
+        "valueKey" : "area",
+        "unit" : "ha"
+      },
+      "summary" : [ {
+        "label" : "Crops",
+        "value" : "2"
+      }, {
+        "label" : "Cultivated area",
+        "value" : "37.5 ha"
+      }, {
+        "label" : "Harvested",
+        "value" : "251 t"
+      } ]
+    },
+    "cropsEmpty" : {
+      "title" : "Crops",
+      "period" : "Year 2026",
+      "columns" : [ {
+        "key" : "crop",
+        "label" : "Crop",
+        "width" : 1.3
+      }, {
+        "key" : "parcels",
+        "label" : "Parcels",
+        "width" : 0.7,
+        "numeric" : true
+      }, {
+        "key" : "area",
+        "label" : "Area (ha)",
+        "width" : 0.9,
+        "numeric" : true
+      }, {
+        "key" : "share",
+        "label" : "Share (%)",
+        "width" : 0.8,
+        "numeric" : true
+      }, {
+        "key" : "yield",
+        "label" : "Yield (t)",
+        "width" : 0.9,
+        "numeric" : true
+      }, {
+        "key" : "perHa",
+        "label" : "t/ha",
+        "width" : 0.7,
+        "numeric" : true
+      } ],
+      "rows" : [ ],
+      "totals" : {
+        "parcels" : 0,
+        "area" : 0,
+        "yield" : 0
+      },
+      "orientation" : "portrait",
+      "chart" : {
+        "title" : "Area by crop",
+        "labelKey" : "crop",
+        "valueKey" : "area",
+        "unit" : "ha"
+      },
+      "summary" : [ {
+        "label" : "Crops",
+        "value" : "0"
+      }, {
+        "label" : "Cultivated area",
+        "value" : "0 ha"
+      }, {
+        "label" : "Harvested",
+        "value" : "0 t"
+      } ]
+    },
+    "profitability" : {
+      "title" : "Profitability",
+      "period" : "Year 2026, in euro",
+      "columns" : [ {
+        "key" : "parcel",
+        "label" : "Parcel",
+        "width" : 1.3
+      }, {
+        "key" : "crop",
+        "label" : "Crop",
+        "width" : 0.9
+      }, {
+        "key" : "area",
+        "label" : "ha",
+        "width" : 0.6,
+        "numeric" : true
+      }, {
+        "key" : "costPerHa",
+        "label" : "Cost/ha",
+        "width" : 0.9,
+        "numeric" : true,
+        "money" : true
+      }, {
+        "key" : "revenuePerHa",
+        "label" : "Revenue/ha",
+        "width" : 0.9,
+        "numeric" : true,
+        "money" : true
+      }, {
+        "key" : "profitPerHa",
+        "label" : "Profit/ha",
+        "width" : 0.9,
+        "numeric" : true,
+        "money" : true
+      }, {
+        "key" : "margin",
+        "label" : "Margin %",
+        "width" : 0.7,
+        "numeric" : true
+      }, {
+        "key" : "profit",
+        "label" : "Profit",
+        "width" : 1,
+        "numeric" : true,
+        "money" : true
+      }, {
+        "key" : "basis",
+        "label" : "Basis",
+        "width" : 0.7
+      } ],
+      "rows" : [ {
+        "parcel" : "North field",
+        "crop" : "Corn",
+        "area" : 23.4,
+        "costPerHa" : 1032.4,
+        "revenuePerHa" : 1653,
+        "profitPerHa" : 620.6,
+        "margin" : 37.5,
+        "profit" : 14522.03,
+        "basis" : "Actual"
+      }, {
+        "parcel" : "Bare",
+        "crop" : "",
+        "area" : 10,
+        "costPerHa" : 49.56,
+        "revenuePerHa" : null,
+        "profitPerHa" : null,
+        "margin" : null,
+        "profit" : null,
+        "basis" : ""
+      }, {
+        "parcel" : "Hill",
+        "crop" : "Wheat",
+        "area" : 4,
+        "costPerHa" : 1358.24,
+        "revenuePerHa" : 450,
+        "profitPerHa" : -908.24,
+        "margin" : -201.8,
+        "profit" : -3632.95,
+        "basis" : "Expected"
+      } ],
+      "totals" : {
+        "area" : 37.4,
+        "profit" : 10889.08
+      },
+      "orientation" : "landscape",
+      "chart" : {
+        "title" : "Profit by parcel",
+        "labelKey" : "parcel",
+        "valueKey" : "profit",
+        "money" : true
+      },
+      "summary" : [ {
+        "label" : "Average cost",
+        "value" : "€804/ha"
+      }, {
+        "label" : "Average profit",
+        "value" : "€621/ha"
+      }, {
+        "label" : "Best field",
+        "value" : "North field"
+      }, {
+        "label" : "Best crop",
+        "value" : "Corn"
+      } ]
+    },
+    "farm" : {
+      "title" : "Farm overview, Demo farm",
+      "period" : "Year 2026",
+      "columns" : [ {
+        "key" : "metric",
+        "label" : "Indicator",
+        "width" : 2
+      }, {
+        "key" : "value",
+        "label" : "Value",
+        "width" : 1.2,
+        "numeric" : true
+      } ],
+      "rows" : [ {
+        "metric" : "Parcels",
+        "value" : "3"
+      }, {
+        "metric" : "Total area",
+        "value" : "37.5 ha"
+      }, {
+        "metric" : "Cultivated area",
+        "value" : "27.5 ha"
+      }, {
+        "metric" : "Operations carried out",
+        "value" : "2"
+      }, {
+        "metric" : "Area worked",
+        "value" : "32.8 ha"
+      }, {
+        "metric" : "Diesel used",
+        "value" : "180 l"
+      }, {
+        "metric" : "Parcels fully completed",
+        "value" : "0"
+      }, {
+        "metric" : "Parcels with overdue work",
+        "value" : "1"
+      }, {
+        "metric" : "Average field completion",
+        "value" : "7%"
+      }, {
+        "metric" : "Ploughing",
+        "value" : "23.5 ha"
+      }, {
+        "metric" : "Sowing",
+        "value" : "9.4 ha"
+      }, {
+        "metric" : "Production cost",
+        "value" : "€30.087"
+      }, {
+        "metric" : "Cost per hectare",
+        "value" : "€804,46"
+      }, {
+        "metric" : "Profit",
+        "value" : "€14.522"
+      }, {
+        "metric" : "Cost: Seeds",
+        "value" : "€6.998"
+      }, {
+        "metric" : "Cost: Fertilisers",
+        "value" : "€6.646"
+      }, {
+        "metric" : "Cost: Crop protection",
+        "value" : "€2.314"
+      }, {
+        "metric" : "Cost: Diesel",
+        "value" : "€2.869"
+      }, {
+        "metric" : "Cost: Machinery",
+        "value" : "€3.324"
+      }, {
+        "metric" : "Cost: Labour",
+        "value" : "€797"
+      }, {
+        "metric" : "Cost: Other costs",
+        "value" : "€7.139"
+      } ],
+      "orientation" : "portrait",
+      "chart" : {
+        "title" : "Production cost by category",
+        "points" : [ {
+          "label" : "Seeds",
+          "value" : 6997.75
+        }, {
+          "label" : "Fertilisers",
+          "value" : 6645.6
+        }, {
+          "label" : "Crop protection",
+          "value" : 2314.26
+        }, {
+          "label" : "Diesel",
+          "value" : 2869.45
+        }, {
+          "label" : "Machinery",
+          "value" : 3323.92
+        }, {
+          "label" : "Labour",
+          "value" : 796.73
+        }, {
+          "label" : "Other costs",
+          "value" : 7139
+        } ],
+        "money" : true
+      },
+      "summary" : [ {
+        "label" : "Area",
+        "value" : "37.5 ha"
+      }, {
+        "label" : "Operations",
+        "value" : "2"
+      }, {
+        "label" : "Cost per hectare",
+        "value" : "€804"
+      }, {
+        "label" : "Field completion",
+        "value" : "7%"
+      } ]
+    },
+    "farmNoEconomics" : {
+      "title" : "Farm overview, Demo farm",
+      "period" : "Year 2026",
+      "columns" : [ {
+        "key" : "metric",
+        "label" : "Indicator",
+        "width" : 2
+      }, {
+        "key" : "value",
+        "label" : "Value",
+        "width" : 1.2,
+        "numeric" : true
+      } ],
+      "rows" : [ {
+        "metric" : "Parcels",
+        "value" : "3"
+      }, {
+        "metric" : "Total area",
+        "value" : "37.5 ha"
+      }, {
+        "metric" : "Cultivated area",
+        "value" : "27.5 ha"
+      }, {
+        "metric" : "Operations carried out",
+        "value" : "2"
+      }, {
+        "metric" : "Area worked",
+        "value" : "32.8 ha"
+      }, {
+        "metric" : "Diesel used",
+        "value" : "180 l"
+      }, {
+        "metric" : "Parcels fully completed",
+        "value" : "0"
+      }, {
+        "metric" : "Parcels with overdue work",
+        "value" : "1"
+      }, {
+        "metric" : "Average field completion",
+        "value" : "7%"
+      }, {
+        "metric" : "Ploughing",
+        "value" : "23.5 ha"
+      }, {
+        "metric" : "Sowing",
+        "value" : "9.4 ha"
+      } ],
+      "orientation" : "portrait",
+      "summary" : [ {
+        "label" : "Area",
+        "value" : "37.5 ha"
+      }, {
+        "label" : "Operations",
+        "value" : "2"
+      }, {
+        "label" : "Field completion",
+        "value" : "7%"
+      } ]
+    },
+    "chartPointsParcels" : [ {
+      "label" : "North field",
+      "value" : 23.46
+    }, {
+      "label" : "Bare",
+      "value" : 10
+    } ],
+    "chartPointsFarm" : [ {
+      "label" : "Other costs",
+      "value" : 7139
+    }, {
+      "label" : "Seeds",
+      "value" : 6997.75
+    }, {
+      "label" : "Fertilisers",
+      "value" : 6645.6
+    }, {
+      "label" : "Machinery",
+      "value" : 3323.92
+    }, {
+      "label" : "Diesel",
+      "value" : 2869.45
+    }, {
+      "label" : "Crop protection",
+      "value" : 2314.26
+    }, {
+      "label" : "Labour",
+      "value" : 796.73
+    } ],
+    "chartPointsText" : [ {
+      "label" : "x",
+      "value" : 12.5
+    } ],
+    "chartPointsNone" : [ ],
+    "columnFlags" : [ true, false ]
+  },
+  "polygonWithoutType" : {
+    "type" : "Polygon",
+    "coordinates" : [ [ [ 26, 44.7 ], [ 26.01, 44.7 ], [ 26.01, 44.71 ] ] ]
+  },
+  "polygonWrongType" : {
+    "type" : "Polygon",
+    "coordinates" : [ [ [ 26, 44.7 ] ] ]
+  },
+  "polygonNoCoordinates" : {
+    "type" : "Polygon",
+    "coordinates" : [ ]
+  },
+  "polygonFromMap" : {
+    "type" : "Polygon",
+    "coordinates" : [ [ [ 26, 44 ], [ 26.5, 44 ] ] ]
+  },
+  "cachedForecast" : [ {
+    "time" : "2026-05-20T10:00",
+    "temperatureC" : 18,
+    "humidityPct" : 60,
+    "precipitationMm" : 0,
+    "precipitationProbabilityPct" : null,
+    "windKmh" : 9,
+    "weatherCode" : null
+  }, {
+    "time" : "2026-05-20T11:00",
+    "temperatureC" : 19.5,
+    "humidityPct" : 58,
+    "precipitationMm" : 0.2,
+    "precipitationProbabilityPct" : 35,
+    "windKmh" : 11,
+    "weatherCode" : 95
+  }, {
+    "time" : "2026-05-20T12:00",
+    "temperatureC" : 20,
+    "humidityPct" : 55,
+    "precipitationMm" : 0,
+    "precipitationProbabilityPct" : null,
+    "windKmh" : 12,
+    "weatherCode" : null
+  } ]
+}
