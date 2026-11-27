@@ -1,0 +1,4 @@
+# Snapshot files are compared byte for byte, so they keep LF line endings on every platform.
+apps/api/src/test/resources/snapshots/*.json text eol=lf
+# Shell scripts must keep LF to run in bash, also from a Windows checkout.
+*.sh text eol=lf

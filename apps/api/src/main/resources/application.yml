@@ -60,6 +60,10 @@ spring:
     default-property-inclusion: always
 
 springdoc:
+  # Kotlin support marks every non-null Kotlin property as required, which would change the
+  # published document (and wrongly so for optional fields with a default). The schemas are read
+  # like Java classes, as they were before the port.
+  enable-kotlin: false
   api-docs:
     path: /api/docs.json
   swagger-ui:

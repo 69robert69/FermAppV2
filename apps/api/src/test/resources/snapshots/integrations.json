@@ -1,0 +1,664 @@
+{
+  "forecast" : {
+    "timezone" : "Europe/Bucharest",
+    "utcOffsetSeconds" : 7200,
+    "hours" : [ {
+      "time" : "2026-05-20T10:00",
+      "temperatureC" : 18.5,
+      "humidityPct" : 60,
+      "precipitationMm" : 0,
+      "precipitationProbabilityPct" : null,
+      "windKmh" : 9,
+      "weatherCode" : 1,
+      "radiationWm2" : 500,
+      "evapotranspirationMm" : 0.2,
+      "et0Mm" : 0.25
+    }, {
+      "time" : "2026-05-20T12:00",
+      "temperatureC" : 21,
+      "humidityPct" : 0,
+      "precipitationMm" : 0,
+      "precipitationProbabilityPct" : 40,
+      "windKmh" : 11,
+      "weatherCode" : 95,
+      "radiationWm2" : 620,
+      "evapotranspirationMm" : null,
+      "et0Mm" : 0.31
+    }, {
+      "time" : "2026-05-20T13:00",
+      "temperatureC" : 22.25,
+      "humidityPct" : 55,
+      "precipitationMm" : 1.5,
+      "precipitationProbabilityPct" : 80,
+      "windKmh" : 0,
+      "weatherCode" : null,
+      "radiationWm2" : 610,
+      "evapotranspirationMm" : 0.1,
+      "et0Mm" : null
+    } ],
+    "days" : [ {
+      "date" : "2026-05-20",
+      "tMaxC" : 24,
+      "tMinC" : 12,
+      "tMeanC" : 18,
+      "precipitationMm" : 0,
+      "radiationMjM2" : 22.5,
+      "et0Mm" : 4.1,
+      "windMaxKmh" : 20,
+      "humidityPct" : 65
+    }, {
+      "date" : "2026-05-22",
+      "tMaxC" : 26,
+      "tMinC" : 14,
+      "tMeanC" : null,
+      "precipitationMm" : 0.4,
+      "radiationMjM2" : null,
+      "et0Mm" : 4.4,
+      "windMaxKmh" : 15,
+      "humidityPct" : null
+    } ]
+  },
+  "forecastFromCacheEqual" : true,
+  "forecastFromCache" : {
+    "timezone" : "Europe/Bucharest",
+    "utcOffsetSeconds" : 7200,
+    "hours" : [ {
+      "time" : "2026-05-20T10:00",
+      "temperatureC" : 18.5,
+      "humidityPct" : 60,
+      "precipitationMm" : 0,
+      "precipitationProbabilityPct" : null,
+      "windKmh" : 9,
+      "weatherCode" : 1,
+      "radiationWm2" : 500,
+      "evapotranspirationMm" : 0.2,
+      "et0Mm" : 0.25
+    }, {
+      "time" : "2026-05-20T12:00",
+      "temperatureC" : 21,
+      "humidityPct" : 0,
+      "precipitationMm" : 0,
+      "precipitationProbabilityPct" : 40,
+      "windKmh" : 11,
+      "weatherCode" : 95,
+      "radiationWm2" : 620,
+      "evapotranspirationMm" : null,
+      "et0Mm" : 0.31
+    }, {
+      "time" : "2026-05-20T13:00",
+      "temperatureC" : 22.25,
+      "humidityPct" : 55,
+      "precipitationMm" : 1.5,
+      "precipitationProbabilityPct" : 80,
+      "windKmh" : 0,
+      "weatherCode" : null,
+      "radiationWm2" : 610,
+      "evapotranspirationMm" : 0.1,
+      "et0Mm" : null
+    } ],
+    "days" : [ {
+      "date" : "2026-05-20",
+      "tMaxC" : 24,
+      "tMinC" : 12,
+      "tMeanC" : 18,
+      "precipitationMm" : 0,
+      "radiationMjM2" : 22.5,
+      "et0Mm" : 4.1,
+      "windMaxKmh" : 20,
+      "humidityPct" : 65
+    }, {
+      "date" : "2026-05-22",
+      "tMaxC" : 26,
+      "tMinC" : 14,
+      "tMeanC" : null,
+      "precipitationMm" : 0.4,
+      "radiationMjM2" : null,
+      "et0Mm" : 4.4,
+      "windMaxKmh" : 15,
+      "humidityPct" : null
+    } ]
+  },
+  "localHour" : "2026-05-20T11:00",
+  "upcomingHours" : [ {
+    "time" : "2026-05-20T12:00",
+    "temperatureC" : 21,
+    "humidityPct" : 0,
+    "precipitationMm" : 0,
+    "precipitationProbabilityPct" : 40,
+    "windKmh" : 11,
+    "weatherCode" : 95,
+    "radiationWm2" : 620,
+    "evapotranspirationMm" : null,
+    "et0Mm" : 0.31
+  }, {
+    "time" : "2026-05-20T13:00",
+    "temperatureC" : 22.25,
+    "humidityPct" : 55,
+    "precipitationMm" : 1.5,
+    "precipitationProbabilityPct" : 80,
+    "windKmh" : 0,
+    "weatherCode" : null,
+    "radiationWm2" : 610,
+    "evapotranspirationMm" : 0.1,
+    "et0Mm" : null
+  } ],
+  "history" : [ {
+    "date" : "2026-05-20",
+    "tMaxC" : 24,
+    "tMinC" : 12,
+    "tMeanC" : 18,
+    "precipitationMm" : 0,
+    "radiationMjM2" : 22.5,
+    "et0Mm" : 4.1,
+    "windMaxKmh" : 20,
+    "humidityPct" : 65
+  }, {
+    "date" : "2026-05-22",
+    "tMaxC" : 26,
+    "tMinC" : 14,
+    "tMeanC" : null,
+    "precipitationMm" : 0.4,
+    "radiationMjM2" : null,
+    "et0Mm" : 4.4,
+    "windMaxKmh" : 15,
+    "humidityPct" : null
+  } ],
+  "historyFromCache" : [ {
+    "date" : "2026-05-20",
+    "tMaxC" : 24,
+    "tMinC" : 12,
+    "tMeanC" : 18,
+    "precipitationMm" : 0,
+    "radiationMjM2" : 22.5,
+    "et0Mm" : 4.1,
+    "windMaxKmh" : 20,
+    "humidityPct" : 65
+  }, {
+    "date" : "2026-05-22",
+    "tMaxC" : 26,
+    "tMinC" : 14,
+    "tMeanC" : null,
+    "precipitationMm" : 0.4,
+    "radiationMjM2" : null,
+    "et0Mm" : 4.4,
+    "windMaxKmh" : 15,
+    "humidityPct" : null
+  } ],
+  "powerDays" : [ {
+    "date" : "2024-01-15",
+    "tMeanC" : -1.5,
+    "tMaxC" : 3,
+    "tMinC" : -6.2,
+    "precipitationMm" : 0,
+    "radiationMjM2" : 4.1
+  }, {
+    "date" : "2024-07-16",
+    "tMeanC" : 24.2,
+    "tMaxC" : 31.5,
+    "tMinC" : 17,
+    "precipitationMm" : 2.4,
+    "radiationMjM2" : null
+  }, {
+    "date" : "2025-04-10",
+    "tMeanC" : 12.1,
+    "tMaxC" : 18.4,
+    "tMinC" : 5.3,
+    "precipitationMm" : 0,
+    "radiationMjM2" : null
+  } ],
+  "powerDaysFromCache" : [ {
+    "date" : "2024-01-15",
+    "tMeanC" : -1.5,
+    "tMaxC" : 3,
+    "tMinC" : -6.2,
+    "precipitationMm" : 0,
+    "radiationMjM2" : 4.1
+  }, {
+    "date" : "2024-07-16",
+    "tMeanC" : 24.2,
+    "tMaxC" : 31.5,
+    "tMinC" : 17,
+    "precipitationMm" : 2.4,
+    "radiationMjM2" : null
+  }, {
+    "date" : "2025-04-10",
+    "tMeanC" : 12.1,
+    "tMaxC" : 18.4,
+    "tMinC" : 5.3,
+    "precipitationMm" : 0,
+    "radiationMjM2" : null
+  } ],
+  "climateYears" : [ {
+    "year" : 2023,
+    "precipitationMm" : 174.9,
+    "seasonPrecipitationMm" : 85.8,
+    "meanTempC" : 15,
+    "seasonTempC" : 15,
+    "radiationMjM2" : 4146.4,
+    "gddBase10" : 2506,
+    "days" : 365
+  }, {
+    "year" : 2024,
+    "precipitationMm" : 0,
+    "seasonPrecipitationMm" : 0,
+    "meanTempC" : 8.5,
+    "seasonTempC" : 0,
+    "radiationMjM2" : 0,
+    "gddBase10" : 9,
+    "days" : 1
+  } ],
+  "climateYearsShort" : [ {
+    "year" : 2024,
+    "precipitationMm" : 2.4,
+    "seasonPrecipitationMm" : 2.4,
+    "meanTempC" : 11.4,
+    "seasonTempC" : 24.2,
+    "radiationMjM2" : 4.1,
+    "gddBase10" : 14,
+    "days" : 2
+  }, {
+    "year" : 2025,
+    "precipitationMm" : 0,
+    "seasonPrecipitationMm" : 0,
+    "meanTempC" : 12.1,
+    "seasonTempC" : 12.1,
+    "radiationMjM2" : 0,
+    "gddBase10" : 4,
+    "days" : 1
+  } ],
+  "climateNormals" : {
+    "seasonTempC" : 15,
+    "annualPrecipitationMm" : 175,
+    "gddBase10" : 2506
+  },
+  "climateNormalsNone" : null,
+  "soil" : {
+    "ph" : 7.07,
+    "clayPct" : 29.5,
+    "sandPct" : 25,
+    "organicCarbonGKg" : 19.5,
+    "fieldCapacityPct" : null,
+    "wiltingPointPct" : 18
+  },
+  "soilEmpty" : null,
+  "owmConfigured" : [ true, false ],
+  "owmHours" : [ ],
+  "owmExpanded" : [ {
+    "time" : "2026-05-20T12:00",
+    "temperatureC" : 18.2,
+    "humidityPct" : 60,
+    "precipitationMm" : 0.5,
+    "precipitationProbabilityPct" : 35,
+    "windKmh" : 10.8,
+    "weatherCode" : 95
+  }, {
+    "time" : "2026-05-20T13:00",
+    "temperatureC" : 18.2,
+    "humidityPct" : 60,
+    "precipitationMm" : 0.5,
+    "precipitationProbabilityPct" : 35,
+    "windKmh" : 10.8,
+    "weatherCode" : 95
+  }, {
+    "time" : "2026-05-20T14:00",
+    "temperatureC" : 15,
+    "humidityPct" : 70,
+    "precipitationMm" : 0.19999999999999998,
+    "precipitationProbabilityPct" : 0,
+    "windKmh" : 19.8,
+    "weatherCode" : 96
+  }, {
+    "time" : "2026-05-20T15:00",
+    "temperatureC" : 15,
+    "humidityPct" : 70,
+    "precipitationMm" : 0.19999999999999998,
+    "precipitationProbabilityPct" : 0,
+    "windKmh" : 19.8,
+    "weatherCode" : 96
+  }, {
+    "time" : "2026-05-20T16:00",
+    "temperatureC" : 15,
+    "humidityPct" : 70,
+    "precipitationMm" : 0.19999999999999998,
+    "precipitationProbabilityPct" : 0,
+    "windKmh" : 19.8,
+    "weatherCode" : 96
+  }, {
+    "time" : "2026-05-20T17:00",
+    "temperatureC" : 12,
+    "humidityPct" : 0,
+    "precipitationMm" : 0,
+    "precipitationProbabilityPct" : 0,
+    "windKmh" : 0,
+    "weatherCode" : null
+  }, {
+    "time" : "2026-05-20T18:00",
+    "temperatureC" : 12,
+    "humidityPct" : 0,
+    "precipitationMm" : 0,
+    "precipitationProbabilityPct" : 0,
+    "windKmh" : 0,
+    "weatherCode" : null
+  }, {
+    "time" : "2026-05-20T19:00",
+    "temperatureC" : 12,
+    "humidityPct" : 0,
+    "precipitationMm" : 0,
+    "precipitationProbabilityPct" : 0,
+    "windKmh" : 0,
+    "weatherCode" : null
+  } ],
+  "owmExpandedPadding" : [ {
+    "time" : "2026-05-20T05:00",
+    "temperatureC" : 18.2,
+    "humidityPct" : 60,
+    "precipitationMm" : 0,
+    "precipitationProbabilityPct" : 0,
+    "windKmh" : 10.8,
+    "weatherCode" : null
+  }, {
+    "time" : "2026-05-20T06:00",
+    "temperatureC" : 18.2,
+    "humidityPct" : 60,
+    "precipitationMm" : 0,
+    "precipitationProbabilityPct" : 0,
+    "windKmh" : 10.8,
+    "weatherCode" : null
+  }, {
+    "time" : "2026-05-20T07:00",
+    "temperatureC" : 18.2,
+    "humidityPct" : 60,
+    "precipitationMm" : 0,
+    "precipitationProbabilityPct" : 0,
+    "windKmh" : 10.8,
+    "weatherCode" : null
+  }, {
+    "time" : "2026-05-20T08:00",
+    "temperatureC" : 18.2,
+    "humidityPct" : 60,
+    "precipitationMm" : 0.5,
+    "precipitationProbabilityPct" : 35,
+    "windKmh" : 10.8,
+    "weatherCode" : 95
+  }, {
+    "time" : "2026-05-20T09:00",
+    "temperatureC" : 18.2,
+    "humidityPct" : 60,
+    "precipitationMm" : 0.5,
+    "precipitationProbabilityPct" : 35,
+    "windKmh" : 10.8,
+    "weatherCode" : 95
+  }, {
+    "time" : "2026-05-20T10:00",
+    "temperatureC" : 18.2,
+    "humidityPct" : 60,
+    "precipitationMm" : 0.5,
+    "precipitationProbabilityPct" : 35,
+    "windKmh" : 10.8,
+    "weatherCode" : 95
+  }, {
+    "time" : "2026-05-20T11:00",
+    "temperatureC" : 15,
+    "humidityPct" : 70,
+    "precipitationMm" : 0.19999999999999998,
+    "precipitationProbabilityPct" : 0,
+    "windKmh" : 19.8,
+    "weatherCode" : 96
+  }, {
+    "time" : "2026-05-20T12:00",
+    "temperatureC" : 15,
+    "humidityPct" : 70,
+    "precipitationMm" : 0.19999999999999998,
+    "precipitationProbabilityPct" : 0,
+    "windKmh" : 19.8,
+    "weatherCode" : 96
+  }, {
+    "time" : "2026-05-20T13:00",
+    "temperatureC" : 15,
+    "humidityPct" : 70,
+    "precipitationMm" : 0.19999999999999998,
+    "precipitationProbabilityPct" : 0,
+    "windKmh" : 19.8,
+    "weatherCode" : 96
+  }, {
+    "time" : "2026-05-20T14:00",
+    "temperatureC" : 12,
+    "humidityPct" : 0,
+    "precipitationMm" : 0,
+    "precipitationProbabilityPct" : 0,
+    "windKmh" : 0,
+    "weatherCode" : null
+  }, {
+    "time" : "2026-05-20T15:00",
+    "temperatureC" : 12,
+    "humidityPct" : 0,
+    "precipitationMm" : 0,
+    "precipitationProbabilityPct" : 0,
+    "windKmh" : 0,
+    "weatherCode" : null
+  }, {
+    "time" : "2026-05-20T16:00",
+    "temperatureC" : 12,
+    "humidityPct" : 0,
+    "precipitationMm" : 0,
+    "precipitationProbabilityPct" : 0,
+    "windKmh" : 0,
+    "weatherCode" : null
+  } ],
+  "owmExpandedEmpty" : [ ],
+  "sentinelConfigured" : true,
+  "sentinelObservations" : [ {
+    "date" : "2026-05-01",
+    "ndvi" : 0.712,
+    "ndre" : 0.346,
+    "cloudPct" : 10
+  }, {
+    "date" : "2026-05-08",
+    "ndvi" : 0.601,
+    "ndre" : null,
+    "cloudPct" : 60
+  } ],
+  "sentinelImageNdvi" : "PNG",
+  "sentinelImageNdre" : "PNG",
+  "sentinelStatistics" : [ {
+    "date" : "2026-05-01",
+    "ndvi" : 0.712,
+    "ndre" : 0.346,
+    "cloudPct" : 10
+  }, {
+    "date" : "2026-05-08",
+    "ndvi" : 0.601,
+    "ndre" : null,
+    "cloudPct" : 60
+  } ],
+  "sentinelUnconfigured" : [ false, {
+    "class" : "ServiceNotConfiguredException",
+    "message" : "The satellite imagery service is not configured on the server.",
+    "code" : "SERVICE_NOT_CONFIGURED"
+  } ],
+  "assistantUnconfigured" : [ false, null ],
+  "assistantTurn" : {
+    "fromUser" : false,
+    "content" : "answer"
+  },
+  "requests" : [ {
+    "service" : "Open-Meteo",
+    "method" : "GET",
+    "url" : "https://api.open-meteo.com/v1/forecast?latitude=45.52&longitude=27.72&hourly=temperature_2m,relative_humidity_2m,precipitation,precipitation_probability,wind_speed_10m,shortwave_radiation,evapotranspiration,et0_fao_evapotranspiration,weather_code&daily=temperature_2m_max,temperature_2m_min,temperature_2m_mean,precipitation_sum,shortwave_radiation_sum,et0_fao_evapotranspiration,wind_speed_10m_max,relative_humidity_2m_mean&forecast_days=15&past_days=1&timezone=auto&wind_speed_unit=kmh",
+    "headers" : { },
+    "body" : null,
+    "timeoutMs" : 15000,
+    "retries" : 2
+  }, {
+    "service" : "Open-Meteo",
+    "method" : "GET",
+    "url" : "https://archive-api.open-meteo.com/v1/archive?latitude=45.50&longitude=27.70&start_date=2026-05-01&end_date=2026-05-31&daily=temperature_2m_max,temperature_2m_min,temperature_2m_mean,precipitation_sum,shortwave_radiation_sum,et0_fao_evapotranspiration,wind_speed_10m_max,relative_humidity_2m_mean&timezone=auto&wind_speed_unit=kmh",
+    "headers" : { },
+    "body" : null,
+    "timeoutMs" : 25000,
+    "retries" : 2
+  }, {
+    "service" : "NASA POWER",
+    "method" : "GET",
+    "url" : "https://power.larc.nasa.gov/api/temporal/daily/point?parameters=T2M,T2M_MAX,T2M_MIN,PRECTOTCORR,ALLSKY_SFC_SW_DWN&community=AG&latitude=45.1234&longitude=27.9876&start=20240101&end=20251231&format=JSON",
+    "headers" : { },
+    "body" : null,
+    "timeoutMs" : 45000,
+    "retries" : 2
+  }, {
+    "service" : "SoilGrids",
+    "method" : "GET",
+    "url" : "https://rest.isric.org/soilgrids/v2.0/properties/query?lon=27.71875&lat=45.51755&value=mean&property=phh2o&property=clay&property=sand&property=soc&property=wv0033&property=wv1500&depth=0-5cm&depth=5-15cm&depth=15-30cm",
+    "headers" : { },
+    "body" : null,
+    "timeoutMs" : 30000,
+    "retries" : 2
+  }, {
+    "service" : "OpenWeatherMap",
+    "method" : "GET",
+    "url" : "https://api.openweathermap.org/data/2.5/forecast?lat=45.5175&lon=27.7187&units=metric&appid=owm%20key%26x",
+    "headers" : { },
+    "body" : null,
+    "timeoutMs" : 15000,
+    "retries" : 2
+  }, {
+    "service" : "Sentinel Hub",
+    "method" : "POST",
+    "url" : "https://token.example/oauth",
+    "headers" : {
+      "Content-Type" : "application/x-www-form-urlencoded"
+    },
+    "body" : "grant_type=client_credentials&client_id=client+id&client_secret=secret+%26%3D",
+    "timeoutMs" : 15000,
+    "retries" : 2
+  }, {
+    "service" : "Sentinel Hub",
+    "method" : "POST",
+    "url" : "https://sh.example/api/v1/statistics",
+    "headers" : {
+      "Authorization" : "Bearer tok-1",
+      "Content-Type" : "application/json"
+    },
+    "body" : {
+      "aggregation" : {
+        "aggregationInterval" : {
+          "of" : "P1D"
+        },
+        "evalscript" : "//VERSION=3\nfunction setup() {\n  return {\n    input: [{ bands: [\"B04\", \"B05\", \"B08\", \"SCL\", \"dataMask\"] }],\n    output: [\n      { id: \"ndvi\", bands: 1, sampleType: \"FLOAT32\" },\n      { id: \"ndre\", bands: 1, sampleType: \"FLOAT32\" },\n      { id: \"dataMask\", bands: 1 }\n    ]\n  };\n}\nfunction evaluatePixel(s) {\n  var clear = (s.SCL === 4 || s.SCL === 5) ? 1 : 0;\n  return {\n    ndvi: [(s.B08 - s.B04) / (s.B08 + s.B04 + 1e-6)],\n    ndre: [(s.B08 - s.B05) / (s.B08 + s.B05 + 1e-6)],\n    dataMask: [s.dataMask * clear]\n  };\n}",
+        "resx" : 1.0E-4,
+        "resy" : 1.0E-4,
+        "timeRange" : {
+          "from" : "2026-05-01T00:00:00Z",
+          "to" : "2026-05-10T23:59:59Z"
+        }
+      },
+      "input" : {
+        "bounds" : {
+          "geometry" : {
+            "coordinates" : [ [ [ 27, 45 ], [ 27.01, 45 ], [ 27.01, 45.01 ], [ 27, 45 ] ] ],
+            "type" : "Polygon"
+          },
+          "properties" : {
+            "crs" : "http://www.opengis.net/def/crs/OGC/1.3/CRS84"
+          }
+        },
+        "data" : [ {
+          "dataFilter" : {
+            "mosaickingOrder" : "leastCC"
+          },
+          "type" : "sentinel-2-l2a"
+        } ]
+      }
+    },
+    "timeoutMs" : 60000,
+    "retries" : 2
+  }, {
+    "service" : "Sentinel Hub",
+    "method" : "POST",
+    "url" : "https://sh.example/api/v1/process",
+    "headers" : {
+      "Accept" : "image/png",
+      "Authorization" : "Bearer tok-1",
+      "Content-Type" : "application/json"
+    },
+    "body" : {
+      "evalscript" : "//VERSION=3\nfunction setup() {\n  return { input: [{ bands: [\"B04\", \"B05\", \"B08\", \"dataMask\"] }], output: { bands: 4 } };\n}\nvar ramp = [[0.1, 0xb5362a], [0.3, 0xd9a521], [0.5, 0xc7cf4a], [0.7, 0x5da342], [0.9, 0x1f6b35]];\nvar viz = new ColorRampVisualizer(ramp);\nfunction evaluatePixel(s) {\n  var v = (s.B08 - s.B04) / (s.B08 + s.B04 + 1e-6);\n  var c = viz.process(v);\n  return [c[0], c[1], c[2], s.dataMask];\n}",
+      "input" : {
+        "bounds" : {
+          "geometry" : {
+            "coordinates" : [ [ [ 27, 45 ], [ 27.01, 45 ], [ 27.01, 45.01 ], [ 27, 45 ] ] ],
+            "type" : "Polygon"
+          },
+          "properties" : {
+            "crs" : "http://www.opengis.net/def/crs/OGC/1.3/CRS84"
+          }
+        },
+        "data" : [ {
+          "dataFilter" : {
+            "timeRange" : {
+              "from" : "2026-05-01T00:00:00Z",
+              "to" : "2026-05-01T23:59:59Z"
+            }
+          },
+          "type" : "sentinel-2-l2a"
+        } ]
+      },
+      "output" : {
+        "height" : 512,
+        "responses" : [ {
+          "format" : {
+            "type" : "image/png"
+          },
+          "identifier" : "default"
+        } ],
+        "width" : 512
+      }
+    },
+    "timeoutMs" : 60000,
+    "retries" : 2
+  }, {
+    "service" : "Sentinel Hub",
+    "method" : "POST",
+    "url" : "https://sh.example/api/v1/process",
+    "headers" : {
+      "Accept" : "image/png",
+      "Authorization" : "Bearer tok-1",
+      "Content-Type" : "application/json"
+    },
+    "body" : {
+      "evalscript" : "//VERSION=3\nfunction setup() {\n  return { input: [{ bands: [\"B04\", \"B05\", \"B08\", \"dataMask\"] }], output: { bands: 4 } };\n}\nvar ramp = [[0.1, 0xb5362a], [0.3, 0xd9a521], [0.5, 0xc7cf4a], [0.7, 0x5da342], [0.9, 0x1f6b35]];\nvar viz = new ColorRampVisualizer(ramp);\nfunction evaluatePixel(s) {\n  var v = (s.B08 - s.B05) / (s.B08 + s.B05 + 1e-6);\n  var c = viz.process(v);\n  return [c[0], c[1], c[2], s.dataMask];\n}",
+      "input" : {
+        "bounds" : {
+          "geometry" : {
+            "coordinates" : [ [ [ 27, 45 ], [ 27.01, 45 ], [ 27.01, 45.01 ], [ 27, 45 ] ] ],
+            "type" : "Polygon"
+          },
+          "properties" : {
+            "crs" : "http://www.opengis.net/def/crs/OGC/1.3/CRS84"
+          }
+        },
+        "data" : [ {
+          "dataFilter" : {
+            "timeRange" : {
+              "from" : "2026-05-01T00:00:00Z",
+              "to" : "2026-05-01T23:59:59Z"
+            }
+          },
+          "type" : "sentinel-2-l2a"
+        } ]
+      },
+      "output" : {
+        "height" : 512,
+        "responses" : [ {
+          "format" : {
+            "type" : "image/png"
+          },
+          "identifier" : "default"
+        } ],
+        "width" : 512
+      }
+    },
+    "timeoutMs" : 60000,
+    "retries" : 2
+  } ]
+}

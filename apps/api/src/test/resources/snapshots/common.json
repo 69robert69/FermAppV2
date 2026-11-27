@@ -1,0 +1,647 @@
+{
+  "js" : {
+    "round" : [ 3, -2, 1, 1, 120 ],
+    "round2" : [ 1, -0.12, 2.68 ],
+    "round1" : [ 0.1, 0, 10 ],
+    "toFixed" : [ "1.00", "3", "-2", "0.10000000000000000555", "1000000000000000000000.00", "0.0" ],
+    "num" : [ "6", "2.5", "1000000000000000000000", "9223372036854775807", "NaN", "0", "0.30000000000000004", "0.0000001", "null", "5", "-12", "3.25" ],
+    "numInfinity" : {
+      "class" : "NumberFormatException",
+      "message" : "Character I is neither a decimal digit number, decimal point, nor \"e\" notation exponential mark."
+    },
+    "clamp" : [ 1, 0, 0.5 ],
+    "finite" : [ false, false, false, true ]
+  },
+  "times" : {
+    "dayMs" : 86400000,
+    "iso" : [ "2026-12-31T22:30:00.123Z", null, "1970-01-01T00:00:00.000Z" ],
+    "isoDay" : [ "2026-12-31", null ],
+    "localYear" : [ 2027, 2026 ],
+    "utc" : [ "2026-03-02T09:00:00.000Z", "2027-01-01T00:00:00.000Z", "2026-01-01T01:00:00.000Z" ],
+    "utcMidnight" : [ "2026-04-05T00:00:00.000Z", "2026-04-05T00:00:00.000Z" ],
+    "atUtcMidnight" : [ "2026-03-01T00:00:00.000Z", null ],
+    "utcDate" : "2026-12-31",
+    "plusDays" : [ "2027-01-02T10:30:00.123Z", "2026-12-31T16:30:00.123Z", "2026-12-31T22:30:00.123Z" ],
+    "nowIsMillis" : true,
+    "currentLocalYear" : true
+  },
+  "text" : {
+    "trim" : [ null, "a b", "x", " y ", "\u0001z\u0001" ],
+    "slice" : [ null, "abc", "ab" ],
+    "isBlank" : [ true, true, false ],
+    "padNumber" : [ "007", "12345", "00-5" ],
+    "containsPattern" : [ "%50\\%\\_a\\\\b%", "", "%ştefan%", "" ]
+  },
+  "concurrency" : {
+    "both" : [ 1, "x" ],
+    "mapLimitSeen" : [ 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19 ],
+    "mapLimitBounded" : true,
+    "mapLimitZeroLimit" : [ 1, 2 ],
+    "bothFailsRuntime" : {
+      "class" : "ConflictException",
+      "message" : "first failed",
+      "status" : 409,
+      "code" : "CONFLICT",
+      "details" : null
+    },
+    "bothFailsError" : {
+      "class" : "IllegalStateException",
+      "message" : "java.lang.AssertionError: boom"
+    }
+  },
+  "json" : {
+    "plainWrite" : "{\"instant\":\"2026-11-26T09:00:00.500Z\",\"six\":6,\"big\":1.0E+15,\"bigger\":1.0E+16,\"tenth\":0.1,\"nan\":null,\"infinity\":null,\"negativeZero\":0,\"tiny\":1.0E-7,\"array\":[1,2.5,null,1.0E+300],\"integer\":7}",
+    "springWrite" : "{\"instant\":\"2026-11-26T09:00:00.500Z\",\"six\":6,\"big\":1.0E+15,\"bigger\":1.0E+16,\"tenth\":0.1,\"nan\":null,\"infinity\":null,\"negativeZero\":0,\"tiny\":1.0E-7,\"array\":[1,2.5,null,1.0E+300],\"integer\":7}",
+    "instantReads" : [ "2026-04-05T00:00:00.000Z", "2026-04-05T07:00:00.000Z", "2026-04-05T07:00:00.000Z", "2026-04-05T10:00:00.123Z", "2023-11-14T22:13:20.000Z", "2023-11-14T22:13:20.000Z", "2023-11-14T22:13:20.000Z", "1969-12-31T23:59:59.995Z", {
+      "class" : "InvalidFormatException",
+      "message" : "Cannot deserialize value of type `java.time.Instant` from String \"tomorrow\": Invalid date\n at [Source: REDACTED (`StreamReadFeature.INCLUDE_SOURCE_IN_LOCATION` disabled); line: 1, column: 7] (through reference chain: com.fermapp.api.common.CommonSnapshotTest$WithInstant[\"at\"])"
+    }, {
+      "class" : "InvalidFormatException",
+      "message" : "Cannot deserialize value of type `java.time.Instant` from String \"\": Invalid date\n at [Source: REDACTED (`StreamReadFeature.INCLUDE_SOURCE_IN_LOCATION` disabled); line: 1, column: 7] (through reference chain: com.fermapp.api.common.CommonSnapshotTest$WithInstant[\"at\"])"
+    }, {
+      "class" : "MismatchedInputException",
+      "message" : "Cannot deserialize value of type `java.time.Instant` from Boolean value (token `JsonToken.VALUE_TRUE`)\n at [Source: REDACTED (`StreamReadFeature.INCLUDE_SOURCE_IN_LOCATION` disabled); line: 1, column: 7] (through reference chain: com.fermapp.api.common.CommonSnapshotTest$WithInstant[\"at\"])"
+    }, "null" ],
+    "lenientParse" : [ null, null, null, "1970-01-01T00:00:00.012Z" ]
+  },
+  "errors" : [ {
+    "class" : "BadRequestException",
+    "message" : "Bad.",
+    "status" : 400,
+    "code" : "BAD_REQUEST",
+    "details" : null,
+    "isRuntime" : true
+  }, {
+    "class" : "BadRequestException",
+    "message" : "Bad.",
+    "status" : 400,
+    "code" : "BAD_REQUEST",
+    "details" : [ "x" ],
+    "isRuntime" : true
+  }, {
+    "class" : "UnauthorizedException",
+    "message" : "Authentication required.",
+    "status" : 401,
+    "code" : "UNAUTHORIZED",
+    "details" : null,
+    "isRuntime" : true
+  }, {
+    "class" : "UnauthorizedException",
+    "message" : "Expired.",
+    "status" : 401,
+    "code" : "UNAUTHORIZED",
+    "details" : null,
+    "isRuntime" : true
+  }, {
+    "class" : "ForbiddenException",
+    "message" : "You do not have permission for this action.",
+    "status" : 403,
+    "code" : "FORBIDDEN",
+    "details" : null,
+    "isRuntime" : true
+  }, {
+    "class" : "ForbiddenException",
+    "message" : "No.",
+    "status" : 403,
+    "code" : "FORBIDDEN",
+    "details" : null,
+    "isRuntime" : true
+  }, {
+    "class" : "NotFoundException",
+    "message" : "Parcel was not found.",
+    "status" : 404,
+    "code" : "NOT_FOUND",
+    "details" : null,
+    "isRuntime" : true
+  }, {
+    "class" : "ConflictException",
+    "message" : "Busy.",
+    "status" : 409,
+    "code" : "CONFLICT",
+    "details" : null,
+    "isRuntime" : true
+  }, {
+    "class" : "ServiceNotConfiguredException",
+    "message" : "Weather is not configured on the server.",
+    "status" : 503,
+    "code" : "SERVICE_NOT_CONFIGURED",
+    "details" : null,
+    "isRuntime" : true
+  }, {
+    "class" : "UpstreamFailedException",
+    "message" : "NASA is not responding right now. Try again later.",
+    "status" : 502,
+    "code" : "UPSTREAM_FAILED",
+    "details" : null,
+    "isRuntime" : true
+  }, {
+    "class" : "RecordNotFoundException",
+    "message" : "The record was not found.",
+    "status" : 404,
+    "code" : "NOT_FOUND",
+    "details" : null,
+    "isRuntime" : true
+  }, {
+    "class" : "ApiException",
+    "message" : "Tea.",
+    "status" : 418,
+    "code" : "TEA",
+    "details" : null,
+    "isRuntime" : true
+  }, {
+    "error" : {
+      "code" : "CODE",
+      "message" : "Message."
+    }
+  }, {
+    "error" : {
+      "code" : "CODE",
+      "message" : "Message.",
+      "details" : [ {
+        "field" : "a.b",
+        "message" : "Required"
+      }, {
+        "field" : null,
+        "message" : null
+      } ]
+    }
+  }, {
+    "error" : {
+      "code" : "C"
+    }
+  } ],
+  "responses" : [ {
+    "status" : 200,
+    "headers" : { },
+    "body" : {
+      "data" : {
+        "a" : 1
+      }
+    }
+  }, {
+    "status" : 200,
+    "headers" : { },
+    "body" : {
+      "data" : null
+    }
+  }, {
+    "status" : 201,
+    "headers" : { },
+    "body" : {
+      "data" : [ 1, 2 ]
+    }
+  }, {
+    "status" : 202,
+    "headers" : { },
+    "body" : {
+      "data" : "queued"
+    }
+  }, {
+    "status" : 204,
+    "headers" : { },
+    "body" : null
+  }, {
+    "status" : 200,
+    "headers" : {
+      "Content-Disposition" : [ "attachment; filename*=UTF-8''raport%20%C4%83%C3%AE%C8%99%202026.pdf" ],
+      "Content-Type" : [ "application/pdf" ]
+    },
+    "body" : "pdf"
+  }, {
+    "status" : 200,
+    "headers" : {
+      "Content-Disposition" : [ "inline; filename*=UTF-8''photo-1" ],
+      "Content-Type" : [ "image/png" ]
+    },
+    "body" : ""
+  }, {
+    "data" : [ "x" ]
+  } ],
+  "rateLimits" : {
+    "policies" : [ {
+      "name" : "GLOBAL",
+      "window" : 60,
+      "limit" : 600,
+      "testLimit" : 100000,
+      "message" : "Too many requests. Try again shortly.",
+      "jsonBody" : true,
+      "keys" : [ "10.0.0.7", "10.0.0.8" ]
+    }, {
+      "name" : "CREDENTIALS",
+      "window" : 900,
+      "limit" : 20,
+      "testLimit" : 10000,
+      "message" : "Too many attempts. Try again in a few minutes.",
+      "jsonBody" : true,
+      "keys" : [ "10.0.0.7", "10.0.0.8" ]
+    }, {
+      "name" : "AI",
+      "window" : 60,
+      "limit" : 20,
+      "testLimit" : 10000,
+      "message" : "Too many questions in one minute. Try again shortly.",
+      "jsonBody" : true,
+      "keys" : [ "10.0.0.7", "10.0.0.8" ]
+    }, {
+      "name" : "INGEST",
+      "window" : 60,
+      "limit" : 120,
+      "testLimit" : 10000,
+      "message" : "Too many requests, please try again later.",
+      "jsonBody" : false,
+      "keys" : [ "dddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd", "anonim" ]
+    } ],
+    "CREDENTIALS" : [ {
+      "status" : 200,
+      "headers" : {
+        "RateLimit-Policy" : "20;w=900",
+        "RateLimit" : "limit=20, remaining=19, reset=900",
+        "Retry-After" : null,
+        "Content-Type" : null
+      },
+      "body" : "",
+      "call" : 1,
+      "allowed" : true
+    }, {
+      "status" : 200,
+      "headers" : {
+        "RateLimit-Policy" : "20;w=900",
+        "RateLimit" : "limit=20, remaining=0, reset=900",
+        "Retry-After" : null,
+        "Content-Type" : null
+      },
+      "body" : "",
+      "call" : 20,
+      "allowed" : true
+    }, {
+      "status" : 429,
+      "headers" : {
+        "RateLimit-Policy" : "20;w=900",
+        "RateLimit" : "limit=20, remaining=0, reset=900",
+        "Retry-After" : "900",
+        "Content-Type" : "application/json;charset=UTF-8"
+      },
+      "body" : "{\"error\":{\"code\":\"RATE_LIMITED\",\"message\":\"Too many attempts. Try again in a few minutes.\"}}",
+      "call" : 21,
+      "allowed" : false
+    } ],
+    "INGEST" : [ {
+      "status" : 200,
+      "headers" : {
+        "RateLimit-Policy" : "120;w=60",
+        "RateLimit" : "limit=120, remaining=119, reset=60",
+        "Retry-After" : null,
+        "Content-Type" : null
+      },
+      "body" : "",
+      "call" : 1,
+      "allowed" : true
+    }, {
+      "status" : 200,
+      "headers" : {
+        "RateLimit-Policy" : "120;w=60",
+        "RateLimit" : "limit=120, remaining=0, reset=60",
+        "Retry-After" : null,
+        "Content-Type" : null
+      },
+      "body" : "",
+      "call" : 120,
+      "allowed" : true
+    }, {
+      "status" : 429,
+      "headers" : {
+        "RateLimit-Policy" : "120;w=60",
+        "RateLimit" : "limit=120, remaining=0, reset=60",
+        "Retry-After" : "60",
+        "Content-Type" : "text/html; charset=utf-8"
+      },
+      "body" : "Too many requests, please try again later.",
+      "call" : 121,
+      "allowed" : false
+    } ],
+    "testEnvironment" : [ true, {
+      "status" : 200,
+      "headers" : {
+        "RateLimit-Policy" : "10000;w=60",
+        "RateLimit" : "limit=10000, remaining=9999, reset=60",
+        "Retry-After" : null,
+        "Content-Type" : null
+      },
+      "body" : ""
+    } ]
+  },
+  "bodySize" : {
+    "maxBytes" : 2097152,
+    "exceptionMessage" : "The request body is too large.",
+    "isIOException" : true,
+    "declaredTooLarge" : {
+      "status" : 413,
+      "headers" : {
+        "RateLimit-Policy" : null,
+        "RateLimit" : null,
+        "Retry-After" : null,
+        "Content-Type" : "application/json;charset=UTF-8"
+      },
+      "body" : "{\"error\":{\"code\":\"TOO_LARGE\",\"message\":\"The request body is too large.\"}}",
+      "chainCalled" : false
+    },
+    "streamed text/plain" : [ "original request", 2097162, -1, true ],
+    "streamed APPLICATION/JSON; charset=utf-8" : [ "wrapped request", {
+      "class" : "PayloadTooLargeException",
+      "message" : "The request body is too large."
+    }, -1, true ],
+    "small" : [ "{\"a\":1}", true, true ]
+  },
+  "idempotency" : {
+    "savedRecord" : {
+      "userId" : "00000000-0000-0000-0000-000000000001",
+      "key" : "kkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkk",
+      "route" : "POST /api/v1/work/start",
+      "statusCode" : 0,
+      "createdAt" : null
+    },
+    "fresh" : {
+      "class" : "Reserved",
+      "reservationId" : "00000000-0000-0000-0000-0000000000aa"
+    },
+    "tooLong" : {
+      "class" : "BadRequestException",
+      "message" : "The idempotency key is too long.",
+      "status" : 400,
+      "code" : "BAD_REQUEST",
+      "details" : null
+    },
+    "longestAllowed" : {
+      "class" : "Reserved",
+      "reservationId" : "00000000-0000-0000-0000-0000000000aa"
+    },
+    "inProgress" : {
+      "result" : {
+        "class" : "ConflictException",
+        "message" : "The operation is already being processed.",
+        "status" : 409,
+        "code" : "CONFLICT",
+        "details" : null
+      },
+      "refreshed" : false
+    },
+    "otherRoute" : {
+      "result" : {
+        "class" : "ConflictException",
+        "message" : "The idempotency key was used for a different operation.",
+        "status" : 409,
+        "code" : "CONFLICT",
+        "details" : null
+      },
+      "refreshed" : false
+    },
+    "replay" : {
+      "result" : {
+        "class" : "Replay",
+        "statusCode" : 201,
+        "response" : {
+          "data" : {
+            "id" : "w1"
+          }
+        }
+      },
+      "refreshed" : false
+    },
+    "replayNoContent" : {
+      "result" : {
+        "class" : "Replay",
+        "statusCode" : 204,
+        "response" : null
+      },
+      "refreshed" : false
+    },
+    "stale" : {
+      "result" : {
+        "class" : "Reserved",
+        "reservationId" : "00000000-0000-0000-0000-0000000000aa"
+      },
+      "refreshed" : true
+    },
+    "missing" : {
+      "result" : {
+        "class" : "ConflictException",
+        "message" : "The operation is already being processed.",
+        "status" : 409,
+        "code" : "CONFLICT",
+        "details" : null
+      },
+      "refreshed" : false
+    },
+    "completed" : [ 201, {
+      "data" : {
+        "id" : "w1"
+      }
+    } ],
+    "releaseIgnoresErrors" : "released",
+    "filter" : [ {
+      "scenario" : [ "POST", "k", 201, "{\"data\":1}", true ],
+      "status" : 201,
+      "body" : "{\"data\":1}"
+    }, {
+      "scenario" : [ "POST", "k", 409, "{}", true ],
+      "status" : 409,
+      "body" : "{}"
+    }, {
+      "scenario" : [ "POST", "k", 204, "", true ],
+      "status" : 204,
+      "body" : ""
+    }, {
+      "scenario" : [ "GET", "k", 200, "{}", true ],
+      "status" : 200,
+      "body" : "{}"
+    }, {
+      "scenario" : [ "POST", "", 200, "{}", true ],
+      "status" : 200,
+      "body" : "{}"
+    }, {
+      "scenario" : [ "POST", "k", 200, "{}", false ],
+      "status" : 200,
+      "body" : "{}"
+    } ],
+    "reservationAttribute" : "com.fermapp.api.common.web.IdempotencyInterceptor.reservation"
+  },
+  "cache" : {
+    "typeReference" : [ [ {
+      "at" : "2026-01-01T00:00:00.000Z",
+      "v" : 1.5
+    } ], [ {
+      "at" : "2026-01-01T00:00:00.000Z",
+      "v" : 1.5
+    } ], 1 ],
+    "classType" : [ "token", "token" ],
+    "expired" : [ 1, 2 ],
+    "loaderFails" : {
+      "class" : "UpstreamFailedException",
+      "message" : "Weather is not responding right now. Try again later.",
+      "status" : 502,
+      "code" : "UPSTREAM_FAILED",
+      "details" : null
+    },
+    "afterFailure" : "recovered",
+    "nullValue" : null,
+    "nullValueAgain" : null,
+    "sharedLoad" : [ [ "shared" ], 1 ],
+    "locks" : [ true, false, true ],
+    "lockKeyIsCacheKey" : "not loaded",
+    "bounded" : [ -1, -1, 5000 ],
+    "redisDown" : [ "a", "a", true, false ]
+  },
+  "storage" : {
+    "detect" : [ {
+      "contentType" : "image/jpeg",
+      "extension" : "jpg"
+    }, {
+      "contentType" : "image/png",
+      "extension" : "png"
+    }, {
+      "contentType" : "image/webp",
+      "extension" : "webp"
+    }, {
+      "contentType" : "image/heic",
+      "extension" : "heic"
+    }, null, null, null, null ],
+    "keyShape" : true,
+    "onDisk" : true,
+    "load" : true,
+    "afterRemove" : "NoSuchFileException",
+    "traversalLoad" : {
+      "class" : "IllegalArgumentException",
+      "message" : "Invalid storage key"
+    },
+    "traversalSave" : {
+      "class" : "IllegalArgumentException",
+      "message" : "Invalid storage key"
+    },
+    "traversalRemove" : "ignored"
+  },
+  "upstream" : {
+    "defaults" : [ "Svc", "GET", "/ok", { }, "null", "PT15S", 2 ],
+    "timeoutCopy" : [ "PT1S", "PT15S", true ],
+    "ok" : {
+      "a" : [ 1, 2.5 ]
+    },
+    "flaky" : {
+      "attempt" : 3
+    },
+    "flakyHits" : 3,
+    "down" : {
+      "class" : "UpstreamFailedException",
+      "message" : "Down is not responding right now. Try again later.",
+      "status" : 502,
+      "code" : "UPSTREAM_FAILED",
+      "details" : null
+    },
+    "downHits" : 3,
+    "missing" : {
+      "class" : "UpstreamFailedException",
+      "message" : "Gone is not responding right now. Try again later.",
+      "status" : 502,
+      "code" : "UPSTREAM_FAILED",
+      "details" : null
+    },
+    "missingHits" : 1,
+    "notJson" : {
+      "class" : "UpstreamFailedException",
+      "message" : "Html is not responding right now. Try again later.",
+      "status" : 502,
+      "code" : "UPSTREAM_FAILED",
+      "details" : null
+    },
+    "redirect" : {
+      "a" : [ 1, 2.5 ]
+    },
+    "timeout" : {
+      "class" : "UpstreamFailedException",
+      "message" : "Slow is not responding right now. Try again later.",
+      "status" : 502,
+      "code" : "UPSTREAM_FAILED",
+      "details" : null
+    },
+    "post" : "{\"echo\":true}",
+    "connectionRefused" : {
+      "class" : "UpstreamFailedException",
+      "message" : "Nowhere is not responding right now. Try again later.",
+      "status" : 502,
+      "code" : "UPSTREAM_FAILED",
+      "details" : null
+    },
+    "received" : [ {
+      "method" : "GET",
+      "uri" : "/ok",
+      "contentType" : null,
+      "authorization" : null,
+      "body" : ""
+    }, {
+      "method" : "GET",
+      "uri" : "/flaky",
+      "contentType" : null,
+      "authorization" : null,
+      "body" : ""
+    }, {
+      "method" : "GET",
+      "uri" : "/flaky",
+      "contentType" : null,
+      "authorization" : null,
+      "body" : ""
+    }, {
+      "method" : "GET",
+      "uri" : "/flaky",
+      "contentType" : null,
+      "authorization" : null,
+      "body" : ""
+    }, {
+      "method" : "GET",
+      "uri" : "/down",
+      "contentType" : null,
+      "authorization" : null,
+      "body" : ""
+    }, {
+      "method" : "GET",
+      "uri" : "/down",
+      "contentType" : null,
+      "authorization" : null,
+      "body" : ""
+    }, {
+      "method" : "GET",
+      "uri" : "/down",
+      "contentType" : null,
+      "authorization" : null,
+      "body" : ""
+    }, {
+      "method" : "GET",
+      "uri" : "/missing",
+      "contentType" : null,
+      "authorization" : null,
+      "body" : ""
+    }, {
+      "method" : "GET",
+      "uri" : "/notjson",
+      "contentType" : null,
+      "authorization" : null,
+      "body" : ""
+    }, {
+      "method" : "GET",
+      "uri" : "/redirect",
+      "contentType" : null,
+      "authorization" : null,
+      "body" : ""
+    }, {
+      "method" : "GET",
+      "uri" : "/ok",
+      "contentType" : null,
+      "authorization" : null,
+      "body" : ""
+    }, {
+      "method" : "POST",
+      "uri" : "/post",
+      "contentType" : "application/x-www-form-urlencoded",
+      "authorization" : "Bearer t",
+      "body" : "a=1&b=%20"
+    } ]
+  }
+}

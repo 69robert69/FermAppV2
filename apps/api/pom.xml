@@ -27,6 +27,10 @@
     <commons-compress.version>1.28.0</commons-compress.version>
     <geotools.version>32.2</geotools.version>
     <paho.version>1.2.5</paho.version>
+    <!-- Same Kotlin as the Gradle build (composeApp, shared) -->
+    <kotlin.version>2.2.20</kotlin.version>
+    <embedded-postgres.version>2.1.0</embedded-postgres.version>
+    <embedded-postgres-binaries.version>17.2.0</embedded-postgres-binaries.version>
   </properties>
 
   <repositories>
@@ -144,11 +148,18 @@
       <version>${paho.version}</version>
     </dependency>
 
-    <!-- Entity accessors -->
+    <!-- Kotlin: the API is being ported from Java file by file -->
     <dependency>
-      <groupId>org.projectlombok</groupId>
-      <artifactId>lombok</artifactId>
-      <optional>true</optional>
+      <groupId>org.jetbrains.kotlin</groupId>
+      <artifactId>kotlin-stdlib</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.jetbrains.kotlin</groupId>
+      <artifactId>kotlin-reflect</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>com.fasterxml.jackson.module</groupId>
+      <artifactId>jackson-module-kotlin</artifactId>
     </dependency>
 
     <!-- Tests -->
@@ -162,7 +173,26 @@
       <artifactId>spring-security-test</artifactId>
       <scope>test</scope>
     </dependency>
+    <!-- A real PostgreSQL for the API contract test, without Docker -->
+    <dependency>
+      <groupId>io.zonky.test</groupId>
+      <artifactId>embedded-postgres</artifactId>
+      <version>${embedded-postgres.version}</version>
+      <scope>test</scope>
+    </dependency>
   </dependencies>
+
+  <dependencyManagement>
+    <dependencies>
+      <dependency>
+        <groupId>io.zonky.test.postgres</groupId>
+        <artifactId>embedded-postgres-binaries-bom</artifactId>
+        <version>${embedded-postgres-binaries.version}</version>
+        <type>pom</type>
+        <scope>import</scope>
+      </dependency>
+    </dependencies>
+  </dependencyManagement>
 
   <build>
     <finalName>fermapp-api</finalName>
@@ -170,27 +200,100 @@
       <plugin>
         <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-maven-plugin</artifactId>
+      </plugin>
+      <!--
+        Kotlin compiles first and reads the Java sources; javac then compiles Java
+        against the Kotlin classes. Both languages can call each other.
+      -->
+      <plugin>
+        <groupId>org.jetbrains.kotlin</groupId>
+        <artifactId>kotlin-maven-plugin</artifactId>
+        <version>${kotlin.version}</version>
         <configuration>
-          <excludes>
-            <exclude>
-              <groupId>org.projectlombok</groupId>
-              <artifactId>lombok</artifactId>
-            </exclude>
-          </excludes>
+          <jvmTarget>${java.version}</jvmTarget>
+          <javaParameters>true</javaParameters>
+          <args>
+            <arg>-Xjsr305=strict</arg>
+            <!-- Puts annotations on type arguments into the bytecode, so Bean Validation sees
+                 constraints such as JsonNullable<@NotNull String> and List<@NotNull Item>. -->
+            <arg>-Xemit-jvm-type-annotations</arg>
+          </args>
+          <compilerPlugins>
+            <plugin>spring</plugin>
+            <plugin>jpa</plugin>
+            <plugin>all-open</plugin>
+          </compilerPlugins>
+          <pluginOptions>
+            <!-- Hibernate subclasses entities for lazy proxies, so they and their properties
+                 must be open; the jpa plugin only adds the no-argument constructor. -->
+            <option>all-open:annotation=jakarta.persistence.Entity</option>
+            <option>all-open:annotation=jakarta.persistence.MappedSuperclass</option>
+            <option>all-open:annotation=jakarta.persistence.Embeddable</option>
+          </pluginOptions>
         </configuration>
+        <dependencies>
+          <dependency>
+            <groupId>org.jetbrains.kotlin</groupId>
+            <artifactId>kotlin-maven-allopen</artifactId>
+            <version>${kotlin.version}</version>
+          </dependency>
+          <dependency>
+            <groupId>org.jetbrains.kotlin</groupId>
+            <artifactId>kotlin-maven-noarg</artifactId>
+            <version>${kotlin.version}</version>
+          </dependency>
+        </dependencies>
+        <executions>
+          <execution>
+            <id>compile</id>
+            <goals><goal>compile</goal></goals>
+            <configuration>
+              <sourceDirs>
+                <sourceDir>${project.basedir}/src/main/kotlin</sourceDir>
+                <sourceDir>${project.basedir}/src/main/java</sourceDir>
+              </sourceDirs>
+            </configuration>
+          </execution>
+          <execution>
+            <id>test-compile</id>
+            <goals><goal>test-compile</goal></goals>
+            <configuration>
+              <sourceDirs>
+                <sourceDir>${project.basedir}/src/test/kotlin</sourceDir>
+                <sourceDir>${project.basedir}/src/test/java</sourceDir>
+              </sourceDirs>
+            </configuration>
+          </execution>
+        </executions>
       </plugin>
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-compiler-plugin</artifactId>
+        <executions>
+          <!-- Replaced by the executions below so that javac runs after kotlinc -->
+          <execution>
+            <id>default-compile</id>
+            <phase>none</phase>
+          </execution>
+          <execution>
+            <id>default-testCompile</id>
+            <phase>none</phase>
+          </execution>
+          <execution>
+            <id>java-compile</id>
+            <phase>compile</phase>
+            <goals><goal>compile</goal></goals>
+          </execution>
+          <execution>
+            <id>java-test-compile</id>
+            <phase>test-compile</phase>
+            <goals><goal>testCompile</goal></goals>
+          </execution>
+        </executions>
         <configuration>
           <parameters>true</parameters>
-          <annotationProcessorPaths>
-            <path>
-              <groupId>org.projectlombok</groupId>
-              <artifactId>lombok</artifactId>
-              <version>${lombok.version}</version>
-            </path>
-          </annotationProcessorPaths>
+          <!-- No annotation processors: Lombok left with the Kotlin entities. -->
+          <proc>none</proc>
           <compilerArgs>
             <arg>-Xlint:unchecked</arg>
           </compilerArgs>
