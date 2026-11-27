@@ -1,0 +1,302 @@
+{
+  "apiNotFound" : {
+    "status" : 404,
+    "body" : {
+      "error" : {
+        "code" : "NOT_FOUND",
+        "message" : "Parcel was not found."
+      }
+    }
+  },
+  "apiWithDetails" : {
+    "status" : 400,
+    "body" : {
+      "error" : {
+        "code" : "BAD_REQUEST",
+        "message" : "Bad.",
+        "details" : [ {
+          "field" : "a",
+          "message" : "b"
+        } ]
+      }
+    }
+  },
+  "apiTeapot" : {
+    "status" : 418,
+    "body" : {
+      "error" : {
+        "code" : "TEA"
+      }
+    }
+  },
+  "invalidBody" : {
+    "status" : 400,
+    "body" : {
+      "error" : {
+        "code" : "BAD_REQUEST",
+        "message" : "Invalid data in the request body.",
+        "details" : [ {
+          "field" : "name",
+          "message" : "Required"
+        }, {
+          "field" : "inner.value",
+          "message" : null
+        }, {
+          "field" : "",
+          "message" : "Send either the parcel or the outline."
+        } ]
+      }
+    }
+  },
+  "invalidQueryObject" : {
+    "status" : 400,
+    "body" : {
+      "error" : {
+        "code" : "BAD_REQUEST",
+        "message" : "Invalid data in the query parameters.",
+        "details" : [ {
+          "field" : "name",
+          "message" : "Required"
+        }, {
+          "field" : "inner.value",
+          "message" : null
+        } ]
+      }
+    }
+  },
+  "constraintViolation" : {
+    "status" : 400,
+    "body" : {
+      "error" : {
+        "code" : "BAD_REQUEST",
+        "message" : "Invalid data in the query parameters.",
+        "details" : [ {
+          "field" : "value",
+          "message" : "must not be null"
+        } ]
+      }
+    }
+  },
+  "typeMismatchPath" : {
+    "status" : 400,
+    "body" : {
+      "error" : {
+        "code" : "BAD_REQUEST",
+        "message" : "Invalid data in the URL.",
+        "details" : [ {
+          "field" : "id",
+          "message" : "Invalid value."
+        } ]
+      }
+    }
+  },
+  "typeMismatchQuery" : {
+    "status" : 400,
+    "body" : {
+      "error" : {
+        "code" : "BAD_REQUEST",
+        "message" : "Invalid data in the query parameters.",
+        "details" : [ {
+          "field" : "year",
+          "message" : "Invalid value."
+        } ]
+      }
+    }
+  },
+  "missingParameter" : {
+    "status" : 400,
+    "body" : {
+      "error" : {
+        "code" : "BAD_REQUEST",
+        "message" : "Invalid data in the query parameters.",
+        "details" : [ {
+          "field" : "year",
+          "message" : "Required"
+        } ]
+      }
+    }
+  },
+  "unreadable" : [ {
+    "status" : 413,
+    "body" : {
+      "error" : {
+        "code" : "TOO_LARGE",
+        "message" : "The request body is too large."
+      }
+    }
+  }, {
+    "status" : 413,
+    "body" : {
+      "error" : {
+        "code" : "TOO_LARGE",
+        "message" : "The request body is too large."
+      }
+    }
+  }, {
+    "status" : 400,
+    "body" : {
+      "error" : {
+        "code" : "BAD_JSON",
+        "message" : "The request body is not valid JSON."
+      }
+    }
+  }, {
+    "status" : 400,
+    "body" : {
+      "error" : {
+        "code" : "BAD_REQUEST",
+        "message" : "Invalid data in the request body.",
+        "details" : [ {
+          "field" : "items.1",
+          "message" : "Invalid value."
+        } ]
+      }
+    }
+  }, {
+    "status" : 400,
+    "body" : {
+      "error" : {
+        "code" : "BAD_REQUEST",
+        "message" : "Invalid data in the request body.",
+        "details" : [ {
+          "field" : "",
+          "message" : "Invalid value."
+        } ]
+      }
+    }
+  }, {
+    "status" : 400,
+    "body" : {
+      "error" : {
+        "code" : "BAD_REQUEST",
+        "message" : "Invalid data in the request body.",
+        "details" : [ {
+          "field" : "",
+          "message" : "Required"
+        } ]
+      }
+    }
+  }, {
+    "status" : 400,
+    "body" : {
+      "error" : {
+        "code" : "BAD_REQUEST",
+        "message" : "Invalid data in the request body.",
+        "details" : [ {
+          "field" : "",
+          "message" : "Required"
+        } ]
+      }
+    }
+  } ],
+  "unsupportedMediaType" : {
+    "status" : 400,
+    "body" : {
+      "error" : {
+        "code" : "BAD_REQUEST",
+        "message" : "Invalid data in the request body.",
+        "details" : [ {
+          "field" : "",
+          "message" : "Required"
+        } ]
+      }
+    }
+  },
+  "uploadTooLarge" : {
+    "status" : 400,
+    "body" : {
+      "error" : {
+        "code" : "BAD_UPLOAD",
+        "message" : "The file exceeds the 20 MB limit."
+      }
+    }
+  },
+  "badUpload" : [ {
+    "status" : 400,
+    "body" : {
+      "error" : {
+        "code" : "BAD_UPLOAD",
+        "message" : "Invalid file."
+      }
+    }
+  }, {
+    "status" : 400,
+    "body" : {
+      "error" : {
+        "code" : "BAD_UPLOAD",
+        "message" : "Invalid file."
+      }
+    }
+  } ],
+  "integrityUnique" : {
+    "status" : 409,
+    "body" : {
+      "error" : {
+        "code" : "CONFLICT",
+        "message" : "A record with this data already exists."
+      }
+    }
+  },
+  "integrityNested" : {
+    "status" : 409,
+    "body" : {
+      "error" : {
+        "code" : "CONFLICT",
+        "message" : "A record with this data already exists."
+      }
+    }
+  },
+  "integrityOther" : {
+    "status" : 500,
+    "body" : {
+      "error" : {
+        "code" : "INTERNAL_ERROR",
+        "message" : "An internal error occurred."
+      }
+    }
+  },
+  "isUniqueViolation" : [ false, true, false, true ],
+  "recordNotFound" : [ {
+    "status" : 404,
+    "body" : {
+      "error" : {
+        "code" : "NOT_FOUND",
+        "message" : "The record was not found."
+      }
+    }
+  }, {
+    "status" : 404,
+    "body" : {
+      "error" : {
+        "code" : "NOT_FOUND",
+        "message" : "The record was not found."
+      }
+    }
+  } ],
+  "unknownRoute" : [ {
+    "status" : 404,
+    "body" : {
+      "error" : {
+        "code" : "NOT_FOUND",
+        "message" : "Route PATCH /api/v1/nowhere does not exist."
+      }
+    }
+  }, {
+    "status" : 404,
+    "body" : {
+      "error" : {
+        "code" : "NOT_FOUND",
+        "message" : "Route PATCH /api/v1/nowhere does not exist."
+      }
+    }
+  } ],
+  "unexpected" : {
+    "status" : 500,
+    "body" : {
+      "error" : {
+        "code" : "INTERNAL_ERROR",
+        "message" : "An internal error occurred."
+      }
+    }
+  }
+}
