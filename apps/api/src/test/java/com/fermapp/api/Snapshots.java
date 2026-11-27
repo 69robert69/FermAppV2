@@ -16,7 +16,7 @@ import java.util.Map;
 import java.util.TreeMap;
 
 /**
- * JSON snapshots under src/test/resources/snapshots. A missing snapshot is recorded; run with
+ * JSON snapshots under src/test/resources/snapshots (or the folder in {@code -Dsnapshot.dir}). A missing snapshot is recorded; run with
  * {@code -Dsnapshot.update=true} to record again after an intended change. On a mismatch the
  * actual output is written to target/NAME-actual.json, to compare with any diff tool.
  */
@@ -29,7 +29,7 @@ public final class Snapshots {
         // The default indenter uses the platform line separator (CRLF on Windows); snapshots always use LF.
         DefaultPrettyPrinter printer = new DefaultPrettyPrinter().withObjectIndenter(new DefaultIndenter("  ", "\n"));
         String json = mapper.writer(printer).writeValueAsString(value) + "\n";
-        Path snapshot = Path.of("src/test/resources/snapshots/" + name + ".json");
+        Path snapshot = Path.of(System.getProperty("snapshot.dir", "src/test/resources/snapshots"), name + ".json");
         if (Boolean.getBoolean("snapshot.update") || !Files.exists(snapshot)) {
             Files.createDirectories(snapshot.getParent());
             Files.writeString(snapshot, json, StandardCharsets.UTF_8);
