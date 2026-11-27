@@ -3,6 +3,7 @@ package com.fermapp.api.domain.plan
 import com.fasterxml.jackson.annotation.JsonInclude
 import com.fermapp.api.common.util.Js
 import com.fermapp.api.common.util.Times
+import com.fermapp.api.common.util.toIsoString
 import com.fermapp.api.domain.crops.CropRules
 import com.fermapp.api.domain.crops.CropRules.ClimateFit
 import com.fermapp.api.domain.crops.CropRules.CropRecommendation
@@ -253,11 +254,11 @@ object ParcelPlanner {
                 val date = addDays(sowing, definition.days)
                 // Overdue preparatory steps in a new plan are done immediately.
                 val due = if (planned && date.isBefore(today)) today else date
-                PlanStep(definition.key, definition.title, definition.taskType, Times.iso(due), definition.priority, due.isBefore(today))
+                PlanStep(definition.key, definition.title, definition.taskType, due.toIsoString(), definition.priority, due.isBefore(today))
             }
             .sortedBy { it.date }
             .toMutableList()
-        return PlanSchedule(Times.iso(sowing), Times.iso(harvest), Times.utcYear(harvest), steps)
+        return PlanSchedule(sowing.toIsoString(), harvest.toIsoString(), Times.utcYear(harvest), steps)
     }
 
     private fun joinClauses(clauses: List<String>): String = when (clauses.size) {

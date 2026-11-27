@@ -159,12 +159,21 @@ Rules for each ported file:
   it uses compensated summation, and Kotlin's `sumOf` can differ in the last bit.
 - An interface that Java records implement keeps record-style methods (`time()`, not a
   `time` property); see `WeatherRules.HourlyWeather`.
+- Keep `@Throws` where the Java method declared a checked exception that Java callers catch
+  (`FileStorage.load`, `RateLimiter.allow`): without it, their `catch` no longer compiles.
+- `Times.iso` takes and returns nullable values, as before. Kotlin code holding a non-null
+  instant uses `instant.toIsoString()`; there is deliberately no non-null overload of `iso`,
+  which Kotlin would pick for values of unknown nullability coming from Java.
 - New tests can go in `src/test/kotlin`.
 
-`DomainSnapshotTest` pins the JSON of every domain rule, written by the production ObjectMapper
-(`src/test/resources/snapshots/domain.json`, recorded from the Java implementation). A port must
-leave it unchanged; after an intended change, record it again with
-`./mvnw test -Dtest=DomainSnapshotTest -Dsnapshot.update=true` and review the diff.
+Snapshot tests record what the Java code did before each step, with the production ObjectMapper,
+in `src/test/resources/snapshots/`: `DomainSnapshotTest` (every domain rule),
+`CommonSnapshotTest` (helpers, errors, rate limiting, body limit, idempotency, cache, storage, the
+upstream HTTP client against a local server), `ExceptionHandlerSnapshotTest` (every error
+response) and `IntegrationSnapshotTest` (the requests each external client sends and what it makes
+of the answers). A port must leave them unchanged; after an intended change, record them again with
+`./mvnw test -Dsnapshot.update=true` and review the diff. Write the snapshot test for the next area
+before porting it.
 
 Order: domain rules, then utilities and integrations, then services and controllers, and the
 JPA entities last (they use Lombok).
@@ -172,7 +181,9 @@ JPA entities last (they use Lombok).
 | Area | Status |
 |---|---|
 | `domain/*` (all rules and enums) | Kotlin |
-| everything else | Java |
+| `common/*` (helpers, errors, JSON, web filters, cache, HTTP, storage) | Kotlin |
+| `integrations/*` (Open-Meteo, OpenWeatherMap, NASA POWER, SoilGrids, Sentinel, Expo, Anthropic) | Kotlin |
+| `config`, `security`, `modules`, `jobs`, `realtime`, `seed`, `persistence` | Java |
 
 Changes in behaviour made during the port, each on purpose:
 
