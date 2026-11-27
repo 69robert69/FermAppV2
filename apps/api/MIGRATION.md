@@ -165,6 +165,20 @@ Rules for each ported file:
   instant uses `instant.toIsoString()`; there is deliberately no non-null overload of `iso`,
   which Kotlin would pick for values of unknown nullability coming from Java.
 - New tests can go in `src/test/kotlin`.
+- Request bodies are plain classes with use-site targets on the constraints (`@field:NotNull`,
+  `@get:AssertTrue`). A value normalised by the Java compact constructor (`Text.trim`, defaults)
+  becomes a body property initialised from a constructor parameter; when a class mixes the two,
+  `@JsonPropertyOrder` keeps the Java field order, which the OpenAPI document follows.
+- Constraints on type arguments (`JsonNullable<@NotNull String>`, `List<@Valid X>`) only reach the
+  validator because of the `-Xemit-jvm-type-annotations` compiler flag in `pom.xml`.
+- `springdoc.enable-kotlin` is off in `application.yml`: otherwise springdoc marks every non-null
+  Kotlin property as required and the OpenAPI document changes.
+- Translate Java string helpers with care: `trim()` only strips characters up to `' '`
+  (`trim { it <= ' ' }`), `split(regex)` drops trailing empty strings, `toLowerCase()` uses the
+  default locale. A `JsonNode` is itself an `Iterable`, so `list += node` adds its children; use
+  `list.add(node)`.
+- The Lombok compiler plugin (K2) overflows the stack when Kotlin reads a Java class annotated with
+  one of its own nested annotations (`PolygonInput` was); port such a class together with its callers.
 
 Snapshot tests record what the Java code did before each step, with the production ObjectMapper,
 in `src/test/resources/snapshots/`: `DomainSnapshotTest` (every domain rule),
@@ -175,6 +189,13 @@ of the answers). A port must leave them unchanged; after an intended change, rec
 `./mvnw test -Dsnapshot.update=true` and review the diff. Write the snapshot test for the next area
 before porting it.
 
+The endpoints are covered by `ApiContractSnapshotTest`, which runs the whole application on an
+embedded PostgreSQL with the external services mocked and records about 280 calls (JSON answers,
+the text of PDFs, the cells of Excel files, export archives, the OpenAPI document). It depends on
+the current time, so it is not compared with a stored file: `./scripts/api-contract-check.sh`
+records the answers of the last commit in a temporary git worktree, then those of the working
+tree, and prints the difference. Run it after every step.
+
 Order: domain rules, then utilities and integrations, then services and controllers, and the
 JPA entities last (they use Lombok).
 
@@ -183,7 +204,8 @@ JPA entities last (they use Lombok).
 | `domain/*` (all rules and enums) | Kotlin |
 | `common/*` (helpers, errors, JSON, web filters, cache, HTTP, storage) | Kotlin |
 | `integrations/*` (Open-Meteo, OpenWeatherMap, NASA POWER, SoilGrids, Sentinel, Expo, Anthropic) | Kotlin |
-| `config`, `security`, `modules`, `jobs`, `realtime`, `seed`, `persistence` | Java |
+| `modules/*` (services, controllers, request and response types, import/export, reports) | Kotlin |
+| `config`, `security`, `jobs`, `realtime`, `seed`, `persistence`, `FermAppApplication` | Java |
 
 Changes in behaviour made during the port, each on purpose:
 

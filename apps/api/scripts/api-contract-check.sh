@@ -7,7 +7,8 @@
 # 2. The same test compares the working tree with that baseline.
 #
 # Both runs happen within a few minutes, because some answers depend on the hour of the day (see
-# ApiContractSnapshotTest). If the hour changes between the two runs, run the script again.
+# ApiContractSnapshotTest). When the hour changes between the two runs and they differ, the
+# script runs both again once.
 # On a difference, target/api-contract-actual.json holds the answers of the working tree.
 set -euo pipefail
 cd "$(dirname "$0")/.."
@@ -36,19 +37,33 @@ rm -rf "$tree/$root_rel/src/test"
 cp -r "$api/src/test" "$tree/$root_rel/src/test"
 cp "$api/pom.xml" "$tree/$root_rel/pom.xml"
 
-echo "Recording the baseline from the last commit..."
-if ! (cd "$tree/$root_rel" && contract -Dsnapshot.update=true) > "$api/target/api-contract-baseline.log" 2>&1; then
-  echo "The baseline run failed; see target/api-contract-baseline.log"
-  exit 1
-fi
+compare() {
+  rm -rf "$baseline" "$api/target/api-contract-actual.json"
+  echo "Recording the baseline from the last commit..."
+  if ! (cd "$tree/$root_rel" && contract -Dsnapshot.update=true) > "$api/target/api-contract-baseline.log" 2>&1; then
+    echo "The baseline run failed; see target/api-contract-baseline.log"
+    exit 1
+  fi
+  echo "Comparing the working tree with the baseline..."
+  contract > "$api/target/api-contract-check.log" 2>&1
+}
 
-echo "Comparing the working tree with the baseline..."
-if contract > "$api/target/api-contract-check.log" 2>&1; then
+hour="$(date +%H)"
+if compare; then
   echo "The API contract is unchanged."
-else
+  exit 0
+fi
+if [ "$(date +%H)" != "$hour" ]; then
+  echo "The hour changed between the two runs; running both again."
+  if compare; then
+    echo "The API contract is unchanged."
+    exit 0
+  fi
+fi
+{
   echo "The API contract differs (or the run failed); see target/api-contract-check.log"
   if [ -f "$api/target/api-contract-actual.json" ]; then
     diff "$baseline/api-contract.json" "$api/target/api-contract-actual.json" | head -80 || true
   fi
   exit 1
-fi
+}

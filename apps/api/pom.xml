@@ -229,6 +229,9 @@
           <javaParameters>true</javaParameters>
           <args>
             <arg>-Xjsr305=strict</arg>
+            <!-- Puts annotations on type arguments into the bytecode, so Bean Validation sees
+                 constraints such as JsonNullable<@NotNull String> and List<@NotNull Item>. -->
+            <arg>-Xemit-jvm-type-annotations</arg>
           </args>
           <compilerPlugins>
             <plugin>spring</plugin>

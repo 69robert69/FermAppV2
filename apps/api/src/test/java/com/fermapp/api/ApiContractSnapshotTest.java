@@ -780,9 +780,32 @@ class ApiContractSnapshotTest {
                 .param("orientation", "portrait"), admin);
 
         // Export and import.
+        Map<String, byte[]> exported = new LinkedHashMap<>();
         for (String format : List.of("geojson", "kml", "kmz", "shp", "lpis", "csv")) {
-            call("GET /parcels/export " + format, get("/api/v1/parcels/export").param("format", format), admin);
+            Call export = call("GET /parcels/export " + format, get("/api/v1/parcels/export").param("format", format), admin);
+            exported.put(format, export.response().getContentAsByteArray());
         }
+        // Every exported file read back by the importer, without saving anything.
+        for (String format : List.of("geojson", "kml", "kmz", "shp", "lpis")) {
+            call("POST /parcels/import dry run of the " + format + " export", multipart("/api/v1/parcels/import")
+                    .file(new MockMultipartFile("file", "parcels." + format, "application/octet-stream", exported.get(format)))
+                    .param("format", format).param("dryRun", "true"), admin);
+        }
+        // KML details: extended and schema data, multi-geometries, a trailing comma, a point and a placemark without geometry.
+        String kml = "<?xml version=\"1.0\" encoding=\"UTF-8\"?><kml xmlns=\"http://www.opengis.net/kml/2.2\"><Document>"
+                + "<Placemark><name> Field K </name><ExtendedData><Data name=\"COD\"><value>K-1</value></Data>"
+                + "<SchemaData><SimpleData name=\"judet\">Ilfov</SimpleData></SchemaData></ExtendedData>"
+                + "<MultiGeometry><Polygon><outerBoundaryIs><LinearRing><coordinates>\n 26.1,44.4,0 26.11,44.4,0\t26.11,44.41,"
+                + " 26.1,44.41,0 26.1,44.4,0 \n</coordinates></LinearRing></outerBoundaryIs></Polygon>"
+                + "<Polygon><outerBoundaryIs><LinearRing><coordinates>26.2,44.4 26.21,44.4 26.21,44.41 26.2,44.4</coordinates>"
+                + "</LinearRing></outerBoundaryIs></Polygon></MultiGeometry></Placemark>"
+                + "<Placemark><name>Spot</name><Point><coordinates>26.1,44.4</coordinates></Point></Placemark>"
+                + "<Placemark><name>Empty</name></Placemark>"
+                + "<Placemark><description>No name</description><Polygon><outerBoundaryIs><LinearRing>"
+                + "<coordinates>26.3,44.4 x,44.4 26.31,44.41 26.3,44.4</coordinates></LinearRing></outerBoundaryIs></Polygon></Placemark>"
+                + "</Document></kml>";
+        call("POST /parcels/import dry run kml details", multipart("/api/v1/parcels/import").file(new MockMultipartFile("file",
+                "fields.kml", "application/xml", kml.getBytes(StandardCharsets.UTF_8))).param("format", "kml").param("dryRun", "true"), admin);
         String geojson = json(map("type", "FeatureCollection", "features", List.of(
                 map("type", "Feature", "properties", map("name", "Imported A", "code", "IMP-A"),
                         "geometry", map("type", "Polygon", "coordinates", rectangle(26.4, 44.5, 0.01, 0.01))),
