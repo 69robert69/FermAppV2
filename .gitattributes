@@ -1,0 +1,2 @@
+# Snapshot files are compared byte for byte, so they keep LF line endings on every platform.
+apps/api/src/test/resources/snapshots/*.json text eol=lf
