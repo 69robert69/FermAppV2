@@ -29,6 +29,8 @@
     <paho.version>1.2.5</paho.version>
     <!-- Same Kotlin as the Gradle build (composeApp, shared) -->
     <kotlin.version>2.2.20</kotlin.version>
+    <embedded-postgres.version>2.1.0</embedded-postgres.version>
+    <embedded-postgres-binaries.version>17.2.0</embedded-postgres-binaries.version>
   </properties>
 
   <repositories>
@@ -178,7 +180,26 @@
       <artifactId>spring-security-test</artifactId>
       <scope>test</scope>
     </dependency>
+    <!-- A real PostgreSQL for the API contract test, without Docker -->
+    <dependency>
+      <groupId>io.zonky.test</groupId>
+      <artifactId>embedded-postgres</artifactId>
+      <version>${embedded-postgres.version}</version>
+      <scope>test</scope>
+    </dependency>
   </dependencies>
+
+  <dependencyManagement>
+    <dependencies>
+      <dependency>
+        <groupId>io.zonky.test.postgres</groupId>
+        <artifactId>embedded-postgres-binaries-bom</artifactId>
+        <version>${embedded-postgres-binaries.version}</version>
+        <type>pom</type>
+        <scope>import</scope>
+      </dependency>
+    </dependencies>
+  </dependencyManagement>
 
   <build>
     <finalName>fermapp-api</finalName>

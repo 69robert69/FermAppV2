@@ -2,9 +2,10 @@ package com.fermapp.api;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+import com.fasterxml.jackson.core.util.DefaultIndenter;
+import com.fasterxml.jackson.core.util.DefaultPrettyPrinter;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.SerializationFeature;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
@@ -25,7 +26,9 @@ public final class Snapshots {
     }
 
     public static void assertMatches(ObjectMapper mapper, String name, Object value) throws IOException {
-        String json = mapper.copy().enable(SerializationFeature.INDENT_OUTPUT).writeValueAsString(value) + "\n";
+        // The default indenter uses the platform line separator (CRLF on Windows); snapshots always use LF.
+        DefaultPrettyPrinter printer = new DefaultPrettyPrinter().withObjectIndenter(new DefaultIndenter("  ", "\n"));
+        String json = mapper.writer(printer).writeValueAsString(value) + "\n";
         Path snapshot = Path.of("src/test/resources/snapshots/" + name + ".json");
         if (Boolean.getBoolean("snapshot.update") || !Files.exists(snapshot)) {
             Files.createDirectories(snapshot.getParent());

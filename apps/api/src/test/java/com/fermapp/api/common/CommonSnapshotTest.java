@@ -554,7 +554,11 @@ class CommonSnapshotTest {
         AtomicInteger loads = new AtomicInteger();
         List<Object> first = cache.cached("k1", 60, new TypeReference<List<Map<String, Object>>>() { }, () -> {
             loads.incrementAndGet();
-            return List.of(Map.of("at", Instant.parse("2026-01-01T00:00:00Z"), "v", 1.5));
+            // An ordered map: Map.of iterates in a different order in every JVM.
+            Map<String, Object> value = new LinkedHashMap<>();
+            value.put("at", Instant.parse("2026-01-01T00:00:00Z"));
+            value.put("v", 1.5);
+            return List.of(value);
         }).stream().map(Object.class::cast).toList();
         List<Map<String, Object>> second = cache.cached("k1", 60, new TypeReference<List<Map<String, Object>>>() { }, () -> {
             loads.incrementAndGet();

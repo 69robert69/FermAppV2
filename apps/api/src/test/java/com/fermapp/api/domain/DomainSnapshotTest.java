@@ -1,11 +1,9 @@
 package com.fermapp.api.domain;
 
-import static org.assertj.core.api.Assertions.assertThat;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fermapp.api.config.JacksonConfig;
 import com.fermapp.api.domain.crops.CropRules;
 import com.fermapp.api.domain.crops.CropRules.ClimateFit;
@@ -62,9 +60,6 @@ import com.fermapp.api.domain.weather.WeatherRules.FieldOperation;
 import com.fermapp.api.domain.weather.WeatherRules.ForecastHour;
 import com.fermapp.api.domain.work.WorkMath;
 import com.fermapp.api.domain.work.WorkMath.WorkParams;
-import java.nio.charset.StandardCharsets;
-import java.nio.file.Files;
-import java.nio.file.Path;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
@@ -87,7 +82,6 @@ import org.springframework.boot.test.context.SpringBootTest;
 @SpringBootTest(classes = {JacksonAutoConfiguration.class, JacksonConfig.class})
 class DomainSnapshotTest {
 
-    private static final Path SNAPSHOT = Path.of("src/test/resources/snapshots/domain.json");
     private static final Instant NOW = Instant.parse("2026-05-20T08:30:00Z");
     private static TimeZone previousZone;
 
@@ -130,17 +124,7 @@ class DomainSnapshotTest {
         reports(out, economics);
         deserialization(out);
 
-        String json = mapper.copy().enable(SerializationFeature.INDENT_OUTPUT).writeValueAsString(out) + "\n";
-        if (Boolean.getBoolean("snapshot.update") || !Files.exists(SNAPSHOT)) {
-            Files.createDirectories(SNAPSHOT.getParent());
-            Files.writeString(SNAPSHOT, json, StandardCharsets.UTF_8);
-        }
-        String expected = Files.readString(SNAPSHOT, StandardCharsets.UTF_8);
-        if (!json.equals(expected)) {
-            // Written next to the build output so the difference can be read with any diff tool.
-            Files.writeString(Path.of("target/domain-snapshot-actual.json"), json, StandardCharsets.UTF_8);
-        }
-        assertThat(json).isEqualTo(expected);
+        com.fermapp.api.Snapshots.assertMatches(mapper, "domain", out);
     }
 
     private void enumsAndCatalogs(Map<String, Object> out) {
