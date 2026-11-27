@@ -68,7 +68,7 @@ class ParcelService(
     fun newParcel(farmId: UUID, draft: ParcelDraft): Parcel {
         val parcel = Parcel()
         parcel.farmId = farmId
-        parcel.name = draft.name
+        parcel.name = draft.name!!
         parcel.code = draft.code ?: nextCode(farmId)
         parcel.locality = draft.locality
         parcel.county = draft.county
@@ -145,7 +145,7 @@ class ParcelService(
         val created = result.parcels.map { imported ->
             Parcel().also { parcel ->
                 parcel.farmId = farmId
-                parcel.name = Text.slice(imported.name, 120)
+                parcel.name = imported.name.take(120)
                 parcel.code = assignCode(imported.code)
                 parcel.locality = imported.locality
                 parcel.county = imported.county

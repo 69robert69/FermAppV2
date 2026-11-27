@@ -131,7 +131,7 @@ class IrrigationController(
         val run = IrrigationRun()
         run.farmId = auth.farmId()
         run.parcelId = parcelId
-        run.systemType = body.systemType
+        run.systemType = body.systemType!!
         run.doseMm = body.doseMm
         run.routeLengthM = body.routeLengthM!!
         run.speedMPerH = body.speedMPerH!!
@@ -215,7 +215,7 @@ class IrrigationController(
 
         val days = if (start <= end) weather.getHistory(parcel.centerLat, parcel.centerLng, start, end) else listOf()
         val precipitationMm = days.sumOfDoubles { it.precipitationMm }
-        val irrigationMm = runs.findCompletedWithDoseSince(parcel.id, Times.utcMidnight(start)).sumOfDoubles { it.doseMm * it.progressPct / 100 }
+        val irrigationMm = runs.findCompletedWithDoseSince(parcel.id, Times.utcMidnight(start)).sumOfDoubles { it.doseMm!! * it.progressPct / 100 }
         return ApiResponse.ok(
             WaterResponse(
                 target, Crops.name(season.crop), Period(start, end), Js.round1(precipitationMm), Js.round1(irrigationMm),

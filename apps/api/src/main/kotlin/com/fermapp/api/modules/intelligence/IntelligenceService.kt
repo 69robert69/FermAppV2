@@ -242,8 +242,8 @@ class IntelligenceService(
                         it.date = date
                     }
                 }
-                row.setTMaxC(current.tMaxC)
-                row.setTMinC(current.tMinC)
+                row.tMaxC = current.tMaxC
+                row.tMinC = current.tMinC
                 row.precipitationMm = current.precipitationMm
                 row.humidityPct = current.humidityPct
                 row.windMaxKmh = current.windMaxKmh
@@ -332,7 +332,7 @@ class IntelligenceService(
             val soilMoisture = latestSoilMoisture(parcelId)
             val planList = plans.findByParcelIdOrderByCreatedAtDesc(parcelId, PageRequest.of(0, 10))
 
-            val activePlan = planList.filter { it.isActive && it.year >= year }.minByOrNull { it.year }
+            val activePlan = planList.filter { it.active && it.year >= year }.minByOrNull { it.year }
             val planData = activePlan?.data
 
             // The last crop declared in the wizard is not the crop in the field when the plan starts in a future year.
@@ -372,7 +372,7 @@ class IntelligenceService(
                 NextActionInput(
                     season?.crop, progress, weatherInput, soilMoisture,
                     observationsList.firstOrNull()?.healthClass,
-                    recentWork.map { RecentWork(it.type.name, it.startedAt) }, now,
+                    recentWork.map { RecentWork(it.type.name, it.startedAt!!) }, now,
                 ),
             )
 
@@ -397,7 +397,7 @@ class IntelligenceService(
                 workViews,
                 nextAction,
                 activePlan?.let { PlanPanel(it.id, it.year, it.createdAt, PlanService.planForRole(planData, auth.role())) },
-                planList.map { PlanHistoryItem(it.id, it.year, Crops.name(it.crop), it.trigger, it.isActive, it.createdAt) },
+                planList.map { PlanHistoryItem(it.id, it.year, Crops.name(it.crop), it.trigger, it.active, it.createdAt) },
                 TaskPanel(TaskSummary(todo, inProgress, done), taskList.map { TaskWithAssignee.of(it) }),
                 weather,
                 SoilSection.of(soilProfiles.findByParcelId(parcelId).orElse(null), mapper),

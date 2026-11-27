@@ -42,7 +42,7 @@ class IrrigationService(
         val snapshot = tx.execute {
             runs.findById(id)
                 .filter { it.status in WorkService.ACTIVE }
-                .map { Snapshot(it.farmId, it.parcel.name, RunProgress.of(it, now)) }
+                .map { Snapshot(it.farmId, it.parcel!!.name, RunProgress.of(it, now)) }
                 .orElse(null)
         } ?: return null
         if (runs.complete(id, now, snapshot.progress.percent, WorkService.ACTIVE) == 0) {

@@ -57,8 +57,8 @@ class NotificationService(
             Notification().apply {
                 farmId = input.farmId
                 this.userId = userId
-                title = input.title
-                body = input.body
+                title = input.title!!
+                body = input.body!!
                 data = input.data?.let { mapper.valueToTree(it) }
             }
         }

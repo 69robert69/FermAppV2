@@ -95,10 +95,10 @@ class DashboardController(
         val current = seasons.findActiveForYear(farmId, year)
 
         val totalAreaHa = Js.round2(active.sumOfDoubles { it.areaHa })
-        val cultivatedAreaHa = Js.round2(current.sumOfDoubles { it.parcel.areaHa })
+        val cultivatedAreaHa = Js.round2(current.sumOfDoubles { it.parcel!!.areaHa })
         val byCrop = LinkedHashMap<CropCode, Double>()
         for (season in current) {
-            byCrop.merge(season.crop, season.parcel.areaHa) { a, b -> a + b }
+            byCrop.merge(season.crop, season.parcel!!.areaHa) { a, b -> a + b }
         }
         val crops = byCrop.map { (crop, area) -> CropArea(crop, Crops.name(crop), Js.round2(area)) }.sortedByDescending { it.areaHa }
 

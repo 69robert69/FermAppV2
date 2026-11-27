@@ -207,7 +207,7 @@ class IntelligenceController(
         val observation = Observation()
         observation.parcelId = id
         observation.authorId = auth.userId()
-        observation.text = body.text
+        observation.text = body.text!!
         observation.lat = body.lat
         observation.lng = body.lng
         val saved = observations.saveAndFlush(observation)

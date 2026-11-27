@@ -64,10 +64,10 @@ class ReportService(
         val rows = works.findByFarmIdAndStartedAtBetweenOrderByStartedAtAsc(farmId, range.from, range.to).map { item ->
             row(
                 "date", day(item.startedAt),
-                "parcel", item.parcel.name,
+                "parcel", item.parcel!!.name,
                 "work", WorkViews.workLabel(item.type),
                 "machine", item.machine?.name ?: "",
-                "operator", item.operator.fullName,
+                "operator", item.operator!!.fullName,
                 "area", round(item.areaHa * item.progressPct / 100),
                 "status", statusLabel(item.status),
             )
@@ -152,12 +152,12 @@ class ReportService(
     private fun yieldReport(farmId: UUID, range: Range): ReportTable {
         val rows = seasons.findForYearOrderByParcelName(farmId, range.year).map { season ->
             row(
-                "parcel", season.parcel.name,
+                "parcel", season.parcel!!.name,
                 "crop", Crops.name(season.crop),
-                "area", season.parcel.areaHa,
+                "area", season.parcel!!.areaHa,
                 "harvest", day(season.harvestDate),
                 "yield", season.yieldT,
-                "perHa", season.yieldT?.let { round(it / season.parcel.areaHa) },
+                "perHa", season.yieldT?.let { round(it / season.parcel!!.areaHa) },
                 "moisture", season.harvestMoisture,
             )
         }
@@ -203,7 +203,7 @@ class ReportService(
         val rows = runs.findByFarmIdAndStartedAtBetweenOrderByStartedAtAsc(farmId, range.from, range.to).map { run ->
             row(
                 "date", day(run.startedAt),
-                "parcel", run.parcel.name,
+                "parcel", run.parcel!!.name,
                 "system", WorkViews.systemLabel(run.systemType),
                 "route", run.routeLengthM,
                 "hours", round(run.durationHours * run.progressPct / 100),

@@ -162,13 +162,6 @@
       <artifactId>jackson-module-kotlin</artifactId>
     </dependency>
 
-    <!-- Entity accessors -->
-    <dependency>
-      <groupId>org.projectlombok</groupId>
-      <artifactId>lombok</artifactId>
-      <optional>true</optional>
-    </dependency>
-
     <!-- Tests -->
     <dependency>
       <groupId>org.springframework.boot</groupId>
@@ -207,14 +200,6 @@
       <plugin>
         <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-maven-plugin</artifactId>
-        <configuration>
-          <excludes>
-            <exclude>
-              <groupId>org.projectlombok</groupId>
-              <artifactId>lombok</artifactId>
-            </exclude>
-          </excludes>
-        </configuration>
       </plugin>
       <!--
         Kotlin compiles first and reads the Java sources; javac then compiles Java
@@ -236,8 +221,15 @@
           <compilerPlugins>
             <plugin>spring</plugin>
             <plugin>jpa</plugin>
-            <plugin>lombok</plugin>
+            <plugin>all-open</plugin>
           </compilerPlugins>
+          <pluginOptions>
+            <!-- Hibernate subclasses entities for lazy proxies, so they and their properties
+                 must be open; the jpa plugin only adds the no-argument constructor. -->
+            <option>all-open:annotation=jakarta.persistence.Entity</option>
+            <option>all-open:annotation=jakarta.persistence.MappedSuperclass</option>
+            <option>all-open:annotation=jakarta.persistence.Embeddable</option>
+          </pluginOptions>
         </configuration>
         <dependencies>
           <dependency>
@@ -248,11 +240,6 @@
           <dependency>
             <groupId>org.jetbrains.kotlin</groupId>
             <artifactId>kotlin-maven-noarg</artifactId>
-            <version>${kotlin.version}</version>
-          </dependency>
-          <dependency>
-            <groupId>org.jetbrains.kotlin</groupId>
-            <artifactId>kotlin-maven-lombok</artifactId>
             <version>${kotlin.version}</version>
           </dependency>
         </dependencies>
@@ -305,13 +292,8 @@
         </executions>
         <configuration>
           <parameters>true</parameters>
-          <annotationProcessorPaths>
-            <path>
-              <groupId>org.projectlombok</groupId>
-              <artifactId>lombok</artifactId>
-              <version>${lombok.version}</version>
-            </path>
-          </annotationProcessorPaths>
+          <!-- No annotation processors: Lombok left with the Kotlin entities. -->
+          <proc>none</proc>
           <compilerArgs>
             <arg>-Xlint:unchecked</arg>
           </compilerArgs>

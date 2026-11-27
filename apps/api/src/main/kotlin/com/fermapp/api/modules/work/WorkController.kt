@@ -189,7 +189,7 @@ class WorkController(
         work.parcelId = parcel.id
         work.machineId = body.machineId
         work.operatorId = operatorId
-        work.type = body.type
+        work.type = body.type!!
         work.notes = body.notes
         work.areaHa = parcel.areaHa
         work.workingWidthM = width

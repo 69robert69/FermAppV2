@@ -208,7 +208,7 @@ class PlanController(
     fun plan(auth: AuthContext, @PathVariable id: UUID): ResponseEntity<ApiResponse<PlanHistory>> {
         access.requireParcel(auth.farmId(), id)
         val history = plans.findByParcelIdOrderByCreatedAtDesc(id, PageRequest.of(0, 20)).map { item ->
-            PlanVersion(item.id, item.year, item.crop, item.isActive, item.trigger, item.createdAt, PlanService.planForRole(item.data, auth.role()))
+            PlanVersion(item.id, item.year, item.crop, item.active, item.trigger, item.createdAt, PlanService.planForRole(item.data, auth.role()))
         }
         return ApiResponse.ok(PlanHistory(history.firstOrNull { it.active }, history))
     }

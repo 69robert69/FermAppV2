@@ -89,7 +89,7 @@ class AiController(
                 farmId = auth.farmId()
                 userId = auth.userId()
                 parcelId = body.parcelId
-                title = Text.slice(question, 80)
+                title = Text.slice(question, 80)!!
             },
         )
         val conversationId = conversation.id

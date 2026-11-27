@@ -2,8 +2,10 @@
 # Compares the API contract of the working tree with the last commit, back to back.
 #
 # 1. The last commit is checked out in a separate git worktree (target/contract-baseline-tree),
-#    with the tests and pom.xml of the working tree, and ApiContractSnapshotTest records a
-#    baseline from it in target/api-contract-baseline/. The working tree is not touched.
+#    with the tests of the working tree, and ApiContractSnapshotTest records a baseline from it
+#    in target/api-contract-baseline/. The working tree is not touched. The baseline keeps its
+#    own pom.xml, because the build changes with the code (Lombok left with the entities), so a
+#    test dependency must be committed before the contract test uses it.
 # 2. The same test compares the working tree with that baseline.
 #
 # Both runs happen within a few minutes, because some answers depend on the hour of the day (see
@@ -35,7 +37,6 @@ git worktree add --detach --force "$tree" HEAD > /dev/null
 root_rel="$(git rev-parse --show-prefix)"
 rm -rf "$tree/$root_rel/src/test"
 cp -r "$api/src/test" "$tree/$root_rel/src/test"
-cp "$api/pom.xml" "$tree/$root_rel/pom.xml"
 
 compare() {
   rm -rf "$baseline" "$api/target/api-contract-actual.json"

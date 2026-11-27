@@ -80,7 +80,7 @@ class WorkService(
                     val progress = RunProgress.of(work, now)
                     Snapshot(
                         work.farmId, work.parcelId, work.operatorId, work.type.name, WorkViews.workLabel(work.type),
-                        work.parcel.name, progress, fuelFor(work.machine, progress.elapsedSeconds),
+                        work.parcel!!.name, progress, fuelFor(work.machine, progress.elapsedSeconds),
                     )
                 }
                 .orElse(null)

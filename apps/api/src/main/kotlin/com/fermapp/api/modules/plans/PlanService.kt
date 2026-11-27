@@ -68,8 +68,9 @@ class PlanService(
     fun loadSiteData(lat: Double, lng: Double, parcelId: UUID?): SiteData {
         val profile = parcelId?.let { soilProfiles.findByParcelId(it).orElse(null) }
         val savedTexture = texture(profile?.texture)
-        val saved = if (profile != null && profile.status == SoilStatus.READY && profile.ph != null && savedTexture != null) {
-            PlanSoil(profile.ph, savedTexture, profile.label)
+        val savedPh = profile?.ph
+        val saved = if (profile != null && profile.status == SoilStatus.READY && savedPh != null && savedTexture != null) {
+            PlanSoil(savedPh, savedTexture, profile.label)
         } else {
             null
         }
@@ -121,7 +122,7 @@ class PlanService(
         saved.year = plan.year
         saved.crop = plan.crop
         saved.trigger = trigger
-        saved.isActive = true
+        saved.active = true
         saved.data = toJson(plan)
         plans.saveAndFlush(saved)
 

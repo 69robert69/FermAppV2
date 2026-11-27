@@ -150,8 +150,9 @@ Rules for each ported file:
 - Move it with `git mv` from `src/main/java/...` to the same package under `src/main/kotlin/...`.
 - Keep the Java API while Java callers remain: `object` + `@JvmStatic` for static helpers,
   `@JvmRecord data class` for records (same accessors and same JSON).
-- The `spring`, `jpa` and `lombok` compiler plugins are on, so Kotlin can extend Spring beans,
-  declare entities and read Lombok accessors of Java entities.
+- The `spring`, `jpa` and `all-open` compiler plugins are on: Spring beans and JPA entities are
+  open (Hibernate subclasses entities for lazy proxies) and entities get a no-argument constructor.
+  Lombok is gone; it left the build together with the Java entities.
 - Keep a reference type nullable wherever the Java code accepted or produced null. Kotlin checks
   non-null parameters at runtime, so a wrong guess turns a working Java call into an exception.
   Types read from JSON (request bodies, the Redis cache, JSON columns) need the most care.
@@ -177,8 +178,16 @@ Rules for each ported file:
   (`trim { it <= ' ' }`), `split(regex)` drops trailing empty strings, `toLowerCase()` uses the
   default locale. A `JsonNode` is itself an `Iterable`, so `list += node` adds its children; use
   `list.add(node)`.
-- The Lombok compiler plugin (K2) overflows the stack when Kotlin reads a Java class annotated with
-  one of its own nested annotations (`PolygonInput` was); port such a class together with its callers.
+- JPA entities are classes with `var` properties in the body, so the mapping annotations land on
+  the fields and Hibernate keeps field access. A column that is `nullable = false` is a
+  `lateinit var` (Hibernate reads the field directly, so an unsaved entity still stores null and
+  the database rejects it, as before). Nullable columns, relations (not loaded on an entity that
+  was just saved) and values `@PrePersist` fills in (`createdAt`, `updatedAt`, optional dates)
+  are `T? = null`, because Java code can see them before the save.
+- `ParcelPlan.active` is `active` in Kotlin and `getActive()` in Java; Lombok named it `isActive()`.
+- Spring Data checks the nullability of Kotlin repositories at runtime: a null argument for a
+  non-null parameter fails, and so does a missing row for a non-null return type. Single results
+  stay `Optional`; parameters are non-null, and callers assert validated values with `!!`.
 
 Snapshot tests record what the Java code did before each step, with the production ObjectMapper,
 in `src/test/resources/snapshots/`: `DomainSnapshotTest` (every domain rule),
@@ -196,8 +205,8 @@ the current time, so it is not compared with a stored file: `./scripts/api-contr
 records the answers of the last commit in a temporary git worktree, then those of the working
 tree, and prints the difference. Run it after every step.
 
-Order: domain rules, then utilities and integrations, then services and controllers, and the
-JPA entities last (they use Lombok).
+Order: domain rules, then utilities and integrations, then services and controllers, then the
+JPA entities and repositories, and the application infrastructure last.
 
 | Area | Status |
 |---|---|
@@ -205,7 +214,8 @@ JPA entities last (they use Lombok).
 | `common/*` (helpers, errors, JSON, web filters, cache, HTTP, storage) | Kotlin |
 | `integrations/*` (Open-Meteo, OpenWeatherMap, NASA POWER, SoilGrids, Sentinel, Expo, Anthropic) | Kotlin |
 | `modules/*` (services, controllers, request and response types, import/export, reports) | Kotlin |
-| `config`, `security`, `jobs`, `realtime`, `seed`, `persistence`, `FermAppApplication` | Java |
+| `persistence/*` (entities and repositories) | Kotlin |
+| `config`, `security`, `jobs`, `realtime`, `seed`, `FermAppApplication` | Java |
 
 Changes in behaviour made during the port, each on purpose:
 

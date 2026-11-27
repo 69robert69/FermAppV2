@@ -129,7 +129,7 @@ class EconomicsService(
                     work.id.toString(), work.type.name, work.status.name, work.areaHa, percent, work.durationHours * percent / 100,
                     work.fuelLiters,
                     machine?.let { OperationMachine(it.id.toString(), it.name, it.type.name, it.avgConsumptionLh) },
-                    OperationOperator(work.operator.id.toString(), work.operator.fullName),
+                    OperationOperator(work.operator!!.id.toString(), work.operator!!.fullName),
                     Times.iso(work.startedAt),
                 )
             }

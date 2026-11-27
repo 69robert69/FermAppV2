@@ -18,7 +18,7 @@ data class RunProgress(val percent: Double, val elapsedSeconds: Long, val remain
         @JvmStatic
         fun of(run: TimedRun, now: Instant): RunProgress {
             val durationMs = run.durationHours * 3_600_000
-            val progress = WorkMath.timedProgress(run.startedAt, durationMs, run.pausedMs.toDouble(), run.pausedAt, now)
+            val progress = WorkMath.timedProgress(run.startedAt!!, durationMs, run.pausedMs.toDouble(), run.pausedAt, now)
             val active = run.status == RunStatus.RUNNING || run.status == RunStatus.PAUSED
             return RunProgress(
                 if (active) progress.percent else run.progressPct,

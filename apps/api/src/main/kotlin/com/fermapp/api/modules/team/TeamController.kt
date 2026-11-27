@@ -52,7 +52,7 @@ class TeamController(
     data class Member(val userId: UUID?, val fullName: String?, val email: String?, val role: Role?) {
         companion object {
             fun of(membership: FarmMembership): Member {
-                val user: UserAccount = membership.user
+                val user: UserAccount = membership.user!!
                 return Member(user.id, user.fullName, user.email, membership.role)
             }
         }
@@ -93,14 +93,14 @@ class TeamController(
     @Operation(summary = "Add a member. A password is required only for new accounts.")
     @Transactional
     fun add(auth: AuthContext, @Valid @RequestBody body: AddMemberRequest): ResponseEntity<ApiResponse<Member>> {
-        var user = users.findByEmail(body.email).orElse(null)
+        var user = users.findByEmail(body.email!!).orElse(null)
         if (user == null) {
             if (body.password == null) {
                 throw Errors.badRequest("A password is required for a new account.")
             }
             user = UserAccount()
-            user.email = body.email
-            user.fullName = body.fullName
+            user.email = body.email!!
+            user.fullName = body.fullName!!
             user.passwordHash = passwords.hash(body.password)
             users.save(user)
         }
@@ -110,7 +110,7 @@ class TeamController(
         val membership = FarmMembership()
         membership.farmId = auth.farmId()
         membership.userId = user.id
-        membership.role = body.role
+        membership.role = body.role!!
         memberships.save(membership)
         return ApiResponse.created(Member(user.id, user.fullName, user.email, body.role))
     }
@@ -128,7 +128,7 @@ class TeamController(
         if (current.role == Role.ADMIN && body.role != Role.ADMIN) {
             assertAnotherAdmin(auth.farmId(), userId)
         }
-        current.role = body.role
+        current.role = body.role!!
         memberships.save(current)
         return ApiResponse.ok(Member.of(current))
     }

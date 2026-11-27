@@ -170,7 +170,7 @@ class CropController(
         access.requireParcel(auth.farmId(), id)
         val season = CropSeason()
         season.parcelId = id
-        season.crop = body.crop
+        season.crop = body.crop!!
         season.year = body.year!!
         season.sowingDate = body.sowingDate
         season.expectedHarvestDate = body.expectedHarvestDate
@@ -277,8 +277,9 @@ class CropController(
         val soil = data.first
         val climate = data.second
         val soilTexture = texture(soil?.texture)
-        val soilInput = if (soil != null && soil.status == SoilStatus.READY && soil.ph != null && soilTexture != null) {
-            SoilFit(soil.ph, soilTexture)
+        val soilPh = soil?.ph
+        val soilInput = if (soil != null && soil.status == SoilStatus.READY && soilPh != null && soilTexture != null) {
+            SoilFit(soilPh, soilTexture)
         } else {
             null
         }

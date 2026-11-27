@@ -46,18 +46,18 @@ class AuthService(
 
     @Transactional
     fun register(body: RegisterRequest): RegisterResponse {
-        if (users.existsByEmail(body.email)) {
+        if (users.existsByEmail(body.email!!)) {
             throw Errors.conflict("An account with this email address already exists.")
         }
         val hash = passwords.hash(body.password)
         val farm = Farm()
-        farm.name = body.farmName
+        farm.name = body.farmName!!
         farm.county = body.county
         farms.save(farm)
 
         val user = UserAccount()
-        user.email = body.email
-        user.fullName = body.fullName
+        user.email = body.email!!
+        user.fullName = body.fullName!!
         user.passwordHash = hash
         users.save(user)
 
@@ -73,7 +73,7 @@ class AuthService(
 
     @Transactional
     fun login(body: LoginRequest): LoginResponse {
-        val found = users.findByEmail(body.email).orElse(null)
+        val found = users.findByEmail(body.email!!).orElse(null)
         val valid = passwords.matches(body.password, found?.passwordHash)
         if (found == null || !valid) {
             throw Errors.unauthorized("Incorrect email or password.")
@@ -84,7 +84,7 @@ class AuthService(
         }
         val first = list[0]
         val session = sessions.issueSession(AuthContext(found.id, first.farmId, first.role))
-        return LoginResponse(PublicUser.of(found), FarmRef(first.farm.id, first.farm.name), first.role, farmsOf(list), session)
+        return LoginResponse(PublicUser.of(found), FarmRef(first.farm!!.id, first.farm!!.name), first.role, farmsOf(list), session)
     }
 
     /**
@@ -128,14 +128,14 @@ class AuthService(
 
     @Transactional
     fun registerPushToken(auth: AuthContext, body: PushTokenRequest) {
-        val device = pushDevices.findByToken(body.token).orElseGet { PushDevice() }
-        device.token = body.token
+        val device = pushDevices.findByToken(body.token!!).orElseGet { PushDevice() }
+        device.token = body.token!!
         device.userId = auth.userId()
         device.platform = body.platform
         pushDevices.save(device)
     }
 
     private companion object {
-        fun farmsOf(list: List<FarmMembership>): List<FarmWithRole> = list.map { FarmWithRole(it.farm.id, it.farm.name, it.role) }
+        fun farmsOf(list: List<FarmMembership>): List<FarmWithRole> = list.map { FarmWithRole(it.farm!!.id, it.farm!!.name, it.role) }
     }
 }

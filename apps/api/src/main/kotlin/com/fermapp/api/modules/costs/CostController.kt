@@ -144,7 +144,7 @@ class CostController(
         cost.farmId = auth.farmId()
         cost.parcelId = body.parcelId
         cost.year = body.year!!
-        cost.category = body.category
+        cost.category = body.category!!
         cost.amount = BigDecimal.valueOf(body.amount!!)
         cost.currency = body.currency
         cost.date = body.date

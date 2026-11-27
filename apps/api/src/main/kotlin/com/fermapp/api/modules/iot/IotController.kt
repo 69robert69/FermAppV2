@@ -89,9 +89,9 @@ class IotController(
         val key = IotService.generateDeviceKey()
         val device = IotDevice()
         device.farmId = auth.farmId()
-        device.name = body.name
-        device.kind = body.kind
-        device.protocol = body.protocol
+        device.name = body.name!!
+        device.kind = body.kind!!
+        device.protocol = body.protocol!!
         device.vendor = body.vendor
         device.parcelId = body.parcelId
         device.keyHash = key.keyHash

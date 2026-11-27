@@ -46,7 +46,7 @@ class IdempotencyService(private val records: IdempotencyRecordRepository) {
             throw Errors.conflict("The idempotency key was used for a different operation.")
         }
         if (found == null || found.statusCode == 0) {
-            if (found != null && Times.now().toEpochMilli() - found.createdAt.toEpochMilli() > STALE_RESERVATION.toMillis()) {
+            if (found != null && Times.now().toEpochMilli() - found.createdAt!!.toEpochMilli() > STALE_RESERVATION.toMillis()) {
                 found.createdAt = Times.now()
                 records.save(found)
                 return Reserved(found.id)

@@ -110,8 +110,8 @@ class MachineController(
         }
         val machine = Machine()
         machine.farmId = auth.farmId()
-        machine.name = body.name
-        machine.type = body.type
+        machine.name = body.name!!
+        machine.type = body.type!!
         machine.brand = body.brand
         machine.model = body.model
         machine.powerHp = body.powerHp

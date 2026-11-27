@@ -154,11 +154,11 @@ class TaskController(
         }
         val task = Task()
         task.farmId = auth.farmId()
-        task.type = body.type
-        task.title = body.title ?: TASK_LABELS[body.type]
+        task.type = body.type!!
+        task.title = body.title ?: TASK_LABELS.getValue(body.type!!)
         task.description = body.description
-        task.priority = body.priority
-        task.dueDate = body.dueDate
+        task.priority = body.priority!!
+        task.dueDate = body.dueDate!!
         task.parcelId = body.parcelId
         task.assigneeId = body.assigneeId
         tasks.saveAndFlush(task)
@@ -213,7 +213,7 @@ class TaskController(
         if (auth.role() == Role.OPERATOR && auth.userId() != current.assigneeId) {
             throw Errors.forbidden("You can only update tasks assigned to you.")
         }
-        current.status = body.status
+        current.status = body.status!!
         current.completedAt = if (body.status == TaskStatus.DONE) Times.now() else null
         tasks.saveAndFlush(current)
         val updated = load(id)
